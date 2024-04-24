@@ -1,0 +1,62 @@
+{
+  "name": "happy-rusty",
+  "version": "1.0.0",
+  "source": "src/mod.ts",
+  "main": "dist/main.cjs",
+  "module": "dist/main.mjs",
+  "types": "dist/types.d.ts",
+  "targets": {
+    "main": {
+      "isLibrary": true
+    },
+    "module": {
+      "isLibrary": true
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "package.json"
+  ],
+  "scripts": {
+    "clean": "npx rimraf .parcel-cache dist",
+    "check": "npx tsc --noEmit",
+    "lint": "npx eslint src/",
+    "watch": "npx parcel watch",
+    "prebuild": "npx rimraf dist",
+    "build": "npx parcel build",
+    "test": "npx jest",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JiangJie/happy-rusty.git"
+  },
+  "keywords": [
+    "rust",
+    "enum",
+    "Option",
+    "Some",
+    "None",
+    "Result",
+    "Ok",
+    "Err"
+  ],
+  "author": "jiang115jie@gmail.com",
+  "license": "GPL-3.0",
+  "description": "Porting some excellent design implementations from Rust to JavaScript.",
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@parcel/packager-ts": "^2.12.0",
+    "@parcel/transformer-typescript-types": "^2.12.0",
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "parcel": "^2.12.0",
+    "rimraf": "^5.0.5",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.4.5"
+  }
+}
