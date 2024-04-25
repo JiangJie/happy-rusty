@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
 // import { Ok, Err, type Option, type Result, None, Some } from 'happy-rusty';
-import { Ok, Err, type Option, type Result, None, Some } from '../../src/mod';
+import { Err, None, Ok, Some, type Option, type Result } from '../../src/mod';
 
 function judge(n: number): Option<Promise<Result<number, Error>>> {
     if (n < 0 || n >= 1) {
