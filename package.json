@@ -15,10 +15,10 @@
     }
   },
   "files": [
-    "dist",
     "LICENSE",
     "README.md",
-    "package.json"
+    "package.json",
+    "dist"
   ],
   "sideEffects": false,
   "scripts": {
