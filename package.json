@@ -19,6 +19,7 @@
     "README.md",
     "package.json"
   ],
+  "sideEffects": false,
   "scripts": {
     "clean": "npx rimraf .parcel-cache dist",
     "check": "npx tsc --noEmit",
