@@ -3,6 +3,9 @@
  * 用于替代null和undefined的使用。
  */
 
+/**
+ * option::Some type
+ */
 interface Some<T> {
     readonly kind: 'Some';
     readonly isSome: (this: Option<T>) => this is Some<T>;
@@ -10,6 +13,9 @@ interface Some<T> {
     readonly unwrap: () => T;
 }
 
+/**
+ * option::None type
+ */
 interface None {
     readonly kind: 'None';
     readonly isSome: <T>(this: Option<T>) => this is Some<T>;
@@ -17,6 +23,9 @@ interface None {
     readonly unwrap: () => never;
 }
 
+/**
+ * option::Option type
+ */
 export type Option<T> = Some<T> | None;
 
 /**
@@ -30,7 +39,7 @@ export type Option<T> = Some<T> | None;
  * ```
  *
  * @param value 被包裹的值，不能为null和undefined
- * @returns Some
+ * @returns {Some}
  */
 export function Some<T>(value: T): Option<T> {
     if (value == null) {
@@ -47,6 +56,7 @@ export function Some<T>(value: T): Option<T> {
 
 /**
  * `None`值是固定的
+ * @constant {None}
  */
 export const None: None = {
     kind: 'None',

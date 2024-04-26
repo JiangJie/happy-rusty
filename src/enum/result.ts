@@ -3,6 +3,9 @@
  * 用于错误处理。
  */
 
+/**
+ * result::Ok type
+ */
 interface Ok<T, E> {
     readonly kind: 'Ok';
     readonly isOk: (this: Result<T, E>) => this is Ok<T, E>;
@@ -10,6 +13,9 @@ interface Ok<T, E> {
     readonly unwrap: () => T;
 }
 
+/**
+ * result::Err type
+ */
 interface Err<T, E> {
     readonly kind: 'Err';
     readonly isOk: (this: Result<T, E>) => this is Ok<T, E>;
@@ -18,6 +24,9 @@ interface Err<T, E> {
     readonly err: () => E;
 }
 
+/**
+ * result::Result type
+ */
 export type Result<T, E> = Ok<T, E> | Err<T, E>;
 
 /**
@@ -53,7 +62,7 @@ if (res.isSome()) {
  * ```
  *
  * @param value 被包裹的值
- * @returns Ok
+ * @returns {Ok}
  */
 export function Ok<T, E>(value: T): Result<T, E> {
     return {
@@ -75,7 +84,7 @@ export function Ok<T, E>(value: T): Result<T, E> {
  * ```
  *
  * @param error 被包裹的错误
- * @returns Err
+ * @returns {Err}
  */
 export function Err<T, E>(error: E): Result<T, E> {
     return {

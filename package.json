@@ -1,5 +1,8 @@
 {
   "name": "happy-rusty",
+  "description": "Porting some excellent design implementations from Rust to JavaScript.",
+  "author": "jiang115jie@gmail.com",
+  "license": "GPL-3.0",
   "version": "1.0.1",
   "source": "./src/mod.ts",
   "main": "./dist/main.cjs",
@@ -45,9 +48,6 @@
     "Ok",
     "Err"
   ],
-  "author": "jiang115jie@gmail.com",
-  "license": "GPL-3.0",
-  "description": "Porting some excellent design implementations from Rust to JavaScript.",
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@parcel/packager-ts": "^2.12.0",
