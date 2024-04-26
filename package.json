@@ -1,10 +1,11 @@
 {
   "name": "happy-rusty",
   "version": "1.0.1",
-  "source": "src/mod.ts",
-  "main": "dist/main.cjs",
-  "module": "dist/main.mjs",
-  "types": "dist/types.d.ts",
+  "source": "./src/mod.ts",
+  "main": "./dist/main.cjs",
+  "module": "./dist/main.mjs",
+  "types": "./dist/types.d.ts",
+  "exports": "./src/mod.ts",
   "targets": {
     "main": {
       "isLibrary": true
