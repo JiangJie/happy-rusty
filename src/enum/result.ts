@@ -3,24 +3,15 @@
  * 用于错误处理。
  */
 
-/**
- * kinds of Result
- * @internal
- */
-const enum ResultKind {
-    Ok = 'Ok',
-    Err = 'Err',
-}
-
 interface Ok<T, E> {
-    readonly kind: ResultKind.Ok;
+    readonly kind: 'Ok';
     readonly isOk: (this: Result<T, E>) => this is Ok<T, E>;
     readonly isErr: (this: Result<T, E>) => this is Err<T, E>;
     readonly unwrap: () => T;
 }
 
 interface Err<T, E> {
-    readonly kind: ResultKind.Err;
+    readonly kind: 'Err';
     readonly isOk: (this: Result<T, E>) => this is Ok<T, E>;
     readonly isErr: (this: Result<T, E>) => this is Err<T, E>;
     readonly unwrap: () => never;
@@ -66,7 +57,7 @@ if (res.isSome()) {
  */
 export function Ok<T, E>(value: T): Result<T, E> {
     return {
-        kind: ResultKind.Ok,
+        kind: 'Ok',
         isOk: () => true,
         isErr: () => false,
         unwrap: () => value,
@@ -88,7 +79,7 @@ export function Ok<T, E>(value: T): Result<T, E> {
  */
 export function Err<T, E>(error: E): Result<T, E> {
     return {
-        kind: ResultKind.Err,
+        kind: 'Err',
         isOk: () => false,
         isErr: () => true,
         unwrap: () => {

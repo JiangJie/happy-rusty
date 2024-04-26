@@ -3,24 +3,15 @@
  * 用于替代null和undefined的使用。
  */
 
-/**
- * kinds of Option
- * @internal
- */
-const enum OptionKind {
-    Some = 'Some',
-    None = 'None',
-}
-
 interface Some<T> {
-    readonly kind: OptionKind.Some;
+    readonly kind: 'Some';
     readonly isSome: (this: Option<T>) => this is Some<T>;
     readonly isNone: (this: Option<T>) => this is None;
     readonly unwrap: () => T;
 }
 
 interface None {
-    readonly kind: OptionKind.None;
+    readonly kind: 'None';
     readonly isSome: <T>(this: Option<T>) => this is Some<T>;
     readonly isNone: <T>(this: Option<T>) => this is None;
     readonly unwrap: () => never;
@@ -47,7 +38,7 @@ export function Some<T>(value: T): Option<T> {
     }
 
     return {
-        kind: OptionKind.Some,
+        kind: 'Some',
         isSome: () => true,
         isNone: () => false,
         unwrap: () => value,
@@ -58,7 +49,7 @@ export function Some<T>(value: T): Option<T> {
  * `None`值是固定的
  */
 export const None: None = {
-    kind: OptionKind.None,
+    kind: 'None',
     isSome: () => false,
     isNone: () => true,
     unwrap: () => {
