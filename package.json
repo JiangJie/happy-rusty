@@ -1,6 +1,6 @@
 {
   "name": "happy-rusty",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "source": "src/mod.ts",
   "main": "dist/main.cjs",
   "module": "dist/main.mjs",
