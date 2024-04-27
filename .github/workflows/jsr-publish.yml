@@ -1,6 +1,6 @@
 # Publish to JSR.
 
-name: Publish
+name: JSR Package
 on:
   push:
     branches:
