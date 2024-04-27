@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
 // import { Some } from 'happy-rusty';
-import { Some } from '../../src/mod';
+import { Some } from '../../src/mod.ts';
 
 describe('Option', () => {
     test('unwrap Some', () => {
