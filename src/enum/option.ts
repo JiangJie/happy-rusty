@@ -51,7 +51,7 @@ export function Some<T>(value: T): Option<T> {
         isSome: () => true,
         isNone: () => false,
         unwrap: () => value,
-    };
+    } as const;
 }
 
 /**
@@ -65,4 +65,4 @@ export const None: None = {
     unwrap: () => {
         throw new Error('None can not unwrap');
     },
-};
+} as const;

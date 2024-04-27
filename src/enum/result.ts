@@ -70,7 +70,7 @@ export function Ok<T, E>(value: T): Result<T, E> {
         isOk: () => true,
         isErr: () => false,
         unwrap: () => value,
-    };
+    } as const;
 }
 
 /**
@@ -95,5 +95,5 @@ export function Err<T, E>(error: E): Result<T, E> {
             throw error;
         },
         err: () => error,
-    };
+    } as const;
 }
