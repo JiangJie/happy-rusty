@@ -3,6 +3,7 @@
  * 用于错误处理。
  */
 
+
 /**
  * result::Ok type
  */
@@ -50,12 +51,14 @@ function judge(n: number): Option<Promise<Result<number, Error>>> {
 }
 
 const res = judge(0.8);
-if (res.isSome()) {
+if (res.isNone()) {
+    console.error('invalid number');
+} else {
     const result = await res.unwrap();
     if (result.isErr()) {
         console.assert(result.err().message === 'lose');
     } else {
-        console.log(result.unwrap());
+        console.log(result.unwrap()); // must greater than 0.8
     }
 }
  *
