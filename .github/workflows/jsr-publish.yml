@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  publish:
+  publish-jsr:
     runs-on: ubuntu-latest
 
     permissions:
@@ -16,6 +16,4 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Publish package
-        run: npx jsr publish
+      - run: npx jsr publish
