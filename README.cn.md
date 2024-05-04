@@ -1,46 +1,40 @@
-<p align="center">
-    <a href="README.cn.md">[中文]</a>
-</p>
+# 在JavaScript中使用Rust特性
 
-# Use Rust features in JavaScript happily
-
-## Partial supported
+## 部分支持的特性
 
 * [option](https://doc.rust-lang.org/core/option/index.html)
 * [result](https://doc.rust-lang.org/core/result/index.html)
 
-## More is coming
+## 更多特性敬请期待
 
-## Installation
+## 安装
 
-Via [JSR](https://jsr.io/@happy-js/happy-rusty) (**recommand**)
+通过 [JSR](https://jsr.io/@happy-js/happy-rusty) (**推荐**)
 ```
 npx jsr add @happy-js/happy-rusty
 ```
 
-or just from npm
+或者直接使用 npm
 ```
 npm install --save happy-rusty
 ```
 
-for deno
+通过 deno
 ```
 deno add @happy-js/happy-rusty
 ```
 
-for bun
+通过 bun
 ```
 bunx jsr add @happy-js/happy-rusty
 ```
 
-then import to your code.
+接下来就可以在代码里引用了。
 ```ts
 import { Some, None, Ok, Err } from '@happy-js/happy-rusty';
 ```
 
-Enjoy the happiness.
-
-## Examples
+## 示例
 
 ```ts
 import { Some, None, Ok, Err } from '@happy-js/happy-rusty';

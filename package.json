@@ -12,6 +12,7 @@
   "files": [
     "LICENSE",
     "README.md",
+    "README.cn.md",
     "package.json",
     "src",
     "dist"
