@@ -1,12 +1,14 @@
 import dts from 'rollup-plugin-dts';
 import esbuild from 'rollup-plugin-esbuild';
 
+const input = 'src/mod.ts';
+
 /**
  * @type {import('rollup').RollupOptions[]}
  */
 export default [
     {
-        input: 'src/mod.ts',
+        input,
         plugins: [
             esbuild(),
         ],
@@ -21,10 +23,10 @@ export default [
                 format: 'esm',
                 sourcemap: true,
             },
-        ]
+        ],
     },
     {
-        input: 'src/mod.ts',
+        input,
         plugins: [
             dts(),
         ],
