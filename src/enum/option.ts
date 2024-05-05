@@ -43,7 +43,7 @@ export type Option<T> = Some<T> | None;
  */
 export function Some<T>(value: T): Option<T> {
     if (value == null) {
-        throw new Error('Some value can not be null or undefined');
+        throw new TypeError('Some value can not be null or undefined');
     }
 
     return {
@@ -63,6 +63,6 @@ export const None: None = {
     isSome: () => false,
     isNone: () => true,
     unwrap: () => {
-        throw new Error('None can not unwrap');
+        throw new TypeError('None can not unwrap');
     },
 } as const;
