@@ -4,6 +4,7 @@
   "author": "jiang115jie@gmail.com",
   "license": "GPL-3.0",
   "version": "1.0.5",
+  "type": "module",
   "source": "./src/mod.ts",
   "main": "./dist/main.cjs",
   "module": "./dist/main.mjs",
