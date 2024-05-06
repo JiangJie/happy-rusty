@@ -10,7 +10,9 @@ export default [
     {
         input,
         plugins: [
-            esbuild(),
+            esbuild({
+                target: 'esnext',
+            }),
         ],
         output: [
             {
