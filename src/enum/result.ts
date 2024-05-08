@@ -1,8 +1,6 @@
 /**
- * @fileoverview 仿rust的[Result](https://doc.rust-lang.org/core/result/index.html)枚举，
- * 用于错误处理。
+ * @fileoverview A Rust-inspired [Result](https://doc.rust-lang.org/core/result/index.html) enum, used for better error handling.
  */
-
 
 /**
  * result::Ok type
@@ -32,7 +30,7 @@ interface Err<T, E> {
 export type Result<T, E> = Ok<T, E> | Err<T, E>;
 
 /**
- * 创建一个`Ok`对象
+ * Create an `Ok` object.
  *
  * # Examples
  *
@@ -65,7 +63,7 @@ if (res.isNone()) {
  *
  * ```
  *
- * @param value 被包裹的值
+ * @param value The wrapped value.
  * @returns {Ok}
  */
 export function Ok<T, E>(value: T): Result<T, E> {
@@ -81,7 +79,7 @@ export function Ok<T, E>(value: T): Result<T, E> {
 }
 
 /**
- * 创建一个`Err`对象
+ * Create an `Err` object.
  *
  * # Examples
  *
@@ -90,7 +88,7 @@ export function Ok<T, E>(value: T): Result<T, E> {
  * console.assert(e.err().message === 'unknown error');
  * ```
  *
- * @param error 被包裹的错误
+ * @param error The wrapped error value.
  * @returns {Err}
  */
 export function Err<T, E>(error: E): Result<T, E> {

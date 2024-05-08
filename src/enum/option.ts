@@ -1,6 +1,5 @@
 /**
- * @fileoverview 仿rust的[Option](https://doc.rust-lang.org/core/option/index.html)枚举，
- * 用于替代null和undefined的使用。
+ * @fileoverview A Rust-inspired [Option](https://doc.rust-lang.org/core/option/index.html) enum, used as an alternative to the use of null and undefined.
  */
 
 /**
@@ -29,7 +28,7 @@ interface None {
 export type Option<T> = Some<T> | None;
 
 /**
- * 创建一个`Some`对象
+ * Create a `Some` object.
  *
  * # Examples
  *
@@ -38,10 +37,10 @@ export type Option<T> = Some<T> | None;
  * console.assert(v.unwrap() === 10);
  * ```
  *
- * @param value 被包裹的值，不能为null和undefined
+ * @param value The wrapped value which can not be null or undefined.
  * @returns {Some}
  */
-export function Some<T>(value: T): Option<T> {
+export function Some<T>(value: NonNullable<T>): Option<T> {
     if (value == null) {
         throw new TypeError('Some value can not be null or undefined');
     }
@@ -55,7 +54,8 @@ export function Some<T>(value: T): Option<T> {
 }
 
 /**
- * `None`值是固定的
+ * `None` value is freeze.
+ *
  * @constant {None}
  */
 export const None: None = {
