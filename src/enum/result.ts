@@ -12,6 +12,7 @@ interface Ok<T, E> {
     readonly isOk: (this: Result<T, E>) => this is Ok<T, E>;
     readonly isErr: (this: Result<T, E>) => this is Err<T, E>;
     readonly unwrap: () => T;
+    readonly err: () => never;
 }
 
 /**
@@ -73,6 +74,9 @@ export function Ok<T, E>(value: T): Result<T, E> {
         isOk: () => true,
         isErr: () => false,
         unwrap: () => value,
+        err: () => {
+            throw new TypeError('Ok is not Err');
+        },
     } as const;
 }
 
