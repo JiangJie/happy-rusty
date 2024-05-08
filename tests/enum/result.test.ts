@@ -1,8 +1,7 @@
 import { describe, expect, test } from '@jest/globals';
-// import { Ok, Err, type Option, type Result, None, Some } from 'happy-rusty';
-import { Err, None, Ok, Some, type Option, type Result } from '../../src/mod.ts';
+import { Err, None, Ok, Some, type AsyncIOResult, type Option } from '../../src/mod.ts';
 
-function judge(n: number): Option<Promise<Result<number, Error>>> {
+function judge(n: number): Option<AsyncIOResult<number>> {
     if (n < 0 || n >= 1) {
         return None;
     }
