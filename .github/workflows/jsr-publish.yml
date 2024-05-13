@@ -7,7 +7,30 @@ on:
       - main
 
 jobs:
+  install:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+  test:
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      - run: pnpm install
+      - run: npm test
+
   publish-jsr:
+    needs: test
     runs-on: ubuntu-latest
 
     permissions:
