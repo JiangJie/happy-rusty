@@ -1,5 +1,4 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+# This workflow will run tests using bun and then upload the coverage reports to Codecov.
 
 name: Test
 
@@ -21,3 +20,7 @@ jobs:
           bun-version: latest
       - run: npm ci
       - run: npm test
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
