@@ -19,12 +19,12 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "check": "npx tsc --noEmit",
-    "lint": "npx eslint src/",
-    "prebuild": "npx rimraf dist && npm run check && npm run lint",
-    "build": "npx rollup --config rollup.config.mjs",
+    "check": "pnpm exec tsc --noEmit",
+    "lint": "pnpm exec eslint src/",
+    "prebuild": "pnpm exec rimraf dist && pnpm run check && pnpm run lint",
+    "build": "pnpm exec rollup --config rollup.config.mjs",
     "test": "bun test --coverage",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "pnpm run build"
   },
   "repository": {
     "type": "git",
@@ -50,5 +50,6 @@
     "rollup-plugin-dts": "^6.1.0",
     "rollup-plugin-esbuild": "^6.1.1",
     "typescript": "^5.4.5"
-  }
+  },
+  "packageManager": "pnpm@9.1.1+sha512.14e915759c11f77eac07faba4d019c193ec8637229e62ec99eefb7cf3c3b75c64447882b7c485142451ee3a6b408059cdfb7b7fa0341b975f12d0f7629c71195"
 }
