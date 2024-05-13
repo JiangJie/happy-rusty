@@ -1,32 +1,29 @@
 import { describe, expect, test } from '@jest/globals';
-import { Err, None, Ok, Some, type AsyncIOResult, type Option } from '../../src/mod.ts';
+import { Err, Ok, type AsyncIOResult } from '../../src/mod.ts';
 
-function judge(n: number): Option<AsyncIOResult<number>> {
-    if (n < 0 || n >= 1) {
-        return None;
-    }
-
-    return Some(new Promise(resolve => {
+function judge(n: number): AsyncIOResult<number> {
+    return new Promise(resolve => {
         const r = Math.random();
         resolve(r > n ? Ok(r) : Err(new Error('lose')));
-    }));
+    });
 }
 
 describe('Result', () => {
-    test('unwrap Ok', () => {
-        const v = Ok(10);
-        expect(v.unwrap()).toBe(10);
+    test('unwrap Ok', async () => {
+        const res = await judge(0);
+
+        expect(res.isOk()).toBe(true);
+        expect(res.isErr()).toBe(false);
+        expect(res.unwrap()).toBeGreaterThan(0);
+        expect(res.err).toThrowError(TypeError);
     });
 
     test('handle Err', async () => {
-        const res = judge(0.8);
-        if (res.isSome()) {
-            const result = await res.unwrap();
-            if (result.isErr()) {
-                expect(result.err().message).toBe('lose');
-            } else {
-                expect(result.unwrap()).toBeGreaterThan(0.8);
-            }
-        }
+        const res = await judge(1);
+
+        expect(res.isOk()).toBe(false);
+        expect(res.isErr()).toBe(true);
+        expect(res.unwrap).toThrowError(Error);
+        expect(res.err().message).toBe('lose');
     })
 });

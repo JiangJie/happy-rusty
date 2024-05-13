@@ -5,11 +5,10 @@
   "license": "GPL-3.0",
   "version": "1.0.7",
   "type": "module",
-  "source": "./src/mod.ts",
-  "main": "./dist/main.cjs",
-  "module": "./dist/main.mjs",
-  "types": "./dist/types.d.ts",
-  "exports": "./src/mod.ts",
+  "source": "src/mod.ts",
+  "main": "dist/main.cjs",
+  "module": "dist/main.mjs",
+  "types": "dist/types.d.ts",
   "files": [
     "LICENSE",
     "README.md",
@@ -24,7 +23,7 @@
     "lint": "npx eslint src/",
     "prebuild": "npx rimraf dist && npm run check && npm run lint",
     "build": "npx rollup --config rollup.config.mjs",
-    "test": "bun test",
+    "test": "bun test --coverage",
     "prepublishOnly": "npm run build"
   },
   "repository": {
