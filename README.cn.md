@@ -1,3 +1,8 @@
+[![NPM version](http://img.shields.io/npm/v/happy-rusty.svg)](https://npmjs.org/package/happy-rusty)
+[![JSR Version](https://jsr.io/badges/@happy-js/happy-rusty)](https://jsr.io/@happy-js/happy-rusty)
+[![JSR Score](https://jsr.io/badges/@happy-js/happy-rusty/score)](https://jsr.io/@happy-js/happy-rusty/score)
+[![Build Status](https://github.com/jiangjie/happy-rusty/actions/workflows/test.yml/badge.svg)](https://github.com/jiangjie/happy-rusty/actions/workflows/test.yml)
+
 # 在JavaScript中使用Rust特性
 
 ## 部分支持的特性
@@ -9,14 +14,24 @@
 
 ## 安装
 
-通过 [JSR](https://jsr.io/@happy-js/happy-rusty) (**推荐**)
+pnpm
 ```
-npx jsr add @happy-js/happy-rusty
+pnpm add happy-rusty
 ```
 
-或者直接使用 npm
+yarn
+```
+yarn add happy-rusty
+```
+
+npm
 ```
 npm install --save happy-rusty
+```
+
+通过 JSR
+```
+jsr add @happy-js/happy-rusty
 ```
 
 通过 deno
