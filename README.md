@@ -1,13 +1,15 @@
-<p align="center">
-    <a href="README.cn.md">[中文]</a>
-</p>
+# Use Rust features in JavaScript happily
 
 [![NPM version](http://img.shields.io/npm/v/happy-rusty.svg)](https://npmjs.org/package/happy-rusty)
 [![JSR Version](https://jsr.io/badges/@happy-js/happy-rusty)](https://jsr.io/@happy-js/happy-rusty)
 [![JSR Score](https://jsr.io/badges/@happy-js/happy-rusty/score)](https://jsr.io/@happy-js/happy-rusty/score)
 [![Build Status](https://github.com/jiangjie/happy-rusty/actions/workflows/test.yml/badge.svg)](https://github.com/jiangjie/happy-rusty/actions/workflows/test.yml)
 
-# Use Rust features in JavaScript happily
+---
+
+<a href="README.cn.md">[中文]</a>
+
+---
 
 ## Partial supported
 

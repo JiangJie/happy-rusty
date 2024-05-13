@@ -1,9 +1,11 @@
+# 在JavaScript中使用Rust特性
+
 [![NPM version](http://img.shields.io/npm/v/happy-rusty.svg)](https://npmjs.org/package/happy-rusty)
 [![JSR Version](https://jsr.io/badges/@happy-js/happy-rusty)](https://jsr.io/@happy-js/happy-rusty)
 [![JSR Score](https://jsr.io/badges/@happy-js/happy-rusty/score)](https://jsr.io/@happy-js/happy-rusty/score)
 [![Build Status](https://github.com/jiangjie/happy-rusty/actions/workflows/test.yml/badge.svg)](https://github.com/jiangjie/happy-rusty/actions/workflows/test.yml)
 
-# 在JavaScript中使用Rust特性
+---
 
 ## 部分支持的特性
 
