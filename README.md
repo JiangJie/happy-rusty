@@ -52,7 +52,7 @@ bunx jsr add @happy-js/happy-rusty
 
 then import to your code.
 ```ts
-import { Some, None, Ok, Err } from '@happy-js/happy-rusty';
+import { Some, None, Ok, Err } from 'happy-rusty';
 ```
 
 Enjoy the happiness.
@@ -60,7 +60,7 @@ Enjoy the happiness.
 ## Examples
 
 ```ts
-import { Some, None, Ok, Err } from '@happy-js/happy-rusty';
+import { Some, None, Ok, Err } from 'happy-rusty';
 
 function judge(n: number): Option<Promise<Result<number, Error>>> {
     if (n < 0 || n >= 1) {

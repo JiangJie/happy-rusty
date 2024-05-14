@@ -48,13 +48,13 @@ bunx jsr add @happy-js/happy-rusty
 
 接下来就可以在代码里引用了。
 ```ts
-import { Some, None, Ok, Err } from '@happy-js/happy-rusty';
+import { Some, None, Ok, Err } from 'happy-rusty';
 ```
 
 ## 示例
 
 ```ts
-import { Some, None, Ok, Err } from '@happy-js/happy-rusty';
+import { Some, None, Ok, Err } from 'happy-rusty';
 
 function judge(n: number): Option<Promise<Result<number, Error>>> {
     if (n < 0 || n >= 1) {
