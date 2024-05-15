@@ -26,6 +26,7 @@ export default [
                 sourcemap: true,
             },
         ],
+        treeshake: 'smallest',
     },
     {
         input,
@@ -37,5 +38,6 @@ export default [
             format: 'esm',
             sourcemap: true,
         },
+        treeshake: 'smallest',
     },
 ];
