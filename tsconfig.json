@@ -1,9 +1,5 @@
 {
   "compilerOptions": {
-    // Enable latest features
-    "lib": [
-        "ESNext"
-    ],
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
