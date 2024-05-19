@@ -11,6 +11,7 @@ interface Ok<T, E> {
     readonly isErr: (this: Result<T, E>) => this is Err<T, E>;
     readonly unwrap: () => T;
     readonly err: () => never;
+    readonly expect: (msg: string) => T;
 }
 
 /**
@@ -22,6 +23,7 @@ interface Err<T, E> {
     readonly isErr: (this: Result<T, E>) => this is Err<T, E>;
     readonly unwrap: () => never;
     readonly err: () => E;
+    readonly expect: (msg: string) => never;
 }
 
 /**
@@ -75,6 +77,8 @@ export function Ok<T, E>(value: T): Result<T, E> {
         err: () => {
             throw new TypeError('Ok is not Err');
         },
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        expect: (_msg: string) => value,
     } as const;
 }
 
@@ -100,6 +104,9 @@ export function Err<T, E>(error: E): Result<T, E> {
             throw error;
         },
         err: () => error,
+        expect: (msg: string) => {
+            throw new TypeError(`${ msg }: ${ error }`);
+        },
     } as const;
 }
 
