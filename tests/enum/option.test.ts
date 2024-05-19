@@ -1,29 +1,30 @@
-import { describe, expect, test } from '@jest/globals';
+import { assert, assertThrows } from '@std/assert';
 import { None, Some, promiseToOption } from '../../src/mod.ts';
 
-describe('Option', () => {
-    test('unwrap Some', () => {
-        const v = Some(10);
+Deno.test('Option:Some', () => {
+    const v = Some(10);
 
-        expect(v.isSome()).toBe(true);
-        expect(v.isNone()).toBe(false);
-        expect(v.unwrap()).toBe(10);
-    });
+    assert(v.isSome());
+    assert(!v.isNone());
+    assert(v.unwrap() === 10);
+    assert(v.expect('value is number 10') === 10);
+    assertThrows(() => Some(null as unknown as number), TypeError);
+});
 
-    test('handle None', () => {
-        const n = Math.random();
-        const v = n > 1 ? Some(n) : None;
+Deno.test('Option:None', () => {
+    const n = Math.random();
+    const v = n > 1 ? Some(n) : None;
 
-        expect(v.isSome()).toBe(false);
-        expect(v.isNone()).toBe(true);
-        expect(v.unwrap).toThrowError(TypeError);
-    });
+    assert(!v.isSome());
+    assert(v.isNone());
+    assertThrows(v.unwrap, TypeError);
+    assertThrows(() => v.expect('value should greater than 1'), TypeError, 'value should greater than 1');
+});
 
-    test('convert from Promise', async () => {
-        const pSome = Promise.resolve(0);
-        expect((await promiseToOption(pSome)).unwrap()).toBe(0);
+Deno.test('Convert Promise to Option', async () => {
+    const pSome = Promise.resolve(0);
+    assert((await promiseToOption(pSome)).unwrap() === 0);
 
-        const pNone = Promise.reject();
-        expect((await promiseToOption(pNone)).isNone()).toBe(true);
-    });
+    const pNone = Promise.reject();
+    assert((await promiseToOption(pNone)).isNone());
 });

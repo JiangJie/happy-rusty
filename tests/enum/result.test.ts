@@ -1,4 +1,4 @@
-import { describe, expect, test } from '@jest/globals';
+import { assert, assertThrows } from "@std/assert";
 import { Err, Ok, promiseToResult, type AsyncIOResult } from '../../src/mod.ts';
 
 function judge(n: number): AsyncIOResult<number> {
@@ -8,30 +8,30 @@ function judge(n: number): AsyncIOResult<number> {
     });
 }
 
-describe('Result', () => {
-    test('unwrap Ok', async () => {
-        const res = await judge(0);
+Deno.test('Result:Ok', async () => {
+    const res = await judge(0);
 
-        expect(res.isOk()).toBe(true);
-        expect(res.isErr()).toBe(false);
-        expect(res.unwrap()).toBeGreaterThan(0);
-        expect(res.err).toThrowError(TypeError);
-    });
+    assert(res.isOk());
+    assert(!res.isErr());
+    assert(res.unwrap() > 0);
+    assert(res.expect('value should greater than 0') > 0);
+    assertThrows(res.err, TypeError);
+});
 
-    test('handle Err', async () => {
-        const res = await judge(1);
+Deno.test('Result:Err', async () => {
+    const res = await judge(1);
 
-        expect(res.isOk()).toBe(false);
-        expect(res.isErr()).toBe(true);
-        expect(res.unwrap).toThrowError(Error);
-        expect(res.err().message).toBe('lose');
-    });
+    assert(!res.isOk());
+    assert(res.isErr());
+    assertThrows(res.unwrap, Error);
+    assert(res.err().message === 'lose');
+    assertThrows(() => res.expect('value should less than 1'), TypeError, 'value should less than 1');
+});
 
-    test('convert from Promise', async () => {
-        const pSome = Promise.resolve(0);
-        expect((await promiseToResult(pSome)).unwrap()).toBe(0);
+Deno.test('Convert Promise to Result', async () => {
+    const pSome = Promise.resolve(0);
+    assert((await promiseToResult(pSome)).unwrap() === 0);
 
-        const pNone = Promise.reject(-1);
-        expect((await promiseToResult(pNone)).err()).toBe(-1);
-    });
+    const pNone = Promise.reject(-1);
+    assert((await promiseToResult(pNone)).err() === -1);
 });

@@ -1,0 +1,38 @@
+{
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "jsr:@std/assert@^0.225.2": "jsr:@std/assert@0.225.2",
+      "jsr:@std/internal@^0.225.1": "jsr:@std/internal@0.225.1"
+    },
+    "jsr": {
+      "@std/assert@0.225.2": {
+        "integrity": "6fd566c3ea01654d29c2b633298b7fc7599716336233852eb87e9843658fa192",
+        "dependencies": [
+          "jsr:@std/internal@^0.225.1"
+        ]
+      },
+      "@std/internal@0.225.1": {
+        "integrity": "7d8a812be88c2792f15ab9cf46911e521ccca50435948a8f24df5cefda96bde9"
+      }
+    }
+  },
+  "remote": {},
+  "workspace": {
+    "dependencies": [
+      "jsr:@std/assert@^0.225.2"
+    ],
+    "packageJson": {
+      "dependencies": [
+        "npm:@typescript-eslint/eslint-plugin@^7.9.0",
+        "npm:@typescript-eslint/parser@^7.9.0",
+        "npm:eslint@^8.57.0",
+        "npm:rimraf@^5.0.7",
+        "npm:rollup-plugin-dts@^6.1.1",
+        "npm:rollup-plugin-esbuild@^6.1.1",
+        "npm:rollup@^4.17.2",
+        "npm:typescript@^5.4.5"
+      ]
+    }
+  }
+}

@@ -22,9 +22,7 @@ jobs:
       - run: pnpm install
 
       - name: Run test cases
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
+        uses: denoland/setup-deno@v1
       - run: pnpm test
 
   publish-npm:

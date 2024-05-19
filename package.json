@@ -23,7 +23,8 @@
     "lint": "pnpm exec eslint src/",
     "prebuild": "pnpm exec rimraf dist && pnpm run check && pnpm run lint",
     "build": "pnpm exec rollup --config rollup.config.mjs",
-    "test": "bun test --coverage",
+    "pretest": "pnpm exec rimraf coverage",
+    "test": "deno test --coverage && deno coverage coverage && deno coverage coverage --lcov --output=coverage/cov_profile.lcov",
     "prepublishOnly": "pnpm run build"
   },
   "repository": {
@@ -41,7 +42,6 @@
     "Err"
   ],
   "devDependencies": {
-    "@jest/globals": "^29.7.0",
     "@typescript-eslint/eslint-plugin": "^7.9.0",
     "@typescript-eslint/parser": "^7.9.0",
     "eslint": "^8.57.0",
