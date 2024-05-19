@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * @fileoverview A Rust-inspired [Option](https://doc.rust-lang.org/core/option/index.html) enum, used as an alternative to the use of null and undefined.
  */
@@ -9,8 +11,14 @@ interface Some<T> {
     readonly kind: 'Some';
     readonly isSome: (this: Option<T>) => this is Some<T>;
     readonly isNone: (this: Option<T>) => this is None;
-    readonly unwrap: () => T;
+    readonly equals: (o: Option<any>) => boolean;
     readonly expect: (msg: string) => T;
+    readonly unwrap: () => T;
+    readonly unwrapOr: (defaultValue: T) => T;
+    readonly unwrapOrElse: (f: () => T) => T;
+    readonly map: <U>(f: (value: T) => NonNullable<U>) => Option<U>;
+    readonly mapOr: <U>(defaultValue: NonNullable<U>, f: (value: T) => NonNullable<U>) => Option<U>;
+    readonly mapOrElse: <U>(defaultF: () => NonNullable<U>, f: (value: T) => NonNullable<U>) => Option<U>;
 }
 
 /**
@@ -20,8 +28,14 @@ interface None {
     readonly kind: 'None';
     readonly isSome: <T>(this: Option<T>) => this is Some<T>;
     readonly isNone: <T>(this: Option<T>) => this is None;
-    readonly unwrap: () => never;
+    readonly equals: (o: Option<any>) => boolean;
     readonly expect: (msg: string) => never;
+    readonly unwrap: () => never;
+    readonly unwrapOr: <T>(defaultValue: T) => T;
+    readonly unwrapOrElse: <T>(f: () => T) => T;
+    readonly map: <U, T>(f: (value: T) => NonNullable<U>) => Option<U>;
+    readonly mapOr: <U, T>(defaultValue: NonNullable<U>, f: (value: T) => NonNullable<U>) => Option<U>;
+    readonly mapOrElse: <U, T>(defaultF: () => NonNullable<U>, f: (value: T) => NonNullable<U>) => Option<U>;
 }
 
 /**
@@ -51,9 +65,14 @@ export function Some<T>(value: NonNullable<T>): Option<T> {
         kind: 'Some',
         isSome: () => true,
         isNone: () => false,
-        unwrap: () => value,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        equals: (o: Option<any>) => o.isSome() && o.unwrap() === value,
         expect: (_msg: string) => value,
+        unwrap: () => value,
+        unwrapOr: (_defaultValue: T) => value,
+        unwrapOrElse: (_f: () => T) => value,
+        map: <U>(f: (value: T) => NonNullable<U>) => Some(f(value)),
+        mapOr: <U>(_defaultValue: NonNullable<U>, f: (value: T) => NonNullable<U>) => Some(f(value)),
+        mapOrElse: <U>(_defaultF: () => NonNullable<U>, f: (value: T) => NonNullable<U>) => Some(f(value)),
     } as const;
 }
 
@@ -66,12 +85,18 @@ export const None: None = {
     kind: 'None',
     isSome: () => false,
     isNone: () => true,
-    unwrap: () => {
-        throw new TypeError('None can not unwrap');
-    },
+    equals: (o: Option<any>) => o === None,
     expect: (msg: string) => {
         throw new TypeError(msg);
     },
+    unwrap: () => {
+        throw new TypeError('None can not unwrap');
+    },
+    unwrapOr: <T>(defaultValue: T) => defaultValue,
+    unwrapOrElse: <T>(f: () => T) => f(),
+    map: <U, T>(_f: (value: T) => NonNullable<U>) => None,
+    mapOr: <U, T>(_defaultValue: NonNullable<U>, _f: (value: T) => NonNullable<U>) => Some(_defaultValue),
+    mapOrElse: <U, T>(defaultF: () => NonNullable<U>, _f: (value: T) => NonNullable<U>) => Some(defaultF()),
 } as const;
 
 /**
