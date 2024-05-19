@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import { None, Some } from '../../src/mod.ts';
+import { None, Some, promiseToOption } from '../../src/mod.ts';
 
 describe('Option', () => {
     test('unwrap Some', () => {
@@ -17,5 +17,13 @@ describe('Option', () => {
         expect(v.isSome()).toBe(false);
         expect(v.isNone()).toBe(true);
         expect(v.unwrap).toThrowError(TypeError);
+    });
+
+    test('convert from Promise', async () => {
+        const pSome = Promise.resolve(0);
+        expect((await promiseToOption(pSome)).unwrap()).toBe(0);
+
+        const pNone = Promise.reject();
+        expect((await promiseToOption(pNone)).isNone()).toBe(true);
     });
 });

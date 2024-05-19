@@ -66,3 +66,17 @@ export const None: None = {
         throw new TypeError('None can not unwrap');
     },
 } as const;
+
+/**
+ * Convert a `Promise` to an `Option`.
+ *
+ * @param p Promise<T>
+ * @returns {Promise<Option<T>>}
+ */
+export function promiseToOption<T>(p: Promise<NonNullable<T>>): Promise<Option<T>> {
+    return p.then((x) => {
+        return Some(x);
+    }).catch(() => {
+        return None;
+    });
+}

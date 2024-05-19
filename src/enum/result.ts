@@ -102,3 +102,18 @@ export function Err<T, E>(error: E): Result<T, E> {
         err: () => error,
     } as const;
 }
+
+/**
+ * Convert a `Promise` to a `Result`.
+ *
+ * @param p Promise<T>
+ * @returns {Promise<Result<T, E>>}
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function promiseToResult<T, E = any>(p: Promise<T>): Promise<Result<T, E>> {
+    return p.then((x) => {
+        return Ok<T, E>(x);
+    }).catch((err: E) => {
+        return Err(err);
+    });
+}
