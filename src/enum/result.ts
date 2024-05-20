@@ -8,39 +8,66 @@
  * result::Ok type
  */
 interface Ok<T, E> {
+    // #region Internal properties
     readonly kind: 'Ok';
+    // #endregion
+
+    // #region Querying the variant
     readonly isOk: (this: Result<T, E>) => this is Ok<T, E>;
     readonly isErr: (this: Result<T, E>) => this is Err<T, E>;
+    // #endregion
+
+    // #region Equals comparison
     readonly equals: (r: Result<any, any>) => boolean;
+    // #endregion
+
+    // #region Extracting the contained value
     readonly expect: (msg: string) => T;
     readonly unwrap: () => T;
     readonly unwrapErr: () => never;
     readonly unwrapOr: (defaultValue: T) => T;
     readonly unwrapOrElse: (f: (e: E) => T) => T;
+    // #endregion
+
+    // #region Transforming contained values
     readonly map: <U>(f: (value: T) => U) => Result<U, E>;
     readonly mapErr: <F>(f: (error: E) => F) => Result<T, F>;
     readonly mapOr: <U>(defaultValue: U, f: (value: T) => U) => Result<U, E>;
     readonly mapOrElse: <U>(defaultF: (error: E) => U, f: (value: T) => U) => Result<U, E>;
+    // #endregion
 }
 
 /**
  * result::Err type
  */
 interface Err<T, E> {
+    // #region Internal properties
     readonly kind: 'Err';
+    // #endregion
+
+    // #region Querying the variant
     readonly isOk: (this: Result<T, E>) => this is Ok<T, E>;
     readonly isErr: (this: Result<T, E>) => this is Err<T, E>;
+    // #endregion
+
+    // #region Equals comparison
     readonly equals: (r: Result<any, any>) => boolean;
+    // #endregion
+
+    // #region Extracting the contained value
     readonly expect: (msg: string) => never;
     readonly unwrap: () => never;
     readonly unwrapErr: () => E;
     readonly unwrapOr: (defaultValue: T) => T;
     readonly unwrapOrElse: (f: (e: E) => T) => T;
+    // #endregion
+
+    // #region Transforming contained values
     readonly map: <U>(f: (value: T) => U) => Result<U, E>;
     readonly mapErr: <F>(f: (error: E) => F) => Result<T, F>;
     readonly mapOr: <U>(defaultValue: U, f: (value: T) => U) => Result<U, E>;
     readonly mapOrElse: <U>(defaultF: (error: E) => U, f: (value: T) => U) => Result<U, E>;
-
+    // #endregion
 }
 
 /**
@@ -88,9 +115,12 @@ if (res.isNone()) {
 export function Ok<T, E>(value: T): Result<T, E> {
     return {
         kind: 'Ok',
+
         isOk: () => true,
         isErr: () => false,
+
         equals: (r: Result<any, any>) => r.isOk() && r.unwrap() === value,
+
         expect: (_msg: string) => value,
         unwrap: () => value,
         unwrapErr: () => {
@@ -98,6 +128,7 @@ export function Ok<T, E>(value: T): Result<T, E> {
         },
         unwrapOr: (_defaultValue: T) => value,
         unwrapOrElse: (_f: (e: E) => T) => value,
+
         map: <U>(f: (value: T) => U) => Ok(f(value)),
         mapErr: <F>(_f: (error: E) => F) => Ok<T, F>(value),
         mapOr: <U>(_defaultValue: U, f: (value: T) => U) => Ok(f(value)),
@@ -121,9 +152,12 @@ export function Ok<T, E>(value: T): Result<T, E> {
 export function Err<T, E>(error: E): Result<T, E> {
     return {
         kind: 'Err',
+
         isOk: () => false,
         isErr: () => true,
+
         equals: (r: Result<any, any>) => r.isErr() && r.unwrapErr() === error,
+
         expect: (msg: string) => {
             throw new TypeError(`${ msg }: ${ error }`);
         },
@@ -133,6 +167,7 @@ export function Err<T, E>(error: E): Result<T, E> {
         unwrapErr: () => error,
         unwrapOr: (defaultValue: T) => defaultValue,
         unwrapOrElse: (f: (e: E) => T) => f(error),
+
         map: <U>(_f: (value: T) => U) => Err<U, E>(error),
         mapErr: <F>(f: (error: E) => F) => Err(f(error)),
         mapOr: <U>(defaultValue: U, _f: (value: T) => U) => Ok(defaultValue),
