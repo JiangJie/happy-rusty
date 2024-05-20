@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * @fileoverview A Rust-inspired [Result](https://doc.rust-lang.org/core/result/index.html) enum, used for better error handling.
  */
@@ -9,9 +11,16 @@ interface Ok<T, E> {
     readonly kind: 'Ok';
     readonly isOk: (this: Result<T, E>) => this is Ok<T, E>;
     readonly isErr: (this: Result<T, E>) => this is Err<T, E>;
-    readonly unwrap: () => T;
-    readonly err: () => never;
+    readonly equals: (r: Result<any, any>) => boolean;
     readonly expect: (msg: string) => T;
+    readonly unwrap: () => T;
+    readonly unwrapErr: () => never;
+    readonly unwrapOr: (defaultValue: T) => T;
+    readonly unwrapOrElse: (f: (e: E) => T) => T;
+    readonly map: <U>(f: (value: T) => U) => Result<U, E>;
+    readonly mapErr: <F>(f: (error: E) => F) => Result<T, F>;
+    readonly mapOr: <U>(defaultValue: U, f: (value: T) => U) => Result<U, E>;
+    readonly mapOrElse: <U>(defaultF: (error: E) => U, f: (value: T) => U) => Result<U, E>;
 }
 
 /**
@@ -21,9 +30,17 @@ interface Err<T, E> {
     readonly kind: 'Err';
     readonly isOk: (this: Result<T, E>) => this is Ok<T, E>;
     readonly isErr: (this: Result<T, E>) => this is Err<T, E>;
-    readonly unwrap: () => never;
-    readonly err: () => E;
+    readonly equals: (r: Result<any, any>) => boolean;
     readonly expect: (msg: string) => never;
+    readonly unwrap: () => never;
+    readonly unwrapErr: () => E;
+    readonly unwrapOr: (defaultValue: T) => T;
+    readonly unwrapOrElse: (f: (e: E) => T) => T;
+    readonly map: <U>(f: (value: T) => U) => Result<U, E>;
+    readonly mapErr: <F>(f: (error: E) => F) => Result<T, F>;
+    readonly mapOr: <U>(defaultValue: U, f: (value: T) => U) => Result<U, E>;
+    readonly mapOrElse: <U>(defaultF: (error: E) => U, f: (value: T) => U) => Result<U, E>;
+
 }
 
 /**
@@ -57,7 +74,7 @@ if (res.isNone()) {
 } else {
     const result = await res.unwrap();
     if (result.isErr()) {
-        console.assert(result.err().message === 'lose');
+        console.assert(result.unwrapErr().message === 'lose');
     } else {
         console.log(result.unwrap()); // must greater than 0.8
     }
@@ -73,12 +90,18 @@ export function Ok<T, E>(value: T): Result<T, E> {
         kind: 'Ok',
         isOk: () => true,
         isErr: () => false,
+        equals: (r: Result<any, any>) => r.isOk() && r.unwrap() === value,
+        expect: (_msg: string) => value,
         unwrap: () => value,
-        err: () => {
+        unwrapErr: () => {
             throw new TypeError('Ok is not Err');
         },
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        expect: (_msg: string) => value,
+        unwrapOr: (_defaultValue: T) => value,
+        unwrapOrElse: (_f: (e: E) => T) => value,
+        map: <U>(f: (value: T) => U) => Ok(f(value)),
+        mapErr: <F>(_f: (error: E) => F) => Ok<T, F>(value),
+        mapOr: <U>(_defaultValue: U, f: (value: T) => U) => Ok(f(value)),
+        mapOrElse: <U>(_defaultF: (error: E) => U, f: (value: T) => U) => Ok(f(value)),
     } as const;
 }
 
@@ -89,7 +112,7 @@ export function Ok<T, E>(value: T): Result<T, E> {
  *
  * ```
  * const e = Err(new Error('unknown error'));
- * console.assert(e.err().message === 'unknown error');
+ * console.assert(e.unwrapErr().message === 'unknown error');
  * ```
  *
  * @param error The wrapped error value.
@@ -100,13 +123,20 @@ export function Err<T, E>(error: E): Result<T, E> {
         kind: 'Err',
         isOk: () => false,
         isErr: () => true,
-        unwrap: () => {
-            throw error;
-        },
-        err: () => error,
+        equals: (r: Result<any, any>) => r.isErr() && r.unwrapErr() === error,
         expect: (msg: string) => {
             throw new TypeError(`${ msg }: ${ error }`);
         },
+        unwrap: () => {
+            throw error;
+        },
+        unwrapErr: () => error,
+        unwrapOr: (defaultValue: T) => defaultValue,
+        unwrapOrElse: (f: (e: E) => T) => f(error),
+        map: <U>(_f: (value: T) => U) => Err<U, E>(error),
+        mapErr: <F>(f: (error: E) => F) => Err(f(error)),
+        mapOr: <U>(defaultValue: U, _f: (value: T) => U) => Ok(defaultValue),
+        mapOrElse: <U>(defaultF: (error: E) => U, _f: (value: T) => U) => Ok(defaultF(error)),
     } as const;
 }
 

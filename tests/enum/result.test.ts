@@ -13,9 +13,20 @@ Deno.test('Result:Ok', async () => {
 
     assert(res.isOk());
     assert(!res.isErr());
-    assert(res.unwrap() > 0);
+
+    assert(res.equals(Ok(res.unwrap())));
+
     assert(res.expect('value should greater than 0') > 0);
-    assertThrows(res.err, TypeError);
+
+    assert(res.unwrap() > 0);
+    assertThrows(res.unwrapErr, TypeError);
+    assert(res.unwrapOr(0) > 0);
+    assert(res.unwrapOrElse((_e) => 0) > 0);
+
+    assert(res.map(_v => 1).equals(Ok(1)));
+    assert(res.mapErr(_error => 0).unwrap() > 0);
+    assert(res.mapOr(0, _v => 1).equals(Ok(1)));
+    assert(res.mapOrElse(_error => 0, _v => 1).equals(Ok(1)));
 });
 
 Deno.test('Result:Err', async () => {
@@ -23,9 +34,20 @@ Deno.test('Result:Err', async () => {
 
     assert(!res.isOk());
     assert(res.isErr());
-    assertThrows(res.unwrap, Error);
-    assert(res.err().message === 'lose');
+
+    assert(res.equals(Err(res.unwrapErr())));
+
     assertThrows(() => res.expect('value should less than 1'), TypeError, 'value should less than 1');
+
+    assertThrows(res.unwrap, Error);
+    assert(res.unwrapErr().message === 'lose');
+    assert(res.unwrapOr(0) === 0);
+    assert(res.unwrapOrElse((e) => e.message.length) === 4);
+
+    assert(res.map(_v => 1).equals(Err(res.unwrapErr())));
+    assert(res.mapErr(_error => 0).unwrapErr() === 0);
+    assert(res.mapOr(0, _v => 1).equals(Ok(0)));
+    assert(res.mapOrElse(_error => 0, _v => 1).equals(Ok(0)));
 });
 
 Deno.test('Convert Promise to Result', async () => {
@@ -33,5 +55,5 @@ Deno.test('Convert Promise to Result', async () => {
     assert((await promiseToResult(pSome)).unwrap() === 0);
 
     const pNone = Promise.reject(-1);
-    assert((await promiseToResult(pNone)).err() === -1);
+    assert((await promiseToResult(pNone)).unwrapErr() === -1);
 });
