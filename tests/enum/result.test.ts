@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { assert, assertThrows } from "@std/assert";
 import { Err, Ok, promiseToResult, type AsyncIOResult } from '../../src/mod.ts';
 
@@ -9,51 +10,51 @@ function judge(n: number): AsyncIOResult<number> {
 }
 
 Deno.test('Result:Ok', async () => {
-    const res = await judge(0);
+    const r = await judge(0);
 
-    assert(res.isOk());
-    assert(!res.isErr());
+    assert(r.isOk());
+    assert(!r.isErr());
 
-    assert(res.equals(Ok(res.unwrap())));
+    assert(r.equals(Ok(r.unwrap())));
 
-    assert(res.expect('value should greater than 0') > 0);
+    assert(r.expect('value should greater than 0') > 0);
 
-    assert(res.unwrap() > 0);
-    assertThrows(res.unwrapErr, TypeError);
-    assert(res.unwrapOr(0) > 0);
-    assert(res.unwrapOrElse((_e) => 0) > 0);
+    assert(r.unwrap() > 0);
+    assertThrows(r.unwrapErr, TypeError);
+    assert(r.unwrapOr(0) > 0);
+    assert(r.unwrapOrElse((_err) => 0) > 0);
 
-    assert(res.map(_v => 1).equals(Ok(1)));
-    assert(res.mapErr(_error => 0).unwrap() > 0);
-    assert(res.mapOr(0, _v => 1).equals(Ok(1)));
-    assert(res.mapOrElse(_error => 0, _v => 1).equals(Ok(1)));
+    assert(r.map(_v => 1).equals(Ok(1)));
+    assert(r.mapErr(_err => 0).unwrap() > 0);
+    assert(r.mapOr(0, _v => 1).equals(Ok(1)));
+    assert(r.mapOrElse(_err => 0, _v => 1).equals(Ok(1)));
 });
 
 Deno.test('Result:Err', async () => {
-    const res = await judge(1);
+    const r = await judge(1);
 
-    assert(!res.isOk());
-    assert(res.isErr());
+    assert(!r.isOk());
+    assert(r.isErr());
 
-    assert(res.equals(Err(res.unwrapErr())));
+    assert(r.equals(Err(r.unwrapErr())));
 
-    assertThrows(() => res.expect('value should less than 1'), TypeError, 'value should less than 1');
+    assertThrows(() => r.expect('value should less than 1'), TypeError, 'value should less than 1');
 
-    assertThrows(res.unwrap, Error);
-    assert(res.unwrapErr().message === 'lose');
-    assert(res.unwrapOr(0) === 0);
-    assert(res.unwrapOrElse((e) => e.message.length) === 4);
+    assertThrows(r.unwrap, Error);
+    assert(r.unwrapErr().message === 'lose');
+    assert(r.unwrapOr(0) === 0);
+    assert(r.unwrapOrElse((err) => err.message.length) === 4);
 
-    assert(res.map(_v => 1).equals(Err(res.unwrapErr())));
-    assert(res.mapErr(_error => 0).unwrapErr() === 0);
-    assert(res.mapOr(0, _v => 1).equals(Ok(0)));
-    assert(res.mapOrElse(_error => 0, _v => 1).equals(Ok(0)));
+    assert(r.map(_v => 1).equals(Err(r.unwrapErr())));
+    assert(r.mapErr(_err => 0).unwrapErr() === 0);
+    assert(r.mapOr(0, _v => 1).equals(Ok(0)));
+    assert(r.mapOrElse(_err => 0, _v => 1).equals(Ok(0)));
 });
 
-Deno.test('Convert Promise to Result', async () => {
-    const pSome = Promise.resolve(0);
-    assert((await promiseToResult(pSome)).unwrap() === 0);
+Deno.test('Convert from Promise to Result', async () => {
+    const pOk = Promise.resolve(0);
+    assert((await promiseToResult(pOk)).unwrap() === 0);
 
-    const pNone = Promise.reject(-1);
-    assert((await promiseToResult(pNone)).unwrapErr() === -1);
+    const pErr = Promise.reject(-1);
+    assert((await promiseToResult(pErr)).unwrapErr() === -1);
 });

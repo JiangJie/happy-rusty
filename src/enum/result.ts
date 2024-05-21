@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
@@ -5,11 +6,19 @@
  */
 
 /**
+ * Symbol for debug
+ */
+const resultKindSymbol = Symbol('Result kind');
+
+/**
  * result::Ok type
  */
 interface Ok<T, E> {
     // #region Internal properties
-    readonly kind: 'Ok';
+    /**
+     * for debug
+     */
+    readonly [resultKindSymbol]: 'Ok';
     // #endregion
 
     // #region Querying the variant
@@ -23,17 +32,18 @@ interface Ok<T, E> {
 
     // #region Extracting the contained value
     readonly expect: (msg: string) => T;
+
     readonly unwrap: () => T;
     readonly unwrapErr: () => never;
     readonly unwrapOr: (defaultValue: T) => T;
-    readonly unwrapOrElse: (f: (e: E) => T) => T;
+    readonly unwrapOrElse: (fn: (err: E) => T) => T;
     // #endregion
 
     // #region Transforming contained values
-    readonly map: <U>(f: (value: T) => U) => Result<U, E>;
-    readonly mapErr: <F>(f: (error: E) => F) => Result<T, F>;
-    readonly mapOr: <U>(defaultValue: U, f: (value: T) => U) => Result<U, E>;
-    readonly mapOrElse: <U>(defaultF: (error: E) => U, f: (value: T) => U) => Result<U, E>;
+    readonly map: <U>(fn: (value: T) => U) => Result<U, E>;
+    readonly mapErr: <F>(fn: (err: E) => F) => Result<T, F>;
+    readonly mapOr: <U>(defaultValue: U, fn: (value: T) => U) => Result<U, E>;
+    readonly mapOrElse: <U>(defaultFn: (err: E) => U, fn: (value: T) => U) => Result<U, E>;
     // #endregion
 }
 
@@ -42,7 +52,10 @@ interface Ok<T, E> {
  */
 interface Err<T, E> {
     // #region Internal properties
-    readonly kind: 'Err';
+    /**
+     * for debug
+     */
+    readonly [resultKindSymbol]: 'Err';
     // #endregion
 
     // #region Querying the variant
@@ -56,17 +69,18 @@ interface Err<T, E> {
 
     // #region Extracting the contained value
     readonly expect: (msg: string) => never;
+
     readonly unwrap: () => never;
     readonly unwrapErr: () => E;
     readonly unwrapOr: (defaultValue: T) => T;
-    readonly unwrapOrElse: (f: (e: E) => T) => T;
+    readonly unwrapOrElse: (fn: (err: E) => T) => T;
     // #endregion
 
     // #region Transforming contained values
-    readonly map: <U>(f: (value: T) => U) => Result<U, E>;
-    readonly mapErr: <F>(f: (error: E) => F) => Result<T, F>;
-    readonly mapOr: <U>(defaultValue: U, f: (value: T) => U) => Result<U, E>;
-    readonly mapOrElse: <U>(defaultF: (error: E) => U, f: (value: T) => U) => Result<U, E>;
+    readonly map: <U>(fn: (value: T) => U) => Result<U, E>;
+    readonly mapErr: <F>(fn: (err: E) => F) => Result<T, F>;
+    readonly mapOr: <U>(defaultValue: U, fn: (value: T) => U) => Result<U, E>;
+    readonly mapOrElse: <U>(defaultFn: (err: E) => U, fn: (value: T) => U) => Result<U, E>;
     // #endregion
 }
 
@@ -110,11 +124,11 @@ if (res.isNone()) {
  * ```
  *
  * @param value The wrapped value.
- * @returns {Ok}
+ * @returns {Result<T, E>}
  */
 export function Ok<T, E>(value: T): Result<T, E> {
     return {
-        kind: 'Ok',
+        [resultKindSymbol]: 'Ok',
 
         isOk: () => true,
         isErr: () => false,
@@ -122,17 +136,18 @@ export function Ok<T, E>(value: T): Result<T, E> {
         equals: (r: Result<any, any>) => r.isOk() && r.unwrap() === value,
 
         expect: (_msg: string) => value,
+
         unwrap: () => value,
         unwrapErr: () => {
-            throw new TypeError('Ok is not Err');
+            throw new TypeError('called `Result::unwrap_err()` on an `Ok` value');
         },
         unwrapOr: (_defaultValue: T) => value,
-        unwrapOrElse: (_f: (e: E) => T) => value,
+        unwrapOrElse: (_fn: (err: E) => T) => value,
 
-        map: <U>(f: (value: T) => U) => Ok(f(value)),
-        mapErr: <F>(_f: (error: E) => F) => Ok<T, F>(value),
-        mapOr: <U>(_defaultValue: U, f: (value: T) => U) => Ok(f(value)),
-        mapOrElse: <U>(_defaultF: (error: E) => U, f: (value: T) => U) => Ok(f(value)),
+        map: <U>(fn: (value: T) => U) => Ok(fn(value)),
+        mapErr: <F>(_fn: (err: E) => F) => Ok<T, F>(value),
+        mapOr: <U>(_defaultValue: U, fn: (value: T) => U) => Ok(fn(value)),
+        mapOrElse: <U>(_defaultFn: (err: E) => U, fn: (value: T) => U) => Ok(fn(value)),
     } as const;
 }
 
@@ -146,42 +161,41 @@ export function Ok<T, E>(value: T): Result<T, E> {
  * console.assert(e.unwrapErr().message === 'unknown error');
  * ```
  *
- * @param error The wrapped error value.
- * @returns {Err}
+ * @param err The wrapped error value.
+ * @returns {Result<T, E>}
  */
-export function Err<T, E>(error: E): Result<T, E> {
+export function Err<T, E>(err: E): Result<T, E> {
     return {
-        kind: 'Err',
+        [resultKindSymbol]: 'Err',
 
         isOk: () => false,
         isErr: () => true,
 
-        equals: (r: Result<any, any>) => r.isErr() && r.unwrapErr() === error,
+        equals: (r: Result<any, any>) => r.isErr() && r.unwrapErr() === err,
 
         expect: (msg: string) => {
-            throw new TypeError(`${ msg }: ${ error }`);
+            throw new TypeError(`${ msg }: ${ err }`);
         },
         unwrap: () => {
-            throw error;
+            throw new TypeError('called `Result::unwrap()` on an `Err` value');
         },
-        unwrapErr: () => error,
+        unwrapErr: () => err,
         unwrapOr: (defaultValue: T) => defaultValue,
-        unwrapOrElse: (f: (e: E) => T) => f(error),
+        unwrapOrElse: (fn: (e: E) => T) => fn(err),
 
-        map: <U>(_f: (value: T) => U) => Err<U, E>(error),
-        mapErr: <F>(f: (error: E) => F) => Err(f(error)),
-        mapOr: <U>(defaultValue: U, _f: (value: T) => U) => Ok(defaultValue),
-        mapOrElse: <U>(defaultF: (error: E) => U, _f: (value: T) => U) => Ok(defaultF(error)),
+        map: <U>(_fn: (value: T) => U) => Err<U, E>(err),
+        mapErr: <F>(fn: (err: E) => F) => Err(fn(err)),
+        mapOr: <U>(defaultValue: U, _fn: (value: T) => U) => Ok(defaultValue),
+        mapOrElse: <U>(defaultFn: (err: E) => U, _fn: (value: T) => U) => Ok(defaultFn(err)),
     } as const;
 }
 
 /**
- * Convert a `Promise` to a `Result`.
+ * Convert from `Promise` to `Promise<Result>`.
  *
  * @param p Promise<T>
  * @returns {Promise<Result<T, E>>}
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function promiseToResult<T, E = any>(p: Promise<T>): Promise<Result<T, E>> {
     return p.then((x) => {
         return Ok<T, E>(x);
