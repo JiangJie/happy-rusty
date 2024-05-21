@@ -1,48 +1,53 @@
 import { assert, assertThrows } from '@std/assert';
-import { None, Some, promiseToOption } from '../../src/mod.ts';
+import { None, Some, promiseToOption, type Option } from '../../src/mod.ts';
 
 Deno.test('Option:Some', () => {
     assertThrows(() => Some(null as unknown as number), TypeError);
 
-    const v = Some<number>(10);
+    const o = Some<number>(10);
 
-    assert(v.isSome());
-    assert(!v.isNone());
+    assert(o.isSome());
+    assert(!o.isNone());
 
-    assert(v.equals(Some(10)));
+    assert(o.eq(Some(10)));
+    assert(!o.eq(None));
 
-    assert(v.expect('value is number 10') === 10);
+    assert(o.expect('value is number 10') === 10);
 
-    assert(v.unwrap() === 10);
-    assert(v.unwrapOr(0) === 10);
-    assert(v.unwrapOrElse(() => 0) === 10);
+    assert(o.unwrap() === 10);
+    assert(o.unwrapOr(0) === 10);
+    assert(o.unwrapOrElse(() => 0) === 10);
 
-    assert(v.map((v) => v + 1).equals(Some(11)));
-    assert(v.mapOr(0, (v) => v + 1).equals(Some(11)));
-    assert(v.mapOrElse(() => 0, (v) => v + 1).equals(Some(11)));
+    assert(o.map((v) => v + 1).eq(Some(11)));
+    assert(o.mapOr(0, (v) => v + 1).eq(Some(11)));
+    assert(o.mapOrElse(() => 0, (v) => v + 1).eq(Some(11)));
+
+    assert(o.filter((v) => v % 2 == 0).eq(Some(10)));
+    assert(o.filter((v) => v % 2 == 1).eq(None));
 });
 
 Deno.test('Option:None', () => {
-    const n = Math.random();
-    const v = n > 1 ? Some(n) : None;
+    const o: Option<number> = None;
 
-    assert(!v.isSome());
-    assert(v.isNone());
+    assert(!o.isSome());
+    assert(o.isNone());
 
-    assert(v.equals(None));
+    assert(o.eq(None));
 
-    assertThrows(() => v.expect('value should greater than 1'), TypeError, 'value should greater than 1');
+    assertThrows(() => o.expect('value should greater than 1'), TypeError, 'value should greater than 1');
 
-    assertThrows(v.unwrap, TypeError);
-    assert(v.unwrapOr(0) === 0);
-    assert(v.unwrapOrElse(() => 0) === 0);
+    assertThrows(o.unwrap, TypeError);
+    assert(o.unwrapOr(0) === 0);
+    assert(o.unwrapOrElse(() => 0) === 0);
 
-    assert(v.map<number, number>((v) => v + 1).equals(None));
-    assert(v.mapOr<number, number>(0, (v) => v + 1).equals(Some(0)));
-    assert(v.mapOrElse<number, number>(() => 0, (v) => v + 1).equals(Some(0)));
+    assert(o.map((v) => v + 1).eq(None));
+    assert(o.mapOr(0, (v) => v + 1).eq(Some(0)));
+    assert(o.mapOrElse(() => 0, (v) => v + 1).eq(Some(0)));
+
+    assert(o.filter((v: number) => v > 0).eq(None));
 });
 
-Deno.test('Convert Promise to Option', async () => {
+Deno.test('Convert from Promise to Option', async () => {
     const pSome = Promise.resolve(0);
     assert((await promiseToOption(pSome)).unwrap() === 0);
 

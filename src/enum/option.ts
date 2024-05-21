@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /**
@@ -5,11 +6,19 @@
  */
 
 /**
+ * Symbol for debug
+ */
+const optionKindSymbol = Symbol('Option kind');
+
+/**
  * option::Some type
  */
 interface Some<T> {
     // #region Internal properties
-    readonly kind: 'Some';
+    /**
+     * for debug
+     */
+    readonly [optionKindSymbol]: 'Some';
     // #endregion
 
     // #region Querying the variant
@@ -18,20 +27,23 @@ interface Some<T> {
     // #endregion
 
     // #region Equals comparison
-    readonly equals: (o: Option<any>) => boolean;
+    readonly eq: (o: Option<any>) => boolean;
     // #endregion
 
     // #region Extracting the contained value
     readonly expect: (msg: string) => T;
+
     readonly unwrap: () => T;
     readonly unwrapOr: (defaultValue: T) => T;
-    readonly unwrapOrElse: (f: () => T) => T;
+    readonly unwrapOrElse: (fn: () => T) => T;
     // #endregion
 
     // #region Transforming contained values
-    readonly map: <U>(f: (value: T) => NonNullable<U>) => Option<U>;
-    readonly mapOr: <U>(defaultValue: NonNullable<U>, f: (value: T) => NonNullable<U>) => Option<U>;
-    readonly mapOrElse: <U>(defaultF: () => NonNullable<U>, f: (value: T) => NonNullable<U>) => Option<U>;
+    readonly map: <U>(fn: (value: T) => NonNullable<U>) => Option<U>;
+    readonly mapOr: <U>(defaultValue: NonNullable<U>, fn: (value: T) => NonNullable<U>) => Option<U>;
+    readonly mapOrElse: <U>(defaultFn: () => NonNullable<U>, fn: (value: T) => NonNullable<U>) => Option<U>;
+
+    readonly filter: (predicate: (value: T) => boolean) => Option<T>;
     // #endregion
 }
 
@@ -40,7 +52,10 @@ interface Some<T> {
  */
 interface None {
     // #region Internal properties
-    readonly kind: 'None';
+    /**
+     * for debug
+     */
+    readonly [optionKindSymbol]: 'None';
     // #endregion
 
     // #region Querying the variant
@@ -49,20 +64,23 @@ interface None {
     // #endregion
 
     // #region Equals comparison
-    readonly equals: (o: Option<any>) => boolean;
+    readonly eq: (o: Option<any>) => boolean;
     // #endregion
 
     // #region Extracting the contained value
     readonly expect: (msg: string) => never;
+
     readonly unwrap: () => never;
     readonly unwrapOr: <T>(defaultValue: T) => T;
-    readonly unwrapOrElse: <T>(f: () => T) => T;
+    readonly unwrapOrElse: <T>(fn: () => T) => T;
     // #endregion
 
     // #region Transforming contained values
-    readonly map: <U, T>(f: (value: T) => NonNullable<U>) => Option<U>;
-    readonly mapOr: <U, T>(defaultValue: NonNullable<U>, f: (value: T) => NonNullable<U>) => Option<U>;
-    readonly mapOrElse: <U, T>(defaultF: () => NonNullable<U>, f: (value: T) => NonNullable<U>) => Option<U>;
+    readonly map: <U>(fn: (value: never) => NonNullable<U>) => None;
+    readonly mapOr: <U>(defaultValue: NonNullable<U>, fn: (value: never) => NonNullable<U>) => Option<U>;
+    readonly mapOrElse: <U>(defaultFn: () => NonNullable<U>, fn: (value: never) => NonNullable<U>) => Option<U>;
+
+    readonly filter: (predicate: (value: never) => boolean) => None;
     // #endregion
 }
 
@@ -82,7 +100,7 @@ export type Option<T> = Some<T> | None;
  * ```
  *
  * @param value The wrapped value which can not be null or undefined.
- * @returns {Some}
+ * @returns {Option<T>}
  */
 export function Some<T>(value: NonNullable<T>): Option<T> {
     if (value == null) {
@@ -90,21 +108,24 @@ export function Some<T>(value: NonNullable<T>): Option<T> {
     }
 
     return {
-        kind: 'Some',
+        [optionKindSymbol]: 'Some',
 
         isSome: () => true,
         isNone: () => false,
 
-        equals: (o: Option<any>) => o.isSome() && o.unwrap() === value,
+        eq: (o: Option<any>) => o.isSome() && o.unwrap() === value,
 
         expect: (_msg: string) => value,
+
         unwrap: () => value,
         unwrapOr: (_defaultValue: T) => value,
-        unwrapOrElse: (_f: () => T) => value,
+        unwrapOrElse: (_fn: () => T) => value,
 
-        map: <U>(f: (value: T) => NonNullable<U>) => Some(f(value)),
-        mapOr: <U>(_defaultValue: NonNullable<U>, f: (value: T) => NonNullable<U>) => Some(f(value)),
-        mapOrElse: <U>(_defaultF: () => NonNullable<U>, f: (value: T) => NonNullable<U>) => Some(f(value)),
+        map: <U>(fn: (value: T) => NonNullable<U>) => Some(fn(value)),
+        mapOr: <U>(_defaultValue: NonNullable<U>, fn: (value: T) => NonNullable<U>) => Some(fn(value)),
+        mapOrElse: <U>(_defaultF: () => NonNullable<U>, fn: (value: T) => NonNullable<U>) => Some(fn(value)),
+
+        filter: (predicate: (value: T) => boolean) => predicate(value) ? Some(value) : None,
     } as const;
 }
 
@@ -113,30 +134,33 @@ export function Some<T>(value: NonNullable<T>): Option<T> {
  *
  * @constant {None}
  */
-export const None: None = {
-    kind: 'None',
+export const None = Object.freeze({
+    [optionKindSymbol]: 'None',
 
     isSome: () => false,
     isNone: () => true,
 
-    equals: (o: Option<any>) => o === None,
+    eq: (o: Option<any>) => o === None,
 
     expect: (msg: string) => {
         throw new TypeError(msg);
     },
+
     unwrap: () => {
-        throw new TypeError('None can not unwrap');
+        throw new TypeError('called `Option::unwrap()` on a `None` value');
     },
     unwrapOr: <T>(defaultValue: T) => defaultValue,
-    unwrapOrElse: <T>(f: () => T) => f(),
+    unwrapOrElse: <T>(fn: () => T) => fn(),
 
-    map: <U, T>(_f: (value: T) => NonNullable<U>) => None,
-    mapOr: <U, T>(_defaultValue: NonNullable<U>, _f: (value: T) => NonNullable<U>) => Some(_defaultValue),
-    mapOrElse: <U, T>(defaultF: () => NonNullable<U>, _f: (value: T) => NonNullable<U>) => Some(defaultF()),
-} as const;
+    map: <U, T = never>(_fn: (value: T) => NonNullable<U>) => None,
+    mapOr: <U, T = never>(defaultValue: NonNullable<U>, _fn: (value: T) => NonNullable<U>) => Some(defaultValue),
+    mapOrElse: <U, T = never>(defaultFn: () => NonNullable<U>, _fn: (value: T) => NonNullable<U>) => Some(defaultFn()),
+
+    filter: <T = never>(_predicate: (value: T) => boolean) => None,
+}) as None;
 
 /**
- * Convert a `Promise` to an `Option`.
+ * Convert from `Promise` to `Promise<Option>`.
  *
  * @param p Promise<T>
  * @returns {Promise<Option<T>>}
