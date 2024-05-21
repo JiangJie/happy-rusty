@@ -27,7 +27,7 @@ interface Ok<T, E> {
     // #endregion
 
     // #region Equals comparison
-    readonly equals: (r: Result<any, any>) => boolean;
+    readonly eq: (r: Result<any, any>) => boolean;
     // #endregion
 
     // #region Extracting the contained value
@@ -64,7 +64,7 @@ interface Err<T, E> {
     // #endregion
 
     // #region Equals comparison
-    readonly equals: (r: Result<any, any>) => boolean;
+    readonly eq: (r: Result<any, any>) => boolean;
     // #endregion
 
     // #region Extracting the contained value
@@ -133,7 +133,7 @@ export function Ok<T, E>(value: T): Result<T, E> {
         isOk: () => true,
         isErr: () => false,
 
-        equals: (r: Result<any, any>) => r.isOk() && r.unwrap() === value,
+        eq: (r: Result<any, any>) => r.isOk() && r.unwrap() === value,
 
         expect: (_msg: string) => value,
 
@@ -171,7 +171,7 @@ export function Err<T, E>(err: E): Result<T, E> {
         isOk: () => false,
         isErr: () => true,
 
-        equals: (r: Result<any, any>) => r.isErr() && r.unwrapErr() === err,
+        eq: (r: Result<any, any>) => r.isErr() && r.unwrapErr() === err,
 
         expect: (msg: string) => {
             throw new TypeError(`${ msg }: ${ err }`);
