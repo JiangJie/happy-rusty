@@ -1,5 +1,5 @@
 import { assert, assertThrows } from '@std/assert';
-import { None, Some, promiseToOption } from '../../src/mod.ts';
+import { None, Some, promiseToOption, type Option } from '../../src/mod.ts';
 
 Deno.test('Option:Some', async (t) => {
     const o = Some<number>(10);
@@ -27,6 +27,9 @@ Deno.test('Option:Some', async (t) => {
     });
 
     await t.step('Transforming contained values', () => {
+        assert(o.okOr(new Error('value is number')).isOk());
+        assert(o.okOrElse(() => new Error('value is number')).isOk());
+
         assert(o.map((v) => v + 1).eq(Some(11)));
         assert(o.mapOr(0, (v) => v + 1).eq(Some(11)));
         assert(o.mapOrElse(() => 0, (v) => v + 1).eq(Some(11)));
@@ -37,30 +40,35 @@ Deno.test('Option:Some', async (t) => {
 });
 
 Deno.test('Option:None', async (t) => {
+    const o: Option<number> = None;
+
     await t.step('Querying the variant', () => {
-        assert(!None.isSome());
-        assert(None.isNone());
+        assert(!o.isSome());
+        assert(o.isNone());
     });
 
     await t.step('Equals comparison', () => {
-        assert(!None.eq(Some(10)));
-        assert(None.eq(None));
+        assert(!o.eq(Some(10)));
+        assert(o.eq(None));
     });
 
     await t.step('Extracting the contained value', () => {
-        assertThrows(() => None.expect('value should greater than 1'), TypeError, 'value should greater than 1');
+        assertThrows(() => o.expect('None has no value'), TypeError, 'None has no value');
 
-        assertThrows(None.unwrap, TypeError);
-        assert(None.unwrapOr(0) === 0);
-        assert(None.unwrapOrElse(() => 0) === 0);
+        assertThrows(o.unwrap, TypeError);
+        assert(o.unwrapOr(0) === 0);
+        assert(o.unwrapOrElse(() => 0) === 0);
     });
 
     await t.step('Transforming contained values', () => {
-        assert(None.map((v) => v + 1).eq(None));
-        assert(None.mapOr(0, (v) => v + 1).eq(Some(0)));
-        assert(None.mapOrElse(() => 0, (v) => v + 1).eq(Some(0)));
+        assert(o.okOr(new Error('None has no value')).unwrapErr().message === 'None has no value');
+        assert(o.okOrElse(() => new Error('None has no value')).unwrapErr().message === 'None has no value');
 
-        assert(None.filter((v: number) => v > 0).eq(None));
+        assert(o.map((v) => v + 1).eq(None));
+        assert(o.mapOr(0, (v) => v + 1).eq(Some(0)));
+        assert(o.mapOrElse(() => 0, (v) => v + 1).eq(Some(0)));
+
+        assert(o.filter((v) => v > 0).eq(None));
     });
 });
 
