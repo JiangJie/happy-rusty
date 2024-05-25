@@ -25,6 +25,7 @@
     "build": "pnpm exec rollup --config rollup.config.mjs",
     "pretest": "pnpm exec rimraf coverage",
     "test": "deno test --coverage && deno coverage coverage && deno coverage coverage --lcov --output=coverage/cov_profile.lcov",
+    "test:html": "deno test --coverage && deno coverage coverage && deno coverage coverage --html",
     "prepublishOnly": "pnpm run build"
   },
   "repository": {

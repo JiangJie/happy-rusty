@@ -1,5 +1,6 @@
 import { assert, assertThrows } from '@std/assert';
-import { None, Some, promiseToOption, type Option } from '../../src/mod.ts';
+import { assertSpyCalls, spy } from '@std/testing/mock';
+import { Err, None, Ok, Some, type Option } from '../../src/mod.ts';
 
 Deno.test('Option:Some', async (t) => {
     const o = Some<number>(10);
@@ -11,6 +12,8 @@ Deno.test('Option:Some', async (t) => {
     await t.step('Querying the variant', () => {
         assert(o.isSome());
         assert(!o.isNone());
+        assert(o.isSomeAnd(v => v === 10));
+        assert(!o.isSomeAnd(v => v === 20));
     });
 
     await t.step('Equals comparison', () => {
@@ -30,12 +33,56 @@ Deno.test('Option:Some', async (t) => {
         assert(o.okOr(new Error('value is number')).isOk());
         assert(o.okOrElse(() => new Error('value is number')).isOk());
 
+        assert(Some(Ok(10)).transpose().isOk());
+        assert(Some(Err(new Error())).transpose().isErr());
+
         assert(o.map((v) => v + 1).eq(Some(11)));
         assert(o.mapOr(0, (v) => v + 1).eq(Some(11)));
         assert(o.mapOrElse(() => 0, (v) => v + 1).eq(Some(11)));
 
         assert(o.filter((v) => v % 2 == 0).eq(Some(10)));
         assert(o.filter((v) => v % 2 == 1).eq(None));
+
+        assert(Some(o).flatten().eq(o));
+
+        const [a, b] = o.zip(Some('foo')).unzip();
+        assert(a.eq(Some(10)));
+        assert(b.eq(Some('foo')));
+        assert(o.zip(None).eq(None));
+
+        const x = o.zipWith(Some(20), (value, otherValue) => value + otherValue);
+        const y = o.zipWith(None, (value, otherValue) => value + otherValue);
+        assert(x.eq(Some(30)));
+        assert(y.eq(None));
+    });
+
+    await t.step('Boolean operators', () => {
+        assert(o.and(Some(20)).eq(Some(20)));
+        assert(o.and(None).eq(None));
+        assert(o.andThen(() => Some(20)).eq(Some(20)));
+
+        assert(o.or(Some<number>(20)).eq(Some(10)));
+        assert(o.or(None).eq(Some(10)));
+        assert(o.orElse(() => Some<number>(20)).eq(Some(10)));
+
+        assert(o.xor(Some<number>(20)).eq(None));
+        assert(o.xor(None).eq(Some(10)));
+    });
+
+    await t.step('Modifying an Option in-place', () => {
+        assert(o.insert(20).eq(Some(20)));
+        assert(o.getOrInsert(20).eq(Some(10)));
+        assert(o.getOrInsertWith(() => 20).eq(Some(10)));
+    });
+
+    await t.step('Inspect will be called', () => {
+        const print = (value: number) => {
+            console.log(`value is ${ value }`);
+        };
+        const printSpy = spy(print);
+
+        o.inspect(printSpy);
+        assertSpyCalls(printSpy, 1);
     });
 });
 
@@ -45,6 +92,7 @@ Deno.test('Option:None', async (t) => {
     await t.step('Querying the variant', () => {
         assert(!o.isSome());
         assert(o.isNone());
+        assert(!o.isSomeAnd(v => v === 10));
     });
 
     await t.step('Equals comparison', () => {
@@ -64,22 +112,55 @@ Deno.test('Option:None', async (t) => {
         assert(o.okOr(new Error('None has no value')).unwrapErr().message === 'None has no value');
         assert(o.okOrElse(() => new Error('None has no value')).unwrapErr().message === 'None has no value');
 
+        assert(None.transpose().isOk());
+        assert(None.transpose().unwrap().eq(None));
+
         assert(o.map((v) => v + 1).eq(None));
         assert(o.mapOr(0, (v) => v + 1).eq(Some(0)));
         assert(o.mapOrElse(() => 0, (v) => v + 1).eq(Some(0)));
 
         assert(o.filter((v) => v > 0).eq(None));
-    });
-});
 
-Deno.test('Convert from Promise to Option', async (t) => {
-    await t.step('Resolve will convert to Some', async () => {
-        const pSome = Promise.resolve(0);
-        assert((await promiseToOption(pSome)).unwrap() === 0);
+        assert(Some(o).flatten().eq(o));
+        assert(None.flatten().eq(None));
+
+        const x = o.zip(Some('foo'));
+        assert(x.eq(None));
+
+        const [a, b] = x.unzip();
+        assert(a.eq(None));
+        assert(b.eq(None));
+
+        const y = o.zipWith(Some(20), (value, otherValue) => value + otherValue);
+        assert(y.eq(None));
     });
 
-    await t.step('Reject will convert to None', async () => {
-        const pNone = Promise.reject();
-        assert((await promiseToOption(pNone)).isNone());
+    await t.step('Boolean operators', () => {
+        assert(o.and(Some(20)).eq(None));
+        assert(o.and(None).eq(None));
+        assert(o.andThen(() => Some(20)).eq(None));
+
+        assert(o.or(Some<number>(20)).eq(Some(20)));
+        assert(o.or(None).eq(None));
+        assert(o.orElse(() => Some<number>(20)).eq(Some(20)));
+
+        assert(o.xor(Some<number>(20)).eq(Some(20)));
+        assert(o.xor(None).eq(None));
+    });
+
+    await t.step('Modifying an Option in-place', () => {
+        assert(o.insert(20).eq(Some(20)));
+        assert(o.getOrInsert(20).eq(Some(20)));
+        assert(o.getOrInsertWith(() => 20).eq(Some(20)));
+    });
+
+    await t.step('Inspect will not be called', () => {
+        const print = (value: number) => {
+            console.log(`value is ${ value }`);
+        };
+        const printSpy = spy(print);
+
+        o.inspect(printSpy);
+        assertSpyCalls(printSpy, 0);
     });
 });

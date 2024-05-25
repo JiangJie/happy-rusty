@@ -1,7 +1,7 @@
 import type { Option } from './enum/option.ts';
 import type { Result } from './enum/result.ts';
 
-export { None, Some, promiseToOption, type Option } from './enum/option.ts';
+export { None, Some, type Option } from './enum/option.ts';
 export { Err, Ok, promiseToResult, type Result } from './enum/result.ts';
 
 // export some commonly used types
