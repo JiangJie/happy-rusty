@@ -17,7 +17,7 @@ Deno.test('Option:Some', async (t) => {
     });
 
     await t.step('Equals comparison', () => {
-        assert(o.eq(Some(10)));
+        assert(o.eq(Some<number>(10)));
         assert(!o.eq(None));
     });
 
@@ -36,17 +36,17 @@ Deno.test('Option:Some', async (t) => {
         assert(Some(Ok(10)).transpose().isOk());
         assert(Some(Err(new Error())).transpose().isErr());
 
-        assert(o.map((v) => v + 1).eq(Some(11)));
-        assert(o.mapOr(0, (v) => v + 1).eq(Some(11)));
-        assert(o.mapOrElse(() => 0, (v) => v + 1).eq(Some(11)));
+        assert(o.map((v) => v + 1).eq(Some<number>(11)));
+        assert(o.mapOr(0, (v) => v + 1).eq(Some<number>(11)));
+        assert(o.mapOrElse(() => 0, (v) => v + 1).eq(Some<number>(11)));
 
-        assert(o.filter((v) => v % 2 == 0).eq(Some(10)));
+        assert(o.filter((v) => v % 2 == 0).eq(Some<number>(10)));
         assert(o.filter((v) => v % 2 == 1).eq(None));
 
         assert(Some(o).flatten().eq(o));
 
         const [a, b] = o.zip(Some('foo')).unzip();
-        assert(a.eq(Some(10)));
+        assert(a.eq(Some<number>(10)));
         assert(b.eq(Some('foo')));
         assert(o.zip(None).eq(None));
 
@@ -56,7 +56,7 @@ Deno.test('Option:Some', async (t) => {
 
         const x = o.zipWith(Some(20), (value, otherValue) => value + otherValue);
         const y = o.zipWith(None, (value, otherValue) => value + otherValue);
-        assert(x.eq(Some(30)));
+        assert(x.eq(Some<number>(30)));
         assert(y.eq(None));
     });
 
@@ -65,18 +65,18 @@ Deno.test('Option:Some', async (t) => {
         assert(o.and(None).eq(None));
         assert(o.andThen(() => Some(20)).eq(Some(20)));
 
-        assert(o.or(Some<number>(20)).eq(Some(10)));
-        assert(o.or(None).eq(Some(10)));
-        assert(o.orElse(() => Some<number>(20)).eq(Some(10)));
+        assert(o.or(Some<number>(20)).eq(Some<number>(10)));
+        assert(o.or(None).eq(Some<number>(10)));
+        assert(o.orElse(() => Some<number>(20)).eq(Some<number>(10)));
 
         assert(o.xor(Some<number>(20)).eq(None));
-        assert(o.xor(None).eq(Some(10)));
+        assert(o.xor(None).eq(Some<number>(10)));
     });
 
     await t.step('Modifying an Option in-place', () => {
-        assert(o.insert(20).eq(Some(20)));
-        assert(o.getOrInsert(20).eq(Some(10)));
-        assert(o.getOrInsertWith(() => 20).eq(Some(10)));
+        assert(o.insert(20).eq(Some<number>(20)));
+        assert(o.getOrInsert(20).eq(Some<number>(10)));
+        assert(o.getOrInsertWith(() => 20).eq(Some<number>(10)));
     });
 
     await t.step('Inspect will be called', () => {
@@ -100,7 +100,7 @@ Deno.test('Option:None', async (t) => {
     });
 
     await t.step('Equals comparison', () => {
-        assert(!o.eq(Some(10)));
+        assert(!o.eq(Some<number>(10)));
         assert(o.eq(None));
     });
 
@@ -120,8 +120,8 @@ Deno.test('Option:None', async (t) => {
         assert(None.transpose().unwrap().eq(None));
 
         assert(o.map((v) => v + 1).eq(None));
-        assert(o.mapOr(0, (v) => v + 1).eq(Some(0)));
-        assert(o.mapOrElse(() => 0, (v) => v + 1).eq(Some(0)));
+        assert(o.mapOr(0, (v) => v + 1).eq(Some<number>(0)));
+        assert(o.mapOrElse(() => 0, (v) => v + 1).eq(Some<number>(0)));
 
         assert(o.filter((v) => v > 0).eq(None));
 
@@ -144,18 +144,18 @@ Deno.test('Option:None', async (t) => {
         assert(o.and(None).eq(None));
         assert(o.andThen(() => Some(20)).eq(None));
 
-        assert(o.or(Some<number>(20)).eq(Some(20)));
+        assert(o.or(Some<number>(20)).eq(Some<number>(20)));
         assert(o.or(None).eq(None));
-        assert(o.orElse(() => Some<number>(20)).eq(Some(20)));
+        assert(o.orElse(() => Some<number>(20)).eq(Some<number>(20)));
 
-        assert(o.xor(Some<number>(20)).eq(Some(20)));
+        assert(o.xor(Some<number>(20)).eq(Some<number>(20)));
         assert(o.xor(None).eq(None));
     });
 
     await t.step('Modifying an Option in-place', () => {
-        assert(o.insert(20).eq(Some(20)));
-        assert(o.getOrInsert(20).eq(Some(20)));
-        assert(o.getOrInsertWith(() => 20).eq(Some(20)));
+        assert(o.insert(20).eq(Some<number>(20)));
+        assert(o.getOrInsert(20).eq(Some<number>(20)));
+        assert(o.getOrInsertWith(() => 20).eq(Some<number>(20)));
     });
 
     await t.step('Inspect will not be called', () => {

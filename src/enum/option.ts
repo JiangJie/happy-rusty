@@ -69,7 +69,7 @@ export interface Option<T> {
     /**
      * Returns `true` if this and input option have same `Some` value or both are `None`.
      */
-    readonly eq: <U>(o: Option<U>) => boolean;
+    readonly eq: (o: Option<T>) => boolean;
 
     // #endregion
 
@@ -340,7 +340,7 @@ export function Some<T>(value: NonNullable<T>): Option<T> {
         isNone: (): false => false,
         isSomeAnd: (predicate: (value: T) => boolean): boolean => predicate(value),
 
-        eq: <U>(o: Option<U>): boolean => {
+        eq: (o: Option<T>): boolean => {
             assertOption(o);
             return o.isSome() && o.unwrap() === value;
         },
@@ -418,7 +418,7 @@ export const None = Object.freeze<None>({
     isNone: (): true => true,
     isSomeAnd: (_predicate: (value: never) => boolean): false => false,
 
-    eq: <U>(o: Option<U>): boolean => {
+    eq: <T>(o: Option<T>): boolean => {
         assertOption(o);
         return o === None;
     },
