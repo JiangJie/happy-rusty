@@ -8,9 +8,25 @@
 import { Err, Ok, type Result } from './result.ts';
 
 /**
- * Symbol for debug
+ * Symbol for Option kind: `Some` or `None`.
  */
 const optionKindSymbol = Symbol('Option kind');
+
+/**
+ * Check the input is an Option.
+ *
+ * @param o The input to check.
+ */
+function assertOption<T>(o: Option<T>): void {
+    if (o == null) {
+        throw new TypeError('Option can not be null or undefined');
+    }
+
+    // `Some` and `None` must be an object.
+    if (typeof o !== 'object' || !(optionKindSymbol in o)) {
+        throw new TypeError('This is not an Option');
+    }
+}
 
 /**
  * option::Option type
@@ -324,7 +340,10 @@ export function Some<T>(value: NonNullable<T>): Option<T> {
         isNone: (): false => false,
         isSomeAnd: (predicate: (value: T) => boolean): boolean => predicate(value),
 
-        eq: <U>(o: Option<U>): boolean => o.isSome() && o.unwrap() === value,
+        eq: <U>(o: Option<U>): boolean => {
+            assertOption(o);
+            return o.isSome() && o.unwrap() === value;
+        },
 
         expect: (_msg: string): T => value,
         unwrap: (): T => value,
@@ -341,6 +360,7 @@ export function Some<T>(value: NonNullable<T>): Option<T> {
         filter: (predicate: (value: T) => boolean): Option<T> => predicate(value) ? some : None,
         flatten: <U>(): Option<U> => {
             const o = value as unknown as Option<U>;
+            assertOption(o);
             return o.isSome() ? o : None;
         },
         map: <U>(fn: (value: T) => NonNullable<U>): Option<U> => Some(fn(value)),
@@ -348,18 +368,30 @@ export function Some<T>(value: NonNullable<T>): Option<T> {
         mapOr: <U>(_defaultValue: NonNullable<U>, fn: (value: T) => NonNullable<U>): Option<U> => Some(fn(value)),
         mapOrElse: <U>(_defaultF: () => NonNullable<U>, fn: (value: T) => NonNullable<U>): Option<U> => Some(fn(value)),
 
-        zip: <U>(other: Option<U>): Option<[T, U]> => other === None ? None : Some([value as T, other.unwrap()]),
-        zipWith: <U, R>(other: Option<U>, fn: (value: T, otherValue: U) => NonNullable<R>): Option<R> => other === None ? None : Some(fn(value, other.unwrap())),
+        zip: <U>(other: Option<U>): Option<[T, U]> => {
+            assertOption(other);
+            return other.isSome() ? Some([value as T, other.unwrap()]) : None;
+        },
+        zipWith: <U, R>(other: Option<U>, fn: (value: T, otherValue: U) => NonNullable<R>): Option<R> => {
+            assertOption(other);
+            return other.isSome() ? Some(fn(value, other.unwrap())) : None;
+        },
         unzip: <U, R>(): [Option<U>, Option<R>] => {
             const [a, b] = value as unknown as [NonNullable<U>, NonNullable<R>];
             return [Some(a), Some(b)];
         },
 
-        and: <U>(other: Option<U>): Option<U> => other,
+        and: <U>(other: Option<U>): Option<U> => {
+            assertOption(other);
+            return other;
+        },
         andThen: <U>(fn: (value: T) => Option<U>): Option<U> => fn(value),
         or: (_other: Option<T>): Option<T> => some,
         orElse: (_fn: () => Option<T>): Option<T> => some,
-        xor: (other: Option<T>): Option<T> => other.isSome() ? None : some,
+        xor: (other: Option<T>): Option<T> => {
+            assertOption(other);
+            return other.isSome() ? None : some;
+        },
 
         insert: (newValue: NonNullable<T>): Option<T> => Some(newValue),
         getOrInsert: (_newValue: NonNullable<T>): Option<T> => some,
@@ -386,13 +418,16 @@ export const None = Object.freeze<None>({
     isNone: (): true => true,
     isSomeAnd: (_predicate: (value: never) => boolean): false => false,
 
-    eq: <U>(o: Option<U>): boolean => o === None,
+    eq: <U>(o: Option<U>): boolean => {
+        assertOption(o);
+        return o === None;
+    },
 
     expect: (msg: string): never => {
         throw new TypeError(msg);
     },
     unwrap: (): never => {
-        throw new TypeError('called `Option::unwrap()` on a `None` value');
+        throw new TypeError('Called `Option::unwrap()` on a `None` value');
     },
     unwrapOr: <T>(defaultValue: T): T => defaultValue,
     unwrapOrElse: <T>(fn: () => T): T => fn(),
@@ -414,9 +449,15 @@ export const None = Object.freeze<None>({
 
     and: <U>(_other: Option<U>): None => None,
     andThen: <U>(_fn: (value: never) => Option<U>): None => None,
-    or: <U>(other: Option<U>): Option<U> => other,
+    or: <U>(other: Option<U>): Option<U> => {
+        assertOption(other);
+        return other;
+    },
     orElse: <U>(fn: () => Option<U>): Option<U> => fn(),
-    xor: <U>(other: Option<U>): Option<U> => other.isSome() ? other : None,
+    xor: <U>(other: Option<U>): Option<U> => {
+        assertOption(other);
+        return other.isSome() ? other : None;
+    },
 
     insert: <T>(newValue: NonNullable<T>): Option<T> => Some(newValue),
     getOrInsert: <T>(newValue: NonNullable<T>): Option<T> => Some(newValue),

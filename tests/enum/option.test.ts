@@ -50,6 +50,10 @@ Deno.test('Option:Some', async (t) => {
         assert(b.eq(Some('foo')));
         assert(o.zip(None).eq(None));
 
+        assertThrows(() => o.zip(null as unknown as Option<string>), TypeError);
+        assertThrows(() => o.zip('foo' as unknown as Option<string>), TypeError);
+        assertThrows(() => o.zip({} as unknown as Option<string>), TypeError);
+
         const x = o.zipWith(Some(20), (value, otherValue) => value + otherValue);
         const y = o.zipWith(None, (value, otherValue) => value + otherValue);
         assert(x.eq(Some(30)));
