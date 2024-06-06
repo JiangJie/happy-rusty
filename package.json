@@ -25,6 +25,7 @@
     "build": "pnpm exec rollup --config rollup.config.mjs",
     "pretest": "pnpm exec rimraf coverage",
     "test": "deno test --coverage && deno coverage coverage && deno coverage coverage --lcov --output=coverage/cov_profile.lcov",
+    "pretest:html": "pnpm run pretest",
     "test:html": "deno test --coverage && deno coverage coverage && deno coverage coverage --html",
     "prepublishOnly": "pnpm run build"
   },
@@ -43,8 +44,8 @@
     "Err"
   ],
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^7.10.0",
-    "@typescript-eslint/parser": "^7.10.0",
+    "@typescript-eslint/eslint-plugin": "^7.12.0",
+    "@typescript-eslint/parser": "^7.12.0",
     "eslint": "^8.57.0",
     "rimraf": "^5.0.7",
     "rollup": "^4.18.0",
@@ -52,5 +53,5 @@
     "rollup-plugin-esbuild": "^6.1.1",
     "typescript": "^5.4.5"
   },
-  "packageManager": "pnpm@9.1.2"
+  "packageManager": "pnpm@9.2.0"
 }
