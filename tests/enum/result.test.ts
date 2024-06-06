@@ -1,28 +1,27 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { assert, assertThrows } from "@std/assert";
-import { Err, Ok, promiseToResult, type AsyncIOResult } from '../../src/mod.ts';
-
-function judge(n: number): AsyncIOResult<number> {
-    return new Promise(resolve => {
-        const r = Math.random();
-        resolve(r > n ? Ok(r) : Err(new Error('lose')));
-    });
-}
+import { assertSpyCalls, spy } from '@std/testing/mock';
+import { Err, None, Ok, Option, Some, promiseToResult, type Result } from '../../src/mod.ts';
 
 Deno.test('Result:Ok', async (t) => {
-    const r = await judge(0);
+    const r: Result<number, Error> = Ok(1);
 
     await t.step('Querying the variant', () => {
         assert(r.isOk());
         assert(!r.isErr());
+        assert(r.isOkAnd(x => x === 1));
+        assert(!r.isErrAnd(_x => true));
     });
 
     await t.step('Equals comparison', () => {
         assert(r.eq(Ok(r.unwrap())));
+        assertThrows(() => r.eq(null as unknown as Result<number, Error>), TypeError);
+        assertThrows(() => r.eq({} as unknown as Result<number, Error>), TypeError);
     });
 
     await t.step('Extracting the contained value', () => {
-        assert(r.expect('value should greater than 0') > 0);
+        assert(r.expect('value should greater than 0') === 1);
+        assertThrows(() => r.expectErr('value should greater than 0'), TypeError, 'value should greater than 0');
 
         assert(r.unwrap() > 0);
         assertThrows(r.unwrapErr, TypeError);
@@ -31,19 +30,61 @@ Deno.test('Result:Ok', async (t) => {
     });
 
     await t.step('Transforming contained values', () => {
+        assert(r.ok().eq(Some(1)));
+        assert(r.err().eq(None));
+
+        assert(Ok(Some(1)).transpose().unwrap().unwrap() === 1);
+        assert(Ok(None).transpose().eq(None));
+
         assert(r.map(_v => 1).eq(Ok(1)));
-        assert(r.mapErr(_err => 0).unwrap() > 0);
-        assert(r.mapOr(0, _v => 1).eq(Ok(1)));
-        assert(r.mapOrElse(_err => 0, _v => 1).eq(Ok(1)));
+        assert(r.mapErr(_err => 0).unwrap() === 1);
+        assert(r.mapOr(0, _v => 2) === 2);
+        assert(r.mapOrElse(_err => 0, _v => 2) === 2);
+
+        assert(Ok<Result<number, Error>, Error>(r).flatten() === r);
+    });
+
+    await t.step('Boolean operators', () => {
+        const other: Result<number, Error> = Ok(2);
+        const otherErr: Result<number, Error> = Err(new Error());
+
+        assert(r.and(other) === other);
+        assert(r.and(otherErr) === otherErr);
+
+        assert(r.or(other) === r);
+        assert(r.or(otherErr) === r);
+
+        assert(r.andThen(x => Ok(x + 10)).eq(Ok(11)));
+        assert(r.orElse(_x => other) === r);
+    });
+
+    await t.step('Inspect will be called', () => {
+        const print = (value: number) => {
+            console.log(`value is ${ value }`);
+        };
+        const printSpy = spy(print);
+
+        r.inspect(printSpy);
+        assertSpyCalls(printSpy, 1);
+
+        const printErr = (error: Error) => {
+            console.log(`error is ${ error.message }`);
+        };
+        const printErrSpy = spy(printErr);
+
+        r.inspectErr(printErrSpy);
+        assertSpyCalls(printErrSpy, 0);
     });
 });
 
 Deno.test('Result:Err', async (t) => {
-    const r = await judge(1);
+    const r: Result<number, Error> = Err(new Error('lose'));
 
     await t.step('Querying the variant', () => {
         assert(!r.isOk());
         assert(r.isErr());
+        assert(!r.isOkAnd(_x => true));
+        assert(r.isErrAnd(x => x.message == 'lose'));
     });
 
     await t.step('Equals comparison', () => {
@@ -52,18 +93,58 @@ Deno.test('Result:Err', async (t) => {
 
     await t.step('Extracting the contained value', () => {
         assertThrows(() => r.expect('value should less than 1'), TypeError, 'value should less than 1');
+        assert(r.expectErr('error').message === 'lose');
 
         assertThrows(r.unwrap, Error);
         assert(r.unwrapErr().message === 'lose');
         assert(r.unwrapOr(0) === 0);
         assert(r.unwrapOrElse((err) => err.message.length) === 4);
+
+        assert(Err<Result<number, Error>, Error>(r.unwrapErr()).flatten().eq(r));
     });
 
     await t.step('Transforming contained values', () => {
+        assert(r.ok().eq(None));
+        assert(r.err().unwrap().message === 'lose');
+
+        assert(Err<Option<number>, Error>(r.unwrapErr()).transpose().unwrap().unwrapErr() === r.unwrapErr());
+
         assert(r.map(_v => 1).eq(Err(r.unwrapErr())));
         assert(r.mapErr(_err => 0).unwrapErr() === 0);
-        assert(r.mapOr(0, _v => 1).eq(Ok(0)));
-        assert(r.mapOrElse(_err => 0, _v => 1).eq(Ok(0)));
+        assert(r.mapOr(0, _v => 1) === 0);
+        assert(r.mapOrElse(_err => 0, _v => 1) === 0);
+    });
+
+    await t.step('Boolean operators', () => {
+        const other: Result<number, Error> = Ok(2);
+        const otherErr: Result<number, Error> = Err(new Error());
+
+        assert(r.and(other) === r);
+        assert(r.and(otherErr) === r);
+
+        assert(r.or(other) === other);
+        assert(r.or(otherErr) === otherErr);
+
+        assert(r.andThen(x => Ok(x + 10)) === r);
+        assert(r.orElse(_x => other) === other);
+    });
+
+    await t.step('InspectErr will be called', () => {
+        const print = (value: number) => {
+            console.log(`value is ${ value }`);
+        };
+        const printSpy = spy(print);
+
+        r.inspect(printSpy);
+        assertSpyCalls(printSpy, 0);
+
+        const printErr = (error: Error) => {
+            console.log(`error is ${ error.message }`);
+        };
+        const printErrSpy = spy(printErr);
+
+        r.inspectErr(printErrSpy);
+        assertSpyCalls(printErrSpy, 1);
     });
 });
 
@@ -74,7 +155,7 @@ Deno.test('Convert from Promise to Result', async (t) => {
     });
 
     await t.step('Reject will convert to Err', async () => {
-        const pErr = Promise.reject(-1);
-        assert((await promiseToResult(pErr)).unwrapErr() === -1);
+        const pErr = Promise.reject(new Error('lose'));
+        assert((await promiseToResult(pErr)).unwrapErr().message === 'lose');
     });
 });

@@ -1,11 +1,12 @@
-// deno-lint-ignore-file no-explicit-any
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * @fileoverview A Rust-inspired [Option](https://doc.rust-lang.org/core/option/index.html) enum, used as an alternative to the use of null and undefined.
+ *
+ * Type `Option` represents an optional value: every `Option` is either `Some` and contains a value, or `None`, and does not.
  */
 
-import { Err, Ok, type Result } from './result.ts';
+import { Err, Ok, assertResult, type Result } from './result.ts';
 
 /**
  * Symbol for Option kind: `Some` or `None`.
@@ -17,19 +18,22 @@ const optionKindSymbol = Symbol('Option kind');
  *
  * @param o The input to check.
  */
-function assertOption<T>(o: Option<T>): void {
-    if (o == null) {
-        throw new TypeError('Option can not be null or undefined');
-    }
-
+export function assertOption<T>(o: Option<T>): void {
     // `Some` and `None` must be an object.
-    if (typeof o !== 'object' || !(optionKindSymbol in o)) {
-        throw new TypeError('This is not an Option');
+    if (o == null || typeof o !== 'object' || !(optionKindSymbol in o)) {
+        throw new TypeError(`This(${ o }) is not an Option`);
     }
 }
 
 /**
  * option::Option type
+ *
+```rust
+pub enum Option<T> {
+    None,
+    Some(T),
+}
+```
  */
 export interface Option<T> {
     // #region Internal properties
@@ -50,26 +54,17 @@ export interface Option<T> {
     /**
      * Returns `true` if the option is a `Some` value.
      */
-    readonly isSome: (this: Option<T>) => this is Some<T>;
+    readonly isSome: () => boolean;
 
     /**
      * Returns `true` if the option is a `None` value.
      */
-    readonly isNone: (this: Option<T>) => this is None;
+    readonly isNone: () => boolean;
 
     /**
      * Returns `true` if the option is a `Some` and the value inside of it matches a predicate.
      */
     readonly isSomeAnd: (predicate: (value: T) => boolean) => boolean;
-
-    // #endregion
-
-    // #region Equals comparison
-
-    /**
-     * Returns `true` if this and input option have same `Some` value or both are `None`.
-     */
-    readonly eq: (o: Option<T>) => boolean;
 
     // #endregion
 
@@ -118,7 +113,7 @@ export interface Option<T> {
     /**
      * Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err)`.
      */
-    readonly okOr: <E>(err: E) => Result<T, E>;
+    readonly okOr: <E>(error: E) => Result<T, E>;
 
     /**
      * Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err())`.
@@ -131,7 +126,7 @@ export interface Option<T> {
      * `None` will be mapped to `Ok(None)`.
      * `Some(Ok(_))` and `Some(Err(_))` will be mapped to `Ok(Some(_))` and `Err(_)`.
      */
-    readonly transpose: <U, E>(this: Option<Result<U, E>>) => Result<Option<U>, E>;
+    readonly transpose: <T, E>(this: Option<Result<T, E>>) => Result<Option<T>, E>;
 
     /**
      * These methods transform the `Some` variant:
@@ -143,17 +138,17 @@ export interface Option<T> {
      * - `Some(t)` if predicate returns `true` (where `t` is the wrapped value), and
      * - `None` if `predicate` returns `false`.
      */
-    readonly filter: (predicate: (value: T) => boolean) => Option<T>;
+    readonly filter: (predicate: (value: T) => boolean) => this;
 
     /**
      * Converts from `Option<Option<U>>` to `Option<U>`.
      */
-    readonly flatten: <U>(this: Option<Option<U>>) => Option<U>;
+    readonly flatten: <T>(this: Option<Option<T>>) => Option<T>;
 
     /**
      * Maps an `Option<T>` to `Option<U>` by applying a function to a contained value (if Some) or returns None (if None).
      */
-    readonly map: <U>(fn: (value: T) => NonNullable<U>) => Option<U>;
+    readonly map: <U>(fn: (value: T) => U) => Option<U>;
 
     /**
      * These methods transform `Option<T>` to a value of a possibly different type U:
@@ -162,12 +157,12 @@ export interface Option<T> {
     /**
      * Returns the provided default result (if none), or applies a function to the contained value (if any).
      */
-    readonly mapOr: <U>(defaultValue: NonNullable<U>, fn: (value: T) => NonNullable<U>) => Option<U>;
+    readonly mapOr: <U>(defaultValue: U, fn: (value: T) => U) => U;
 
     /**
      * Computes a default function result (if none), or applies a different function to the contained value (if any).
      */
-    readonly mapOrElse: <U>(defaultFn: () => NonNullable<U>, fn: (value: T) => NonNullable<U>) => Option<U>;
+    readonly mapOrElse: <U>(defaultFn: () => U, fn: (value: T) => U) => U;
 
     /**
      * These methods combine the `Some` variants of two `Option` values:
@@ -187,7 +182,7 @@ export interface Option<T> {
      * If `this` is `Some(s)` and `other` is `Some(o)`, this method returns `Some(fn(s, o))`.
      * Otherwise, `None` is returned.
      */
-    readonly zipWith: <U, R>(other: Option<U>, fn: (value: T, otherValue: U) => NonNullable<R>) => Option<R>;
+    readonly zipWith: <U, R>(other: Option<U>, fn: (value: T, otherValue: U) => R) => Option<R>;
 
     /**
      * Unzips an option containing a tuple of two options.
@@ -195,7 +190,7 @@ export interface Option<T> {
      * If `this` is `Some((a, b))` this method returns `[Some(a), Some(b)]`.
      * Otherwise, `[None, None]` is returned.
      */
-    readonly unzip: <U, R>(this: Option<[U, R]>) => [Option<U>, Option<R>];
+    readonly unzip: <T, U>(this: Option<[T, U]>) => [Option<T>, Option<U>];
 
     // #endregion
 
@@ -232,88 +227,22 @@ export interface Option<T> {
 
     // #endregion
 
-    // #region Modifying an `Option` in-place
-
-    /**
-     * These methods return a mutable reference to the contained value of an `Option<T>`:
-     */
-
-    /**
-     * Inserts `value` into the option.
-     *
-     * If the option already contains a value, the old value is dropped.
-     */
-    readonly insert: (value: NonNullable<T>) => Option<T>;
-
-    /**
-     * Inserts `value` into the option if it is `None`.
-     */
-    readonly getOrInsert: (value: NonNullable<T>) => Option<T>;
-
-    /**
-     * Inserts a value computed from `fn` into the option if it is `None`.
-     */
-    readonly getOrInsertWith: (fn: () => NonNullable<T>) => Option<T>;
-
-    // #endregion
-
     /**
      * Calls a function with a reference to the contained value if `Some`.
      */
-    readonly inspect: (fn: (value: T) => void) => Option<T>;
-}
+    readonly inspect: (fn: (value: T) => void) => this;
 
-/**
- * option::Some type
- */
-interface Some<T> extends Option<T> {
-    // #region Override
+    // #region Equals comparison
 
-    readonly [optionKindSymbol]: 'Some';
-
-    // #endregion
-}
-
-/**
- * option::None type
- */
-interface None extends Option<any> {
     /**
-     * Difference between `Option` while using `None` alone.
-     * - T is unknown.
-     * - value is never.
+     * Returns `true` if this and input option have same `Some` value or both are `None`.
      */
-
-    // #region Override
-
-    readonly [optionKindSymbol]: 'None';
-
-    readonly isSome: <T>(this: Option<T>) => this is Some<T>;
-    readonly isNone: <T>(this: Option<T>) => this is None;
-    readonly isSomeAnd: (_predicate: (value: never) => boolean) => boolean;
-
-    readonly expect: (msg: string) => never;
-    readonly unwrap: () => never;
-
-    readonly filter: (predicate: (value: never) => boolean) => None;
-    readonly flatten: <U>(this: Option<Option<U>>) => None;
-    readonly map: <U>(fn: (value: never) => NonNullable<U>) => None;
-
-    readonly mapOr: <U>(defaultValue: NonNullable<U>, fn: (value: never) => NonNullable<U>) => Option<U>;
-    readonly mapOrElse: <U>(defaultFn: () => NonNullable<U>, fn: (value: never) => NonNullable<U>) => Option<U>;
-
-    readonly zip: <U>(other: Option<U>) => None;
-    readonly zipWith: <U, R>(other: Option<U>, fn: (value: never, otherValue: U) => NonNullable<R>) => None;
-    readonly unzip: <U, R>(this: Option<[U, R]>) => [None, None];
-
-    readonly and: <U>(other: Option<U>) => None;
-    readonly andThen: <U>(fn: (value: never) => Option<U>) => None;
-    readonly orElse: <T>(fn: () => Option<T>) => Option<T>;
-
-    readonly inspect: (fn: (value: never) => void) => None;
+    readonly eq: (other: Option<T>) => boolean;
 
     // #endregion
 }
+
+type None = Option<any>;
 
 /**
  * Create a `Some` object.
@@ -328,56 +257,54 @@ interface None extends Option<any> {
  * @param value The contained value which can not be null or undefined.
  * @returns {Option<T>}
  */
-export function Some<T>(value: NonNullable<T>): Option<T> {
-    if (value == null) {
-        throw new TypeError('Some value can not be null or undefined');
-    }
-
+export function Some<T>(value: T): Option<T> {
     const some: Option<T> = {
         [optionKindSymbol]: 'Some',
 
-        isSome: (): true => true,
-        isNone: (): false => false,
+        isSome: (): boolean => true,
+        isNone: (): boolean => false,
         isSomeAnd: (predicate: (value: T) => boolean): boolean => predicate(value),
-
-        eq: (o: Option<T>): boolean => {
-            assertOption(o);
-            return o.isSome() && o.unwrap() === value;
-        },
 
         expect: (_msg: string): T => value,
         unwrap: (): T => value,
         unwrapOr: (_defaultValue: T): T => value,
         unwrapOrElse: (_fn: () => T): T => value,
 
-        okOr: <E>(_err: E): Result<T, E> => Ok<T, E>(value),
-        okOrElse: <E>(_err: () => E): Result<T, E> => Ok<T, E>(value),
-        transpose: <U, E>(): Result<Option<U>, E> => {
-            const r = value as unknown as Result<U, E>;
-            return r.isOk() ? Ok(Some(r.unwrap() as NonNullable<U>)) : Err(r.unwrapErr());
+        okOr: <E>(_error: E): Result<T, E> => Ok(value),
+        okOrElse: <E>(_err: () => E): Result<T, E> => Ok(value),
+        transpose: <T, E>(): Result<Option<T>, E> => {
+            const r = value as unknown as Result<T, E>;
+            assertResult(r);
+            return r.isOk() ? Ok(Some(r.unwrap())) : Err(r.unwrapErr());
         },
 
         filter: (predicate: (value: T) => boolean): Option<T> => predicate(value) ? some : None,
-        flatten: <U>(): Option<U> => {
-            const o = value as unknown as Option<U>;
+        flatten: <T>(): Option<T> => {
+            const o = value as unknown as Option<T>;
             assertOption(o);
-            return o.isSome() ? o : None;
+            return o;
         },
-        map: <U>(fn: (value: T) => NonNullable<U>): Option<U> => Some(fn(value)),
+        map: <U>(fn: (value: T) => U): Option<U> => Some(fn(value)),
 
-        mapOr: <U>(_defaultValue: NonNullable<U>, fn: (value: T) => NonNullable<U>): Option<U> => Some(fn(value)),
-        mapOrElse: <U>(_defaultF: () => NonNullable<U>, fn: (value: T) => NonNullable<U>): Option<U> => Some(fn(value)),
+        mapOr: <U>(_defaultValue: U, fn: (value: T) => U): U => fn(value),
+        mapOrElse: <U>(_defaultFn: () => U, fn: (value: T) => U): U => fn(value),
 
         zip: <U>(other: Option<U>): Option<[T, U]> => {
             assertOption(other);
-            return other.isSome() ? Some([value as T, other.unwrap()]) : None;
+            return other.isSome() ? Some([value, other.unwrap()]) : None;
         },
-        zipWith: <U, R>(other: Option<U>, fn: (value: T, otherValue: U) => NonNullable<R>): Option<R> => {
+        zipWith: <U, R>(other: Option<U>, fn: (value: T, otherValue: U) => R): Option<R> => {
             assertOption(other);
             return other.isSome() ? Some(fn(value, other.unwrap())) : None;
         },
-        unzip: <U, R>(): [Option<U>, Option<R>] => {
-            const [a, b] = value as unknown as [NonNullable<U>, NonNullable<R>];
+        unzip: <T, U>(): [Option<T>, Option<U>] => {
+            const tuple = value as unknown as [T, U];
+
+            if (!Array.isArray(tuple) || tuple.length !== 2) {
+                throw new TypeError('Unzip format is incorrect.');
+            }
+
+            const [a, b] = tuple;
             return [Some(a), Some(b)];
         },
 
@@ -393,13 +320,14 @@ export function Some<T>(value: NonNullable<T>): Option<T> {
             return other.isSome() ? None : some;
         },
 
-        insert: (newValue: NonNullable<T>): Option<T> => Some(newValue),
-        getOrInsert: (_newValue: NonNullable<T>): Option<T> => some,
-        getOrInsertWith: (_fn: () => NonNullable<T>): Option<T> => some,
-
         inspect: (fn: (value: T) => void): Option<T> => {
             fn(value);
             return some;
+        },
+
+        eq: (other: Option<T>): boolean => {
+            assertOption(other);
+            return other.isSome() && other.unwrap() === value;
         },
     } as const;
 
@@ -414,14 +342,9 @@ export function Some<T>(value: NonNullable<T>): Option<T> {
 export const None = Object.freeze<None>({
     [optionKindSymbol]: 'None',
 
-    isSome: (): false => false,
-    isNone: (): true => true,
-    isSomeAnd: (_predicate: (value: never) => boolean): false => false,
-
-    eq: <T>(o: Option<T>): boolean => {
-        assertOption(o);
-        return o === None;
-    },
+    isSome: (): boolean => false,
+    isNone: (): boolean => true,
+    isSomeAnd: (_predicate: (value: never) => boolean): boolean => false,
 
     expect: (msg: string): never => {
         throw new TypeError(msg);
@@ -432,36 +355,37 @@ export const None = Object.freeze<None>({
     unwrapOr: <T>(defaultValue: T): T => defaultValue,
     unwrapOrElse: <T>(fn: () => T): T => fn(),
 
-    okOr: <E, T>(err: E): Result<T, E> => Err<T, E>(err),
-    okOrElse: <E, T>(err: () => E): Result<T, E> => Err<T, E>(err()),
-    transpose: <E, T>(): Result<Option<T>, E> => Ok(None as Option<T>),
+    okOr: <E, T>(error: E): Result<T, E> => Err(error),
+    okOrElse: <E, T>(err: () => E): Result<T, E> => Err(err()),
+    transpose: <E, T>(): Result<Option<T>, E> => Ok(None),
 
     filter: (_predicate: (value: never) => boolean): None => None,
     flatten: (): None => None,
-    map: <U>(_fn: (value: never) => NonNullable<U>): None => None,
+    map: <U>(_fn: (value: never) => U): None => None,
 
-    mapOr: <U>(defaultValue: NonNullable<U>, _fn: (value: never) => NonNullable<U>): Option<U> => Some(defaultValue),
-    mapOrElse: <U>(defaultFn: () => NonNullable<U>, _fn: (value: never) => NonNullable<U>): Option<U> => Some(defaultFn()),
+    mapOr: <U>(defaultValue: U, _fn: (value: never) => U): U => defaultValue,
+    mapOrElse: <U>(defaultFn: () => U, _fn: (value: never) => U): U => defaultFn(),
 
     zip: <U>(_other: Option<U>): None => None,
-    zipWith: <U, R>(_other: Option<U>, _fn: (value: never, otherValue: U) => NonNullable<R>): None => None,
-    unzip: (): [None, None] => [None, None],
+    zipWith: <U, R>(_other: Option<U>, _fn: (value: never, otherValue: U) => R): None => None,
+    unzip: <T, U>(): [Option<T>, Option<U>] => [None, None],
 
-    and: <U>(_other: Option<U>): None => None,
-    andThen: <U>(_fn: (value: never) => Option<U>): None => None,
-    or: <U>(other: Option<U>): Option<U> => {
+    and: <U>(_other: Option<U>): Option<U> => None,
+    andThen: <U>(_fn: (value: never) => Option<U>): Option<U> => None,
+    or: <T>(other: Option<T>): Option<T> => {
         assertOption(other);
         return other;
     },
-    orElse: <U>(fn: () => Option<U>): Option<U> => fn(),
-    xor: <U>(other: Option<U>): Option<U> => {
+    orElse: <T>(fn: () => Option<T>): Option<T> => fn(),
+    xor: <T>(other: Option<T>): Option<T> => {
         assertOption(other);
         return other.isSome() ? other : None;
     },
 
-    insert: <T>(newValue: NonNullable<T>): Option<T> => Some(newValue),
-    getOrInsert: <T>(newValue: NonNullable<T>): Option<T> => Some(newValue),
-    getOrInsertWith: <T>(fn: () => NonNullable<T>): Option<T> => Some(fn()),
-
     inspect: (_fn: (value: never) => void): None => None,
+
+    eq: <T>(other: Option<T>): boolean => {
+        assertOption(other);
+        return other === None;
+    },
 }) as None;

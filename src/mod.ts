@@ -1,8 +1,6 @@
-import type { Option } from './enum/option.ts';
-import type { Result } from './enum/result.ts';
+import type { Option, Result } from './enum/prelude.ts';
 
-export { None, Some, type Option } from './enum/option.ts';
-export { Err, Ok, promiseToResult, type Result } from './enum/result.ts';
+export { Err, None, Ok, promiseToResult, Some, type Option, type Result } from './enum/prelude.ts';
 
 // export some commonly used types
 
