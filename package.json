@@ -27,6 +27,8 @@
     "test": "deno test --coverage && deno coverage coverage && deno coverage coverage --lcov --output=coverage/cov_profile.lcov",
     "pretest:html": "pnpm run pretest",
     "test:html": "deno test --coverage && deno coverage coverage && deno coverage coverage --html",
+    "predocs": "pnpm exec rimraf docs",
+    "docs": "pnpm exec typedoc",
     "prepublishOnly": "pnpm run build"
   },
   "repository": {
@@ -51,6 +53,8 @@
     "rollup": "^4.18.0",
     "rollup-plugin-dts": "^6.1.1",
     "rollup-plugin-esbuild": "^6.1.1",
+    "typedoc": "^0.25.13",
+    "typedoc-plugin-markdown": "^4.0.3",
     "typescript": "^5.4.5"
   },
   "packageManager": "pnpm@9.2.0"

@@ -9,16 +9,14 @@
 
 ---
 
-<a href="README.cn.md">[中文]</a>
+## [中文](README.cn.md)
 
 ---
 
-## Partial supported
+## Supported
 
--   [option](https://doc.rust-lang.org/core/option/index.html)
--   [result](https://doc.rust-lang.org/core/result/index.html)
-
-### More is coming
+- [option](https://doc.rust-lang.org/core/option/index.html)
+- [result](https://doc.rust-lang.org/core/result/index.html)
 
 ## Installation
 
@@ -66,33 +64,4 @@ import { Some, None, Ok, Err } from 'happy-rusty';
 
 Enjoy the happiness.
 
-## Examples
-
-```ts
-import { Some, None, Ok, Err } from 'happy-rusty';
-
-function judge(n: number): Option<Promise<Result<number, Error>>> {
-    if (n < 0 || n >= 1) {
-        return None;
-    }
-
-    return Some(
-        new Promise((resolve) => {
-            const r = Math.random();
-            resolve(r > n ? Ok(r) : Err(new Error('lose')));
-        })
-    );
-}
-
-const res = judge(0.8);
-if (res.isNone()) {
-    console.error('invalid number');
-} else {
-    const result = await res.unwrap();
-    if (result.isErr()) {
-        console.assert(result.err().message === 'lose');
-    } else {
-        console.log(result.unwrap()); // must greater than 0.8
-    }
-}
-```
+## [Docs](docs/index.md)

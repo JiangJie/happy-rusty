@@ -973,6 +973,8 @@
         "npm:rollup-plugin-dts@^6.1.1",
         "npm:rollup-plugin-esbuild@^6.1.1",
         "npm:rollup@^4.18.0",
+        "npm:typedoc-plugin-markdown@^4.0.3",
+        "npm:typedoc@^0.25.13",
         "npm:typescript@^5.4.5"
       ]
     }
