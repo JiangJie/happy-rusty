@@ -13,12 +13,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      - name: Install pnpm
         uses: actions/setup-node@v4
         with:
           node-version: latest
       - run: npm install pnpm -g
-      - run: pnpm install
 
       - name: Run test cases
         uses: denoland/setup-deno@v1
