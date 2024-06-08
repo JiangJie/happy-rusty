@@ -142,7 +142,7 @@ export interface Option<T> {
      * - `None` if predicate returns `false`.
      * @param predicate - A function that takes the contained value and returns a boolean.
      */
-    filter(predicate: (value: T) => boolean): this;
+    filter(predicate: (value: T) => boolean): Option<T>;
 
     /**
      * Converts from `Option<Option<T>>` to `Option<T>`.
