@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * @fileoverview
@@ -19,8 +18,6 @@ const optionKindSymbol = Symbol('Option kind');
 const resultKindSymbol = Symbol('Result kind');
 
 /**
- * option::Option type
- *
  * Type `Option` represents an optional value: every `Option` is either `Some` and contains a value, or `None`, and does not.
  * This interface includes methods that act on the `Option` type, similar to Rust's `Option` enum.
  *
@@ -283,15 +280,41 @@ export interface Option<T> {
 }
 
 /**
- * Represents the absence of a value in an `Option` type.
- * This type alias is useful when you want to explicitly denote the `None` case of an `Option` without specifying the type of value that could be present.
- * It is a subtype of `Option<any>`, which means it can be used in place of an `Option<T>` for any type `T`.
+ * Represents the absence of a value, as a specialized `Option` type.
+ * The type parameter is set to `never` because `None` does not hold a value.
+ *
+ * @extends {Option<never>} Extends the generic `Option` type with `never` to denote no value.
  */
-export type None = Option<any>;
+export interface None extends Option<never> {
+    /**
+     * When using `None` alone, the following overrides can make type inference more accurate.
+     */
+
+    readonly [optionKindSymbol]: 'None';
+
+    unwrapOr<T>(defaultValue: T): T;
+    unwrapOrElse<T>(fn: () => T): T;
+
+    transpose(): Result<None, never>;
+
+    filter(predicate: (value: never) => boolean): None;
+    flatten(): None;
+    map<U>(fn: (value: never) => U): None;
+
+    zip<U>(other: Option<U>): None;
+    zipWith<U, R>(other: Option<U>, fn: (value: never, otherValue: U) => R): None;
+    unzip(): [None, None];
+
+    and<U>(other: Option<U>): None;
+    andThen<U>(fn: (value: never) => Option<U>): None;
+    or<T>(other: Option<T>): Option<T>;
+    orElse<T>(fn: () => Option<T>): Option<T>;
+    xor<T>(other: Option<T>): Option<T>;
+
+    eq<T>(other: Option<T>): boolean;
+}
 
 /**
- * result::Result type
- *
  * The `Result` type is used for returning and propagating errors.
  * It is an enum with the variants, `Ok(T)`, representing success and containing a value, and `Err(E)`, representing error and containing an error value.
  * This interface includes methods that act on the `Result` type, similar to Rust's `Result` enum.
@@ -605,8 +628,8 @@ export function Some<T>(value: T): Option<T> {
     const some: Option<T> = {
         [optionKindSymbol]: 'Some',
 
-        isSome: (): boolean => true,
-        isNone: (): boolean => false,
+        isSome: (): true => true,
+        isNone: (): false => false,
         isSomeAnd: (predicate: (value: T) => boolean): boolean => predicate(value),
 
         expect: (_msg: string): T => value,
@@ -685,9 +708,9 @@ export function Some<T>(value: T): Option<T> {
 export const None = Object.freeze<None>({
     [optionKindSymbol]: 'None',
 
-    isSome: (): boolean => false,
-    isNone: (): boolean => true,
-    isSomeAnd: (_predicate: (value: never) => boolean): boolean => false,
+    isSome: (): false => false,
+    isNone: (): true => true,
+    isSomeAnd: (_predicate: (value: never) => boolean): false => false,
 
     expect: (msg: string): never => {
         throw new TypeError(msg);
@@ -698,9 +721,9 @@ export const None = Object.freeze<None>({
     unwrapOr: <T>(defaultValue: T): T => defaultValue,
     unwrapOrElse: <T>(fn: () => T): T => fn(),
 
-    okOr: <E, T>(error: E): Result<T, E> => Err(error),
-    okOrElse: <E, T>(err: () => E): Result<T, E> => Err(err()),
-    transpose: <E, T>(): Result<Option<T>, E> => Ok(None),
+    okOr: <E>(error: E): Result<never, E> => Err(error),
+    okOrElse: <E>(err: () => E): Result<never, E> => Err(err()),
+    transpose: (): Result<None, never> => Ok(None),
 
     filter: (_predicate: (value: never) => boolean): None => None,
     flatten: (): None => None,
@@ -711,10 +734,10 @@ export const None = Object.freeze<None>({
 
     zip: <U>(_other: Option<U>): None => None,
     zipWith: <U, R>(_other: Option<U>, _fn: (value: never, otherValue: U) => R): None => None,
-    unzip: <T, U>(): [Option<T>, Option<U>] => [None, None],
+    unzip: (): [None, None] => [None, None],
 
-    and: <U>(_other: Option<U>): Option<U> => None,
-    andThen: <U>(_fn: (value: never) => Option<U>): Option<U> => None,
+    and: <U>(_other: Option<U>): None => None,
+    andThen: <U>(_fn: (value: never) => Option<U>): None => None,
     or: <T>(other: Option<T>): Option<T> => {
         assertOption(other);
         return other;
@@ -754,10 +777,10 @@ export function Ok<T, E>(value: T): Result<T, E> {
     const ok: Result<T, E> = {
         [resultKindSymbol]: 'Ok',
 
-        isOk: (): boolean => true,
-        isErr: (): boolean => false,
+        isOk: (): true => true,
+        isErr: (): false => false,
         isOkAnd: (predicate: (value: T) => boolean): boolean => predicate(value),
-        isErrAnd: (_predicate: (error: E) => boolean): boolean => false,
+        isErrAnd: (_predicate: (error: E) => boolean): false => false,
 
         expect: (_msg: string): T => value,
         unwrap: (): T => value,
@@ -772,7 +795,7 @@ export function Ok<T, E>(value: T): Result<T, E> {
         },
 
         ok: (): Option<T> => Some(value),
-        err: (): Option<E> => None,
+        err: (): None => None,
         transpose: <T>(): Option<Result<T, E>> => {
             const o = value as Option<T>;
             assertOption(o);
@@ -833,9 +856,9 @@ export function Err<T, E>(error: E): Result<T, E> {
     const err: Result<T, E> = {
         [resultKindSymbol]: 'Err',
 
-        isOk: (): boolean => false,
-        isErr: (): boolean => true,
-        isOkAnd: (_predicate: (value: T) => boolean): boolean => false,
+        isOk: (): false => false,
+        isErr: (): true => true,
+        isOkAnd: (_predicate: (value: T) => boolean): false => false,
         isErrAnd: (predicate: (error: E) => boolean): boolean => predicate(error),
 
         expect: (msg: string): T => {
@@ -850,7 +873,7 @@ export function Err<T, E>(error: E): Result<T, E> {
         expectErr: (_msg: string): E => error,
         unwrapErr: (): E => error,
 
-        ok: (): Option<T> => None,
+        ok: (): None => None,
         err: (): Option<E> => Some(error),
         transpose: <T>(): Option<Result<T, E>> => Some(err as unknown as Result<T, E>),
 

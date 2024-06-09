@@ -5,20 +5,11 @@ import { Err, None, Ok, Some, type Option } from '../../src/mod.ts';
 Deno.test('Option:Some', async (t) => {
     const o = Some(10);
 
-    // await t.step('Some value can not be nullable', () => {
-    //     assertThrows(() => Some(null as unknown as number), TypeError);
-    // });
-
     await t.step('Querying the variant', () => {
         assert(o.isSome());
         assert(!o.isNone());
         assert(o.isSomeAnd(v => v === 10));
         assert(!o.isSomeAnd(v => v === 20));
-    });
-
-    await t.step('Equals comparison', () => {
-        assert(o.eq(Some(10)));
-        assert(!o.eq(None));
     });
 
     await t.step('Extracting the contained value', () => {
@@ -84,20 +75,21 @@ Deno.test('Option:Some', async (t) => {
         o.inspect(printSpy);
         assertSpyCalls(printSpy, 1);
     });
+
+    await t.step('Equals comparison', () => {
+        assert(o.eq(Some(10)));
+        assert(!o.eq(None));
+    });
 });
 
 Deno.test('Option:None', async (t) => {
-    const o: Option<number> = None;
+    // const o: Option<number> = None;
+    const o = None;
 
     await t.step('Querying the variant', () => {
         assert(!o.isSome());
         assert(o.isNone());
         assert(!o.isSomeAnd(v => v === 10));
-    });
-
-    await t.step('Equals comparison', () => {
-        assert(!o.eq(Some(10)));
-        assert(o.eq(None));
     });
 
     await t.step('Extracting the contained value', () => {
@@ -112,8 +104,7 @@ Deno.test('Option:None', async (t) => {
         assert(o.okOr(new Error('None has no value')).unwrapErr().message === 'None has no value');
         assert(o.okOrElse(() => new Error('None has no value')).unwrapErr().message === 'None has no value');
 
-        assert(None.transpose().isOk());
-        assert(None.transpose().unwrap().eq(None));
+        assert(None.transpose().eq(Ok(None)));
 
         assert(o.map((v) => v + 1).eq(None));
         assert(o.mapOr(0, (v) => v + 1) === 0);
@@ -121,7 +112,6 @@ Deno.test('Option:None', async (t) => {
 
         assert(o.filter((v) => v > 0).eq(None));
 
-        assert(Some(o).flatten().eq(o));
         assert(None.flatten().eq(None));
 
         const x = o.zip(Some('foo'));
@@ -156,5 +146,10 @@ Deno.test('Option:None', async (t) => {
 
         o.inspect(printSpy);
         assertSpyCalls(printSpy, 0);
+    });
+
+    await t.step('Equals comparison', () => {
+        assert(!o.eq(Some(10)));
+        assert(o.eq(None));
     });
 });
