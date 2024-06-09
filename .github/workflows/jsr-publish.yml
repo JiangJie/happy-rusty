@@ -39,5 +39,4 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: latest
-      - run: npm install jsr -g
-      - run: jsr publish
+      - run: npx jsr publish --config jsr.json
