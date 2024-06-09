@@ -8,8 +8,9 @@
 
 | Interface | Description |
 | :------ | :------ |
-| [Option](interfaces/Option.md) | option::Option type |
-| [Result](interfaces/Result.md) | result::Result type |
+| [None](interfaces/None.md) | Represents the absence of a value, as a specialized `Option` type. The type parameter is set to `never` because `None` does not hold a value. |
+| [Option](interfaces/Option.md) | Type `Option` represents an optional value: every `Option` is either `Some` and contains a value, or `None`, and does not. This interface includes methods that act on the `Option` type, similar to Rust's `Option` enum. |
+| [Result](interfaces/Result.md) | The `Result` type is used for returning and propagating errors. It is an enum with the variants, `Ok(T)`, representing success and containing a value, and `Err(E)`, representing error and containing an error value. This interface includes methods that act on the `Result` type, similar to Rust's `Result` enum. |
 
 ## Type Aliases
 
@@ -19,7 +20,6 @@
 | [AsyncOption](type-aliases/AsyncOption.md) | Represents an asynchronous operation that yields an `Option<T>`. This is a promise that resolves to either `Some(T)` if the value is present, or `None` if the value is absent. |
 | [AsyncResult](type-aliases/AsyncResult.md) | Represents an asynchronous operation that yields a `Result<T, E>`. This is a promise that resolves to `Ok(T)` if the operation was successful, or `Err(E)` if there was an error. |
 | [IOResult](type-aliases/IOResult.md) | Represents a synchronous operation that yields a `Result<T, Error>`. This is a result that is either `Ok(T)` if the operation was successful, or `Err(Error)` if there was an error. |
-| [None](type-aliases/None.md) | Represents the absence of a value in an `Option` type. This type alias is useful when you want to explicitly denote the `None` case of an `Option` without specifying the type of value that could be present. It is a subtype of `Option<any>`, which means it can be used in place of an `Option<T>` for any type `T`. |
 
 ## Variables
 
