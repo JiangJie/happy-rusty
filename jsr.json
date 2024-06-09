@@ -1,6 +1,6 @@
 {
   "name": "@happy-js/happy-rusty",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "exports": "./src/mod.ts",
   "publish": {
     "include": [
@@ -9,6 +9,7 @@
       "README.cn.md",
       "package.json",
       "jsr.json",
+      "docs",
       "src"
     ]
   }
