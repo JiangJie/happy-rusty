@@ -1,8 +1,8 @@
-[**happy-rusty**](../index.md) • **Docs**
+[**happy-rusty**](../README.md) • **Docs**
 
 ***
 
-[happy-rusty](../index.md) / AsyncIOResult
+[happy-rusty](../README.md) / AsyncIOResult
 
 # Type alias: AsyncIOResult\<T\>
 
@@ -21,4 +21,4 @@ This is a promise that resolves to `Ok(T)` if the I/O operation was successful, 
 
 ## Source
 
-[enum/prelude.ts:609](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L609)
+[enum/prelude.ts:609](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L609)

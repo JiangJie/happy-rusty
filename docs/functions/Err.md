@@ -1,8 +1,8 @@
-[**happy-rusty**](../index.md) • **Docs**
+[**happy-rusty**](../README.md) • **Docs**
 
 ***
 
-[happy-rusty](../index.md) / Err
+[happy-rusty](../README.md) / Err
 
 # Function: Err()
 
@@ -43,4 +43,4 @@ if (badResult.isErr()) {
 
 ## Source
 
-[enum/prelude.ts:855](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L855)
+[enum/prelude.ts:855](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L855)

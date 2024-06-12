@@ -64,4 +64,4 @@ import { Some, None, Ok, Err } from 'happy-rusty';
 
 Enjoy the happiness.
 
-## [Docs](docs/index.md)
+## [Docs](docs/README.md)

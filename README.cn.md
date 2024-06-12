@@ -58,4 +58,4 @@ bunx jsr add @happy-js/happy-rusty
 import { Some, None, Ok, Err } from 'happy-rusty';
 ```
 
-## [文档](docs/index.md)
+## [文档](docs/README.md)

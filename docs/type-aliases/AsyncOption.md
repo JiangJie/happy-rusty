@@ -1,8 +1,8 @@
-[**happy-rusty**](../index.md) • **Docs**
+[**happy-rusty**](../README.md) • **Docs**
 
 ***
 
-[happy-rusty](../index.md) / AsyncOption
+[happy-rusty](../README.md) / AsyncOption
 
 # Type alias: AsyncOption\<T\>
 
@@ -21,4 +21,4 @@ This is a promise that resolves to either `Some(T)` if the value is present, or 
 
 ## Source
 
-[enum/prelude.ts:584](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L584)
+[enum/prelude.ts:584](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L584)

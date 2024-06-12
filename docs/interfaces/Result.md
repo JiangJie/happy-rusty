@@ -1,8 +1,8 @@
-[**happy-rusty**](../index.md) • **Docs**
+[**happy-rusty**](../README.md) • **Docs**
 
 ***
 
-[happy-rusty](../index.md) / Result
+[happy-rusty](../README.md) / Result
 
 # Interface: Result\<T, E\>
 
@@ -61,7 +61,7 @@ The passed `Result` if `this` is `Ok`, otherwise returns `this` (which is `Err`)
 
 #### Source
 
-[enum/prelude.ts:518](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L518)
+[enum/prelude.ts:518](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L518)
 
 ***
 
@@ -93,7 +93,7 @@ The result of `fn` if `this` is `Ok`, otherwise `this` as `Err`.
 
 #### Source
 
-[enum/prelude.ts:534](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L534)
+[enum/prelude.ts:534](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L534)
 
 ***
 
@@ -119,7 +119,7 @@ Tests whether `this` and `other` are both `Ok` containing equal values, or both 
 
 #### Source
 
-[enum/prelude.ts:569](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L569)
+[enum/prelude.ts:569](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L569)
 
 ***
 
@@ -139,7 +139,7 @@ If the result is `Ok`, returns `None`.
 
 #### Source
 
-[enum/prelude.ts:442](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L442)
+[enum/prelude.ts:442](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L442)
 
 ***
 
@@ -167,7 +167,7 @@ Throws an error with the provided message if the result is an `Err`.
 
 #### Source
 
-[enum/prelude.ts:385](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L385)
+[enum/prelude.ts:385](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L385)
 
 ***
 
@@ -195,7 +195,7 @@ Throws an error with the provided message if the result is an `Ok`.
 
 #### Source
 
-[enum/prelude.ts:414](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L414)
+[enum/prelude.ts:414](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L414)
 
 ***
 
@@ -227,7 +227,7 @@ If the result is `Ok(Err(E))` or `Err(E)`, returns `Err(E)`.
 
 #### Source
 
-[enum/prelude.ts:502](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L502)
+[enum/prelude.ts:502](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L502)
 
 ***
 
@@ -254,7 +254,7 @@ Does not modify the `Result`.
 
 #### Source
 
-[enum/prelude.ts:552](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L552)
+[enum/prelude.ts:552](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L552)
 
 ***
 
@@ -281,7 +281,7 @@ Does not modify the `Result`.
 
 #### Source
 
-[enum/prelude.ts:560](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L560)
+[enum/prelude.ts:560](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L560)
 
 ***
 
@@ -299,7 +299,7 @@ Returns `true` if the result is `Err`.
 
 #### Source
 
-[enum/prelude.ts:358](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L358)
+[enum/prelude.ts:358](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L358)
 
 ***
 
@@ -323,7 +323,7 @@ Returns `true` if the result is `Err` and the provided predicate returns `true` 
 
 #### Source
 
-[enum/prelude.ts:370](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L370)
+[enum/prelude.ts:370](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L370)
 
 ***
 
@@ -341,7 +341,7 @@ Returns `true` if the result is `Ok`.
 
 #### Source
 
-[enum/prelude.ts:353](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L353)
+[enum/prelude.ts:353](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L353)
 
 ***
 
@@ -365,7 +365,7 @@ Returns `true` if the result is `Ok` and the provided predicate returns `true` f
 
 #### Source
 
-[enum/prelude.ts:364](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L364)
+[enum/prelude.ts:364](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L364)
 
 ***
 
@@ -396,7 +396,7 @@ leaving an `Err` value untouched.
 
 #### Source
 
-[enum/prelude.ts:463](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L463)
+[enum/prelude.ts:463](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L463)
 
 ***
 
@@ -427,7 +427,7 @@ leaving an `Ok` value untouched.
 
 #### Source
 
-[enum/prelude.ts:475](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L475)
+[enum/prelude.ts:475](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L475)
 
 ***
 
@@ -458,7 +458,7 @@ Maps a `Result<T, E>` to `U` by applying a function to the contained `Ok` value 
 
 #### Source
 
-[enum/prelude.ts:487](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L487)
+[enum/prelude.ts:487](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L487)
 
 ***
 
@@ -489,7 +489,7 @@ Maps a `Result<T, E>` to `U` by applying a function to the contained `Ok` value 
 
 #### Source
 
-[enum/prelude.ts:495](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L495)
+[enum/prelude.ts:495](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L495)
 
 ***
 
@@ -509,7 +509,7 @@ If the result is `Err`, returns `None`.
 
 #### Source
 
-[enum/prelude.ts:435](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L435)
+[enum/prelude.ts:435](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L435)
 
 ***
 
@@ -541,7 +541,7 @@ Returns `this` if it is `Ok`, otherwise returns the passed `Result`.
 
 #### Source
 
-[enum/prelude.ts:526](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L526)
+[enum/prelude.ts:526](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L526)
 
 ***
 
@@ -573,7 +573,7 @@ The result of `fn` if `this` is `Err`, otherwise `this` as `Ok`.
 
 #### Source
 
-[enum/prelude.ts:542](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L542)
+[enum/prelude.ts:542](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L542)
 
 ***
 
@@ -607,7 +607,7 @@ Transposes a `Result` of an `Option` into an `Option` of a `Result`.
 
 #### Source
 
-[enum/prelude.ts:451](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L451)
+[enum/prelude.ts:451](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L451)
 
 ***
 
@@ -629,7 +629,7 @@ Throws an error if the result is an `Err`.
 
 #### Source
 
-[enum/prelude.ts:391](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L391)
+[enum/prelude.ts:391](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L391)
 
 ***
 
@@ -651,7 +651,7 @@ Throws an error if the result is an `Ok`.
 
 #### Source
 
-[enum/prelude.ts:420](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L420)
+[enum/prelude.ts:420](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L420)
 
 ***
 
@@ -675,7 +675,7 @@ Returns the contained `Ok` value or a provided default.
 
 #### Source
 
-[enum/prelude.ts:397](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L397)
+[enum/prelude.ts:397](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L397)
 
 ***
 
@@ -699,4 +699,4 @@ Returns the contained `Ok` value or computes it from a closure if the result is 
 
 #### Source
 
-[enum/prelude.ts:403](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L403)
+[enum/prelude.ts:403](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L403)

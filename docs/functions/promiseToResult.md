@@ -1,8 +1,8 @@
-[**happy-rusty**](../index.md) • **Docs**
+[**happy-rusty**](../README.md) • **Docs**
 
 ***
 
-[happy-rusty](../index.md) / promiseToResult
+[happy-rusty](../README.md) / promiseToResult
 
 # Function: promiseToResult()
 
@@ -47,4 +47,4 @@ async function example() {
 
 ## Source
 
-[enum/prelude.ts:959](https://github.com/JiangJie/happy-rusty/blob/15ed105e08c6cc3943e22243c9386336a521d83e/src/enum/prelude.ts#L959)
+[enum/prelude.ts:959](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L959)
