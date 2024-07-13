@@ -282,8 +282,6 @@ export interface Option<T> {
 /**
  * Represents the absence of a value, as a specialized `Option` type.
  * The type parameter is set to `never` because `None` does not hold a value.
- *
- * @extends {Option<never>} Extends the generic `Option` type with `never` to denote no value.
  */
 export interface None extends Option<never> {
     /**
