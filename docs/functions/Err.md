@@ -13,17 +13,17 @@ function Err<T, E>(error): Result<T, E>
 Creates a `Result<T, E>` representing a failed outcome containing an error.
 This function is used to construct a `Result` that signifies the operation failed by containing the error `E`.
 
-## Type parameters
+## Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `T` | The type of the value that the result could potentially contain (not used in this case). |
 | `E` | The type of the error to be wrapped in the `Err` result. |
 
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `error` | `E` | The error to wrap as an `Err` result. |
 
 ## Returns
@@ -41,6 +41,6 @@ if (badResult.isErr()) {
 }
 ```
 
-## Source
+## Defined in
 
-[enum/prelude.ts:855](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L855)
+[prelude.ts:853](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L853)

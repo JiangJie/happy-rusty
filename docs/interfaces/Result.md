@@ -18,18 +18,12 @@ pub enum Result<T, E> {
 }
 ```
 
-## Type parameters
+## Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `T` | The type of the value contained in a successful `Result`. |
 | `E` | The type of the error contained in an unsuccessful `Result`. |
-
-## Properties
-
-| Property | Modifier | Type | Description |
-| :------ | :------ | :------ | :------ |
-| `[resultKindSymbol]` | `private` | `"Ok"` \| `"Err"` | Identify `Ok` or `Err`. |
 
 ## Methods
 
@@ -41,16 +35,16 @@ and<U>(other): Result<U, E>
 
 Returns `this` if the result is `Err`, otherwise returns the passed `Result`.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `U` | The type of the value in the other `Result`. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `other` | [`Result`](Result.md)\<`U`, `E`\> | The `Result` to return if `this` is `Ok`. |
 
 #### Returns
@@ -59,9 +53,9 @@ Returns `this` if the result is `Err`, otherwise returns the passed `Result`.
 
 The passed `Result` if `this` is `Ok`, otherwise returns `this` (which is `Err`).
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:518](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L518)
+[prelude.ts:516](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L516)
 
 ***
 
@@ -73,16 +67,16 @@ andThen<U>(fn): Result<U, E>
 
 Calls the provided function with the contained value if `this` is `Ok`, otherwise returns `this` as `Err`.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `U` | The type of the value returned by the function. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `fn` | (`value`) => [`Result`](Result.md)\<`U`, `E`\> | A function that takes the `Ok` value and returns a `Result`. |
 
 #### Returns
@@ -91,9 +85,9 @@ Calls the provided function with the contained value if `this` is `Ok`, otherwis
 
 The result of `fn` if `this` is `Ok`, otherwise `this` as `Err`.
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:534](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L534)
+[prelude.ts:532](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L532)
 
 ***
 
@@ -108,7 +102,7 @@ Tests whether `this` and `other` are both `Ok` containing equal values, or both 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `other` | [`Result`](Result.md)\<`T`, `E`\> | The other `Result` to compare with. |
 
 #### Returns
@@ -117,9 +111,9 @@ Tests whether `this` and `other` are both `Ok` containing equal values, or both 
 
 `true` if `this` and `other` are both `Ok` with equal values, or both are `Err` with equal errors, otherwise `false`.
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:569](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L569)
+[prelude.ts:567](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L567)
 
 ***
 
@@ -137,9 +131,9 @@ If the result is `Ok`, returns `None`.
 
 [`Option`](Option.md)\<`E`\>
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:442](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L442)
+[prelude.ts:440](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L440)
 
 ***
 
@@ -154,7 +148,7 @@ Returns the contained `Ok` value, with a provided error message if the result is
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `msg` | `string` | The error message to provide if the result is an `Err`. |
 
 #### Returns
@@ -165,9 +159,9 @@ Returns the contained `Ok` value, with a provided error message if the result is
 
 Throws an error with the provided message if the result is an `Err`.
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:385](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L385)
+[prelude.ts:383](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L383)
 
 ***
 
@@ -182,7 +176,7 @@ Returns the contained `Err` value, with a provided error message if the result i
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `msg` | `string` | The error message to provide if the result is an `Ok`. |
 
 #### Returns
@@ -193,9 +187,9 @@ Returns the contained `Err` value, with a provided error message if the result i
 
 Throws an error with the provided message if the result is an `Ok`.
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:414](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L414)
+[prelude.ts:412](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L412)
 
 ***
 
@@ -209,25 +203,25 @@ Converts from `Result<Result<T, E>, E>` to `Result<T, E>`.
 If the result is `Ok(Ok(T))`, returns `Ok(T)`.
 If the result is `Ok(Err(E))` or `Err(E)`, returns `Err(E)`.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter |
-| :------ |
+| Type Parameter |
+| ------ |
 | `T` |
 
 #### Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `this` | [`Result`](Result.md)\<[`Result`](Result.md)\<`T`, `E`\>, `E`\> |
 
 #### Returns
 
 [`Result`](Result.md)\<`T`, `E`\>
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:502](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L502)
+[prelude.ts:500](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L500)
 
 ***
 
@@ -243,7 +237,7 @@ Does not modify the `Result`.
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `fn` | (`value`) => `void` | A function to call with the `Ok` value. |
 
 #### Returns
@@ -252,9 +246,9 @@ Does not modify the `Result`.
 
 `this`, unmodified.
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:552](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L552)
+[prelude.ts:550](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L550)
 
 ***
 
@@ -270,7 +264,7 @@ Does not modify the `Result`.
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `fn` | (`error`) => `void` | A function to call with the `Err` value. |
 
 #### Returns
@@ -279,9 +273,9 @@ Does not modify the `Result`.
 
 `this`, unmodified.
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:560](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L560)
+[prelude.ts:558](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L558)
 
 ***
 
@@ -297,9 +291,9 @@ Returns `true` if the result is `Err`.
 
 `boolean`
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:358](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L358)
+[prelude.ts:356](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L356)
 
 ***
 
@@ -314,16 +308,16 @@ Returns `true` if the result is `Err` and the provided predicate returns `true` 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `predicate` | (`error`) => `boolean` | A function that takes the `Err` value and returns a boolean. |
 
 #### Returns
 
 `boolean`
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:370](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L370)
+[prelude.ts:368](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L368)
 
 ***
 
@@ -339,9 +333,9 @@ Returns `true` if the result is `Ok`.
 
 `boolean`
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:353](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L353)
+[prelude.ts:351](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L351)
 
 ***
 
@@ -356,16 +350,16 @@ Returns `true` if the result is `Ok` and the provided predicate returns `true` f
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `predicate` | (`value`) => `boolean` | A function that takes the `Ok` value and returns a boolean. |
 
 #### Returns
 
 `boolean`
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:364](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L364)
+[prelude.ts:362](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L362)
 
 ***
 
@@ -378,25 +372,25 @@ map<U>(fn): Result<U, E>
 Maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `Ok` value,
 leaving an `Err` value untouched.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `U` | The type of the value returned by the map function. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `fn` | (`value`) => `U` | A function that takes the `Ok` value and returns a new value. |
 
 #### Returns
 
 [`Result`](Result.md)\<`U`, `E`\>
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:463](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L463)
+[prelude.ts:461](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L461)
 
 ***
 
@@ -409,25 +403,25 @@ mapErr<F>(fn): Result<T, F>
 Maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained `Err` value,
 leaving an `Ok` value untouched.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `F` | The type of the error returned by the map function. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `fn` | (`error`) => `F` | A function that takes the `Err` value and returns a new error value. |
 
 #### Returns
 
 [`Result`](Result.md)\<`T`, `F`\>
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:475](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L475)
+[prelude.ts:473](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L473)
 
 ***
 
@@ -439,16 +433,16 @@ mapOr<U>(defaultValue, fn): U
 
 Maps a `Result<T, E>` to `U` by applying a function to the contained `Ok` value (if `Ok`), or returns the provided default (if `Err`).
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `U` | The type of the value returned by the map function or the default value. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `defaultValue` | `U` | The value to return if the result is `Err`. |
 | `fn` | (`value`) => `U` | A function that takes the `Ok` value and returns a new value. |
 
@@ -456,9 +450,9 @@ Maps a `Result<T, E>` to `U` by applying a function to the contained `Ok` value 
 
 `U`
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:487](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L487)
+[prelude.ts:485](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L485)
 
 ***
 
@@ -470,16 +464,16 @@ mapOrElse<U>(defaultFn, fn): U
 
 Maps a `Result<T, E>` to `U` by applying a function to the contained `Ok` value (if `Ok`), or computes a default (if `Err`).
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `U` | The type of the value returned by the map function or the default function. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `defaultFn` | (`error`) => `U` | A function that returns the default value. |
 | `fn` | (`value`) => `U` | A function that takes the `Ok` value and returns a new value. |
 
@@ -487,9 +481,9 @@ Maps a `Result<T, E>` to `U` by applying a function to the contained `Ok` value 
 
 `U`
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:495](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L495)
+[prelude.ts:493](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L493)
 
 ***
 
@@ -507,9 +501,9 @@ If the result is `Err`, returns `None`.
 
 [`Option`](Option.md)\<`T`\>
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:435](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L435)
+[prelude.ts:433](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L433)
 
 ***
 
@@ -521,16 +515,16 @@ or<F>(other): Result<T, F>
 
 Returns `this` if it is `Ok`, otherwise returns the passed `Result`.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `F` | The type of the error in the other `Result`. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `other` | [`Result`](Result.md)\<`T`, `F`\> | The `Result` to return if `this` is `Err`. |
 
 #### Returns
@@ -539,9 +533,9 @@ Returns `this` if it is `Ok`, otherwise returns the passed `Result`.
 
 `this` if it is `Ok`, otherwise returns `other`.
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:526](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L526)
+[prelude.ts:524](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L524)
 
 ***
 
@@ -553,16 +547,16 @@ orElse<F>(fn): Result<T, F>
 
 Calls the provided function with the contained error if `this` is `Err`, otherwise returns `this` as `Ok`.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `F` | The type of the error returned by the function. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `fn` | (`error`) => [`Result`](Result.md)\<`T`, `F`\> | A function that takes the `Err` value and returns a `Result`. |
 
 #### Returns
@@ -571,9 +565,9 @@ Calls the provided function with the contained error if `this` is `Err`, otherwi
 
 The result of `fn` if `this` is `Err`, otherwise `this` as `Ok`.
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:542](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L542)
+[prelude.ts:540](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L540)
 
 ***
 
@@ -585,16 +579,16 @@ transpose<T>(this): Option<Result<T, E>>
 
 Transposes a `Result` of an `Option` into an `Option` of a `Result`.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `T` | The type of the success value in the `Ok` variant of the `Option`. |
 
 #### Parameters
 
 | Parameter | Type |
-| :------ | :------ |
+| ------ | ------ |
 | `this` | [`Result`](Result.md)\<[`Option`](Option.md)\<`T`\>, `E`\> |
 
 #### Returns
@@ -605,9 +599,9 @@ Transposes a `Result` of an `Option` into an `Option` of a `Result`.
          `Some` containing `Err` if the result is `Err`,
          `None` if the result is `Ok` containing `None`.
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:451](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L451)
+[prelude.ts:449](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L449)
 
 ***
 
@@ -627,9 +621,9 @@ Returns the contained `Ok` value.
 
 Throws an error if the result is an `Err`.
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:391](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L391)
+[prelude.ts:389](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L389)
 
 ***
 
@@ -649,9 +643,9 @@ Returns the contained `Err` value.
 
 Throws an error if the result is an `Ok`.
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:420](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L420)
+[prelude.ts:418](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L418)
 
 ***
 
@@ -666,16 +660,16 @@ Returns the contained `Ok` value or a provided default.
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `defaultValue` | `T` | The value to return if the result is an `Err`. |
 
 #### Returns
 
 `T`
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:397](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L397)
+[prelude.ts:395](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L395)
 
 ***
 
@@ -690,13 +684,13 @@ Returns the contained `Ok` value or computes it from a closure if the result is 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `fn` | (`error`) => `T` | A function that takes the `Err` value and returns an `Ok` value. |
 
 #### Returns
 
 `T`
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:403](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L403)
+[prelude.ts:401](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L401)

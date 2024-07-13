@@ -13,16 +13,16 @@ function Some<T>(value): Option<T>
 Creates an `Option<T>` representing the presence of a value.
 This function is typically used to construct an `Option` that contains a value, indicating that the operation yielding the value was successful.
 
-## Type parameters
+## Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `T` | The type of the value to be wrapped in a `Some`. |
 
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `value` | `T` | The value to wrap as a `Some` option. |
 
 ## Returns
@@ -40,6 +40,6 @@ if (maybeValue.isSome()) {
 }
 ```
 
-## Source
+## Defined in
 
-[enum/prelude.ts:627](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L627)
+[prelude.ts:625](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L625)

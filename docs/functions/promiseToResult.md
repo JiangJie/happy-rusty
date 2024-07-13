@@ -13,17 +13,17 @@ function promiseToResult<T, E>(p): Promise<Result<T, E>>
 Converts a Promise to a Result type, capturing the resolved value in an `Ok`, or the error in an `Err`.
 This allows for promise-based asynchronous operations to be handled in a way that is more in line with the Result pattern.
 
-## Type parameters
+## Type Parameters
 
-| Type parameter | Value | Description |
-| :------ | :------ | :------ |
+| Type Parameter | Default type | Description |
+| ------ | ------ | ------ |
 | `T` | - | The type of the value that the promise resolves to. |
 | `E` | `Error` | The type of the error that the promise may reject with, defaults to `Error`. |
 
 ## Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `p` | `Promise`\<`T`\> | The promise to convert into a `Result` type. |
 
 ## Returns
@@ -45,6 +45,6 @@ async function example() {
 }
 ```
 
-## Source
+## Defined in
 
-[enum/prelude.ts:959](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L959)
+[prelude.ts:957](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L957)

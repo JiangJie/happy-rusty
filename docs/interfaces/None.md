@@ -15,9 +15,9 @@ The type parameter is set to `never` because `None` does not hold a value.
 
 ## Properties
 
-| Property | Modifier | Type | Description | Overrides |
-| :------ | :------ | :------ | :------ | :------ |
-| `[optionKindSymbol]` | `readonly` | `"None"` | When using `None` alone, the following overrides can make type inference more accurate. | [`Option`](Option.md).`[optionKindSymbol]` |
+| Property | Modifier | Type | Description | Overrides | Defined in |
+| ------ | ------ | ------ | ------ | ------ | ------ |
+| `[optionKindSymbol]` | `readonly` | `"None"` | When using `None` alone, the following overrides can make type inference more accurate. | `Option.[optionKindSymbol]` | [prelude.ts:291](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L291) |
 
 ## Methods
 
@@ -30,16 +30,16 @@ and<U>(other): None
 Returns `None` if the Option is `None`, otherwise returns `other`.
 This is sometimes called "and then" because it is similar to a logical AND operation.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `U` | The type of the value in the other `Option`. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `other` | [`Option`](Option.md)\<`U`\> | The `Option` to return if `this` is `Some`. |
 
 #### Returns
@@ -52,9 +52,9 @@ This is sometimes called "and then" because it is similar to a logical AND opera
 
 [`Option`](Option.md).[`and`](Option.md#and)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:308](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L308)
+[prelude.ts:306](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L306)
 
 ***
 
@@ -67,16 +67,16 @@ andThen<U>(fn): None
 Returns `None` if the Option is `None`, otherwise calls `fn` with the wrapped value and returns the result.
 This function can be used for control flow based on `Option` values.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `U` | The type of the value returned by the function. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `fn` | (`value`) => [`Option`](Option.md)\<`U`\> | A function that takes the contained value and returns an `Option`. |
 
 #### Returns
@@ -89,9 +89,9 @@ The result of `fn` if `this` is `Some`, otherwise `None`.
 
 [`Option`](Option.md).[`andThen`](Option.md#andthen)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:309](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L309)
+[prelude.ts:307](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L307)
 
 ***
 
@@ -104,16 +104,16 @@ eq<T>(other): boolean
 Tests whether `this` and `other` are both `Some` containing equal values, or both are `None`.
 This method can be used for comparing `Option` instances in a value-sensitive manner.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter |
-| :------ |
+| Type Parameter |
+| ------ |
 | `T` |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `other` | [`Option`](Option.md)\<`T`\> | The other `Option` to compare with. |
 
 #### Returns
@@ -126,9 +126,9 @@ This method can be used for comparing `Option` instances in a value-sensitive ma
 
 [`Option`](Option.md).[`eq`](Option.md#eq)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:314](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L314)
+[prelude.ts:312](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L312)
 
 ***
 
@@ -143,24 +143,24 @@ Returns the contained `Some` value, with a provided error message if the value i
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `msg` | `string` | The error message to provide if the value is a `None`. |
 
 #### Returns
 
 `never`
 
-#### Inherited from
-
-[`Option`](Option.md).[`expect`](Option.md#expect)
-
 #### Throws
 
 Throws an error with the provided message if the Option is a `None`.
 
-#### Source
+#### Inherited from
 
-[enum/prelude.ts:80](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L80)
+[`Option`](Option.md).[`expect`](Option.md#expect)
+
+#### Defined in
+
+[prelude.ts:80](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L80)
 
 ***
 
@@ -177,7 +177,7 @@ Returns `None` if the Option is `None`, otherwise calls predicate with the wrapp
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `predicate` | (`value`) => `boolean` | A function that takes the contained value and returns a boolean. |
 
 #### Returns
@@ -188,9 +188,9 @@ Returns `None` if the Option is `None`, otherwise calls predicate with the wrapp
 
 [`Option`](Option.md).[`filter`](Option.md#filter)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:300](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L300)
+[prelude.ts:298](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L298)
 
 ***
 
@@ -212,9 +212,9 @@ Converts from `Option<Option<T>>` to `Option<T>`.
 
 [`Option`](Option.md).[`flatten`](Option.md#flatten)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:301](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L301)
+[prelude.ts:299](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L299)
 
 ***
 
@@ -230,7 +230,7 @@ This is primarily for side effects and does not transform the `Option`.
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `fn` | (`value`) => `void` | A function to call with the contained value. |
 
 #### Returns
@@ -243,9 +243,9 @@ This is primarily for side effects and does not transform the `Option`.
 
 [`Option`](Option.md).[`inspect`](Option.md#inspect)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:267](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L267)
+[prelude.ts:267](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L267)
 
 ***
 
@@ -265,9 +265,9 @@ Returns `true` if the Option is a `None` value.
 
 [`Option`](Option.md).[`isNone`](Option.md#isnone)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:59](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L59)
+[prelude.ts:59](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L59)
 
 ***
 
@@ -287,9 +287,9 @@ Returns `true` if the Option is a `Some` value.
 
 [`Option`](Option.md).[`isSome`](Option.md#issome)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:54](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L54)
+[prelude.ts:54](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L54)
 
 ***
 
@@ -304,7 +304,7 @@ Returns `true` if the Option is a `Some` value and the predicate returns `true` 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `predicate` | (`value`) => `boolean` | A function that takes the contained value and returns a boolean. |
 
 #### Returns
@@ -315,9 +315,9 @@ Returns `true` if the Option is a `Some` value and the predicate returns `true` 
 
 [`Option`](Option.md).[`isSomeAnd`](Option.md#issomeand)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:65](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L65)
+[prelude.ts:65](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L65)
 
 ***
 
@@ -329,16 +329,16 @@ map<U>(fn): None
 
 Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `U` | The type of the value returned by the map function. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `fn` | (`value`) => `U` | A function that takes the contained value and returns a new value. |
 
 #### Returns
@@ -349,9 +349,9 @@ Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
 
 [`Option`](Option.md).[`map`](Option.md#map)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:302](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L302)
+[prelude.ts:300](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L300)
 
 ***
 
@@ -363,16 +363,16 @@ mapOr<U>(defaultValue, fn): U
 
 Maps an `Option<T>` to `U` by applying a function to the contained value (if any), or returns the provided default (if not).
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `U` | The type of the value returned by the map function or the default value. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `defaultValue` | `U` | The value to return if the Option is `None`. |
 | `fn` | (`value`) => `U` | A function that takes the contained value and returns a new value. |
 
@@ -384,9 +384,9 @@ Maps an `Option<T>` to `U` by applying a function to the contained value (if any
 
 [`Option`](Option.md).[`mapOr`](Option.md#mapor)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:163](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L163)
+[prelude.ts:163](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L163)
 
 ***
 
@@ -398,16 +398,16 @@ mapOrElse<U>(defaultFn, fn): U
 
 Maps an `Option<T>` to `U` by applying a function to a contained value (if any), or computes a default (if not).
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `U` | The type of the value returned by the map function or the default function. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `defaultFn` | () => `U` | A function that returns the default value. |
 | `fn` | (`value`) => `U` | A function that takes the contained value and returns a new value. |
 
@@ -419,9 +419,9 @@ Maps an `Option<T>` to `U` by applying a function to a contained value (if any),
 
 [`Option`](Option.md).[`mapOrElse`](Option.md#maporelse)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:171](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L171)
+[prelude.ts:171](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L171)
 
 ***
 
@@ -433,16 +433,16 @@ okOr<E>(error): Result<never, E>
 
 Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err)`.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `E` | The type of the error value in the `Err` variant of the resulting `Result`. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `error` | `E` | The error value to use if the Option is a `None`. |
 
 #### Returns
@@ -453,9 +453,9 @@ Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` a
 
 [`Option`](Option.md).[`okOr`](Option.md#okor)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:113](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L113)
+[prelude.ts:113](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L113)
 
 ***
 
@@ -467,16 +467,16 @@ okOrElse<E>(err): Result<never, E>
 
 Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err())`.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `E` | The type of the error value in the `Err` variant of the resulting `Result`. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `err` | () => `E` | A function that returns the error value. |
 
 #### Returns
@@ -487,9 +487,9 @@ Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` a
 
 [`Option`](Option.md).[`okOrElse`](Option.md#okorelse)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:120](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L120)
+[prelude.ts:120](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L120)
 
 ***
 
@@ -502,16 +502,16 @@ or<T>(other): Option<T>
 Returns the Option if it contains a value, otherwise returns `other`.
 This can be used for providing a fallback `Option`.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter |
-| :------ |
+| Type Parameter |
+| ------ |
 | `T` |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `other` | [`Option`](Option.md)\<`T`\> | The fallback `Option` to use if `this` is `None`. |
 
 #### Returns
@@ -524,9 +524,9 @@ This can be used for providing a fallback `Option`.
 
 [`Option`](Option.md).[`or`](Option.md#or)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:310](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L310)
+[prelude.ts:308](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L308)
 
 ***
 
@@ -539,16 +539,16 @@ orElse<T>(fn): Option<T>
 Returns the Option if it contains a value, otherwise calls `fn` and returns the result.
 This method can be used for lazy fallbacks, as `fn` is only evaluated if `this` is `None`.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter |
-| :------ |
+| Type Parameter |
+| ------ |
 | `T` |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `fn` | () => [`Option`](Option.md)\<`T`\> | A function that produces an `Option`. |
 
 #### Returns
@@ -561,9 +561,9 @@ This method can be used for lazy fallbacks, as `fn` is only evaluated if `this` 
 
 [`Option`](Option.md).[`orElse`](Option.md#orelse)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:311](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L311)
+[prelude.ts:309](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L309)
 
 ***
 
@@ -587,9 +587,9 @@ Transposes an `Option` of a `Result` into a `Result` of an `Option`.
 
 [`Option`](Option.md).[`transpose`](Option.md#transpose)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:298](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L298)
+[prelude.ts:296](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L296)
 
 ***
 
@@ -605,17 +605,17 @@ Returns the contained `Some` value.
 
 `never`
 
-#### Inherited from
-
-[`Option`](Option.md).[`unwrap`](Option.md#unwrap)
-
 #### Throws
 
 Throws an error if the value is a `None`.
 
-#### Source
+#### Inherited from
 
-[enum/prelude.ts:86](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L86)
+[`Option`](Option.md).[`unwrap`](Option.md#unwrap)
+
+#### Defined in
+
+[prelude.ts:86](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L86)
 
 ***
 
@@ -627,16 +627,16 @@ unwrapOr<T>(defaultValue): T
 
 Returns the contained `Some` value or a provided default.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter |
-| :------ |
+| Type Parameter |
+| ------ |
 | `T` |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `defaultValue` | `T` | The value to return if the Option is a `None`. |
 
 #### Returns
@@ -647,9 +647,9 @@ Returns the contained `Some` value or a provided default.
 
 [`Option`](Option.md).[`unwrapOr`](Option.md#unwrapor)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:295](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L295)
+[prelude.ts:293](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L293)
 
 ***
 
@@ -661,16 +661,16 @@ unwrapOrElse<T>(fn): T
 
 Returns the contained `Some` value or computes it from a closure.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter |
-| :------ |
+| Type Parameter |
+| ------ |
 | `T` |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `fn` | () => `T` | A function that returns the default value. |
 
 #### Returns
@@ -681,9 +681,9 @@ Returns the contained `Some` value or computes it from a closure.
 
 [`Option`](Option.md).[`unwrapOrElse`](Option.md#unwraporelse)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:296](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L296)
+[prelude.ts:294](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L294)
 
 ***
 
@@ -707,9 +707,9 @@ A tuple of `Options`, one for each element in the original `Option` of a tuple.
 
 [`Option`](Option.md).[`unzip`](Option.md#unzip)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:306](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L306)
+[prelude.ts:304](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L304)
 
 ***
 
@@ -722,16 +722,16 @@ xor<T>(other): Option<T>
 Returns `Some` if exactly one of `this`, `other` is `Some`, otherwise returns `None`.
 This can be thought of as an exclusive or operation on `Option` values.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter |
-| :------ |
+| Type Parameter |
+| ------ |
 | `T` |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `other` | [`Option`](Option.md)\<`T`\> | The other `Option` to compare with. |
 
 #### Returns
@@ -744,9 +744,9 @@ This can be thought of as an exclusive or operation on `Option` values.
 
 [`Option`](Option.md).[`xor`](Option.md#xor)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:312](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L312)
+[prelude.ts:310](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L310)
 
 ***
 
@@ -760,16 +760,16 @@ Combines `this` with another `Option` by zipping their contained values.
 If `this` is `Some(s)` and `other` is `Some(o)`, returns `Some([s, o])`.
 If either `this` or `other` is `None`, returns `None`.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `U` | The type of the value in the other `Option`. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `other` | [`Option`](Option.md)\<`U`\> | The other `Option` to zip with. |
 
 #### Returns
@@ -782,9 +782,9 @@ An `Option` containing a tuple of the values if both are `Some`, otherwise `None
 
 [`Option`](Option.md).[`zip`](Option.md#zip)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:304](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L304)
+[prelude.ts:302](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L302)
 
 ***
 
@@ -798,17 +798,17 @@ Zips `this` with another `Option` using a provided function to combine their con
 If `this` is `Some(s)` and `other` is `Some(o)`, returns `Some(fn(s, o))`.
 If either `this` or `other` is `None`, returns `None`.
 
-#### Type parameters
+#### Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `U` | The type of the value in the other `Option`. |
 | `R` | The return type of the combining function. |
 
 #### Parameters
 
 | Parameter | Type | Description |
-| :------ | :------ | :------ |
+| ------ | ------ | ------ |
 | `other` | [`Option`](Option.md)\<`U`\> | The other `Option` to zip with. |
 | `fn` | (`value`, `otherValue`) => `R` | The function to combine the values from both `Options`. |
 
@@ -822,6 +822,6 @@ An `Option` containing the result of `fn` if both `Options` are `Some`, otherwis
 
 [`Option`](Option.md).[`zipWith`](Option.md#zipwith)
 
-#### Source
+#### Defined in
 
-[enum/prelude.ts:305](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L305)
+[prelude.ts:303](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L303)

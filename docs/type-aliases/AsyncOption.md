@@ -4,7 +4,7 @@
 
 [happy-rusty](../README.md) / AsyncOption
 
-# Type alias: AsyncOption\<T\>
+# Type Alias: AsyncOption\<T\>
 
 ```ts
 type AsyncOption<T>: Promise<Option<T>>;
@@ -13,12 +13,12 @@ type AsyncOption<T>: Promise<Option<T>>;
 Represents an asynchronous operation that yields an `Option<T>`.
 This is a promise that resolves to either `Some(T)` if the value is present, or `None` if the value is absent.
 
-## Type parameters
+## Type Parameters
 
-| Type parameter | Description |
-| :------ | :------ |
+| Type Parameter | Description |
+| ------ | ------ |
 | `T` | The type of the value that may be contained within the `Option`. |
 
-## Source
+## Defined in
 
-[enum/prelude.ts:584](https://github.com/JiangJie/happy-rusty/blob/d102b1cddf6a12ecdb610e0f92d003cc7e0015ee/src/enum/prelude.ts#L584)
+[prelude.ts:582](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L582)
