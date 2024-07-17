@@ -21,4 +21,4 @@ This is a promise that resolves to `Ok(T)` if the I/O operation was successful, 
 
 ## Defined in
 
-[prelude.ts:607](https://github.com/JiangJie/happy-rusty/blob/82bfb94138be23b97750c830432d7e013c0e5b80/src/enum/prelude.ts#L607)
+[prelude.ts:628](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L628)
