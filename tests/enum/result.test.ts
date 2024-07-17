@@ -75,6 +75,11 @@ Deno.test('Result:Ok', async (t) => {
         r.inspectErr(printErrSpy);
         assertSpyCalls(printErrSpy, 0);
     });
+
+    await t.step('Convert type', () => {
+        assert(r.asOk() === r);
+        assertThrows(() => r.asErr(), TypeError);
+    });
 });
 
 Deno.test('Result:Err', async (t) => {
@@ -145,6 +150,11 @@ Deno.test('Result:Err', async (t) => {
 
         r.inspectErr(printErrSpy);
         assertSpyCalls(printErrSpy, 1);
+    });
+
+    await t.step('Convert type', () => {
+        assertThrows(() => r.asOk(), TypeError);
+        assert(r.asErr() === r);
     });
 });
 

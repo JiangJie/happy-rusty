@@ -567,6 +567,27 @@ export interface Result<T, E> {
     eq(other: Result<T, E>): boolean;
 
     // #endregion
+
+    /**
+     * Transforms the current Result into a new Result where the type of the error result is replaced with a new type `F`.
+     * The type of the success result remains unchanged.
+     * Just same as `result as unknown as Result<T, F>`.
+     *
+     * @typeParam F - The new type for the error result.
+     * @returns `this` but the error result type is `F`.
+     */
+    asOk<F>(): Result<T, F>;
+
+    /**
+     * Transforms the current Result into a new Result where the type of the success result is replaced with a new type `U`.
+     * The type of the error result remains unchanged.
+     * Useful where you need to return an Error chained to another type.
+     * Just same as `result as unknown as Result<U, E>`.
+     *
+     * @typeParam U - The new type for the success result.
+     * @returns `this` but the success result type is `U`.
+     */
+    asErr<U>(): Result<U, E>;
 }
 
 /**
@@ -828,6 +849,13 @@ export function Ok<T, E>(value: T): Result<T, E> {
             assertResult(other);
             return other.isOk() && other.unwrap() === value;
         },
+
+        asOk<F>(): Result<T, F> {
+            return ok as unknown as Result<T, F>;
+        },
+        asErr(): never {
+            throw new TypeError('Called `Result::asErr()` on an `Ok` value');
+        },
     } as const;
 
     return ok;
@@ -898,6 +926,13 @@ export function Err<T, E>(error: E): Result<T, E> {
         eq: (other: Result<T, E>): boolean => {
             assertResult(other);
             return other.isErr() && other.unwrapErr() === error;
+        },
+
+        asOk(): never {
+            throw new TypeError('Called `Result::asOk()` on an `Err` value');
+        },
+        asErr<U>(): Result<U, E> {
+            return err as unknown as Result<U, E>;
         },
     } as const;
 
