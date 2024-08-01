@@ -4,6 +4,7 @@
         "source.organizeImports": "explicit"
     },
     "deno.disablePaths": [
-        "./src"
+        "./src",
+        "./eslint.config.mjs"
     ]
 }
