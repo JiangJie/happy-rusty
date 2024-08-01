@@ -5,6 +5,7 @@
     },
     "deno.disablePaths": [
         "./src",
-        "./eslint.config.mjs"
+        "./eslint.config.mjs",
+        "./rollup.config.mjs"
     ]
 }
