@@ -21,4 +21,4 @@ This is a result that is either `Ok(T)` if the operation was successful, or `Err
 
 ## Defined in
 
-[prelude.ts:640](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L640)
+[defines.ts:30](https://github.com/JiangJie/happy-rusty/blob/ba112bb228eba4376da813b0604a1f67c4b2f569/src/enum/defines.ts#L30)

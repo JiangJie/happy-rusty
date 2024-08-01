@@ -22,4 +22,4 @@ This is a promise that resolves to `Ok(T)` if the operation was successful, or `
 
 ## Defined in
 
-[prelude.ts:632](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L632)
+[defines.ts:22](https://github.com/JiangJie/happy-rusty/blob/ba112bb228eba4376da813b0604a1f67c4b2f569/src/enum/defines.ts#L22)

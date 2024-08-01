@@ -2,12 +2,12 @@
 
 ***
 
-[happy-rusty](../README.md) / promiseToResult
+[happy-rusty](../README.md) / promiseToAsyncResult
 
-# Function: promiseToResult()
+# Function: promiseToAsyncResult()
 
 ```ts
-function promiseToResult<T, E>(p): Promise<Result<T, E>>
+function promiseToAsyncResult<T, E>(p): Promise<Result<T, E>>
 ```
 
 Converts a Promise to a Result type, capturing the resolved value in an `Ok`, or the error in an `Err`.
@@ -36,7 +36,7 @@ A promise that resolves to a `Result<T, E>`. If the input promise `p` resolves, 
 
 ```ts
 async function example() {
-  const result = await promiseToResult(fetchData());
+  const result = await promiseToAsyncResult(fetchData());
   if (result.isOk()) {
     console.log('Data:', result.unwrap());
   } else {
@@ -47,4 +47,4 @@ async function example() {
 
 ## Defined in
 
-[prelude.ts:1178](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L1178)
+[extensions.ts:25](https://github.com/JiangJie/happy-rusty/blob/ba112bb228eba4376da813b0604a1f67c4b2f569/src/enum/extensions.ts#L25)

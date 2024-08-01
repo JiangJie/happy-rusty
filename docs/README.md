@@ -26,6 +26,9 @@
 | Variable | Description |
 | ------ | ------ |
 | [None](variables/None.md) | A constant representing the `None` case of an `Option`, indicating the absence of a value. This constant is frozen to ensure it is immutable and cannot be altered, preserving the integrity of `None` throughout the application. |
+| [RESULT\_FALSE](variables/RESULT_FALSE.md) | Result constant for `false`. Can be used anywhere due to immutability. |
+| [RESULT\_TRUE](variables/RESULT_TRUE.md) | Result constant for `true`. Can be used anywhere due to immutability. |
+| [RESULT\_ZERO](variables/RESULT_ZERO.md) | Result constant for `0`. Can be used anywhere due to immutability. |
 
 ## Functions
 
@@ -36,4 +39,4 @@
 | [Some](functions/Some.md) | Creates an `Option<T>` representing the presence of a value. This function is typically used to construct an `Option` that contains a value, indicating that the operation yielding the value was successful. |
 | [isOption](functions/isOption.md) | Checks if a value is an `Option`. |
 | [isResult](functions/isResult.md) | Checks if a value is a `Result`. |
-| [promiseToResult](functions/promiseToResult.md) | Converts a Promise to a Result type, capturing the resolved value in an `Ok`, or the error in an `Err`. This allows for promise-based asynchronous operations to be handled in a way that is more in line with the Result pattern. |
+| [promiseToAsyncResult](functions/promiseToAsyncResult.md) | Converts a Promise to a Result type, capturing the resolved value in an `Ok`, or the error in an `Err`. This allows for promise-based asynchronous operations to be handled in a way that is more in line with the Result pattern. |
