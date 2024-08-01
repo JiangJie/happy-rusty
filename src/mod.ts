@@ -3,6 +3,8 @@ export {
     None,
     Ok,
     Some,
+    isOption,
+    isResult,
     promiseToResult,
     type AsyncIOResult,
     type AsyncOption,
