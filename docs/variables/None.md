@@ -15,4 +15,4 @@ This constant is frozen to ensure it is immutable and cannot be altered, preserv
 
 ## Defined in
 
-[prelude.ts:286](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L286)
+[prelude.ts:296](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L296)

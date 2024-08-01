@@ -21,4 +21,4 @@ This is a promise that resolves to either `Some(T)` if the value is present, or 
 
 ## Defined in
 
-[prelude.ts:603](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L603)
+[prelude.ts:623](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L623)

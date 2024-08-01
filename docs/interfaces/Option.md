@@ -27,6 +27,12 @@ pub enum Option<T> {
 | ------ | ------ |
 | `T` | The type of the value contained in the `Some` variant. |
 
+## Properties
+
+| Property | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| `[toStringTag]` | `"Option"` | [object Option]. | [prelude.ts:39](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L39) |
+
 ## Methods
 
 ### and()
@@ -58,7 +64,7 @@ This is sometimes called "and then" because it is similar to a logical AND opera
 
 #### Defined in
 
-[prelude.ts:224](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L224)
+[prelude.ts:229](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L229)
 
 ***
 
@@ -91,7 +97,7 @@ The result of `fn` if `this` is `Some`, otherwise `None`.
 
 #### Defined in
 
-[prelude.ts:233](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L233)
+[prelude.ts:238](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L238)
 
 ***
 
@@ -118,7 +124,7 @@ This method can be used for comparing `Option` instances in a value-sensitive ma
 
 #### Defined in
 
-[prelude.ts:277](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L277)
+[prelude.ts:282](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L282)
 
 ***
 
@@ -146,7 +152,7 @@ Throws an error with the provided message if the Option is a `None`.
 
 #### Defined in
 
-[prelude.ts:80](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L80)
+[prelude.ts:85](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L85)
 
 ***
 
@@ -172,7 +178,7 @@ Returns `None` if the Option is `None`, otherwise calls predicate with the wrapp
 
 #### Defined in
 
-[prelude.ts:142](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L142)
+[prelude.ts:147](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L147)
 
 ***
 
@@ -204,7 +210,7 @@ Converts from `Option<Option<T>>` to `Option<T>`.
 
 #### Defined in
 
-[prelude.ts:148](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L148)
+[prelude.ts:153](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L153)
 
 ***
 
@@ -231,7 +237,7 @@ This is primarily for side effects and does not transform the `Option`.
 
 #### Defined in
 
-[prelude.ts:267](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L267)
+[prelude.ts:272](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L272)
 
 ***
 
@@ -249,7 +255,7 @@ Returns `true` if the Option is a `None` value.
 
 #### Defined in
 
-[prelude.ts:59](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L59)
+[prelude.ts:64](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L64)
 
 ***
 
@@ -267,7 +273,7 @@ Returns `true` if the Option is a `Some` value.
 
 #### Defined in
 
-[prelude.ts:54](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L54)
+[prelude.ts:59](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L59)
 
 ***
 
@@ -291,7 +297,7 @@ Returns `true` if the Option is a `Some` value and the predicate returns `true` 
 
 #### Defined in
 
-[prelude.ts:65](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L65)
+[prelude.ts:70](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L70)
 
 ***
 
@@ -321,7 +327,7 @@ Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
 
 #### Defined in
 
-[prelude.ts:155](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L155)
+[prelude.ts:160](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L160)
 
 ***
 
@@ -352,7 +358,7 @@ Maps an `Option<T>` to `U` by applying a function to the contained value (if any
 
 #### Defined in
 
-[prelude.ts:163](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L163)
+[prelude.ts:168](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L168)
 
 ***
 
@@ -383,7 +389,7 @@ Maps an `Option<T>` to `U` by applying a function to a contained value (if any),
 
 #### Defined in
 
-[prelude.ts:171](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L171)
+[prelude.ts:176](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L176)
 
 ***
 
@@ -413,7 +419,7 @@ Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` a
 
 #### Defined in
 
-[prelude.ts:113](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L113)
+[prelude.ts:118](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L118)
 
 ***
 
@@ -443,7 +449,7 @@ Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` a
 
 #### Defined in
 
-[prelude.ts:120](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L120)
+[prelude.ts:125](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L125)
 
 ***
 
@@ -470,7 +476,7 @@ This can be used for providing a fallback `Option`.
 
 #### Defined in
 
-[prelude.ts:241](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L241)
+[prelude.ts:246](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L246)
 
 ***
 
@@ -497,7 +503,25 @@ This method can be used for lazy fallbacks, as `fn` is only evaluated if `this` 
 
 #### Defined in
 
-[prelude.ts:249](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L249)
+[prelude.ts:254](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L254)
+
+***
+
+### toString()
+
+```ts
+toString(): string
+```
+
+Custom `toString` implementation that uses the `Option`'s contained value.
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[prelude.ts:289](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L289)
 
 ***
 
@@ -532,7 +556,7 @@ Transposes an `Option` of a `Result` into a `Result` of an `Option`.
 
 #### Defined in
 
-[prelude.ts:130](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L130)
+[prelude.ts:135](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L135)
 
 ***
 
@@ -554,7 +578,7 @@ Throws an error if the value is a `None`.
 
 #### Defined in
 
-[prelude.ts:86](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L86)
+[prelude.ts:91](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L91)
 
 ***
 
@@ -578,7 +602,7 @@ Returns the contained `Some` value or a provided default.
 
 #### Defined in
 
-[prelude.ts:92](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L92)
+[prelude.ts:97](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L97)
 
 ***
 
@@ -602,7 +626,7 @@ Returns the contained `Some` value or computes it from a closure.
 
 #### Defined in
 
-[prelude.ts:98](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L98)
+[prelude.ts:103](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L103)
 
 ***
 
@@ -637,7 +661,7 @@ A tuple of `Options`, one for each element in the original `Option` of a tuple.
 
 #### Defined in
 
-[prelude.ts:207](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L207)
+[prelude.ts:212](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L212)
 
 ***
 
@@ -664,7 +688,7 @@ This can be thought of as an exclusive or operation on `Option` values.
 
 #### Defined in
 
-[prelude.ts:257](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L257)
+[prelude.ts:262](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L262)
 
 ***
 
@@ -698,7 +722,7 @@ An `Option` containing a tuple of the values if both are `Some`, otherwise `None
 
 #### Defined in
 
-[prelude.ts:185](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L185)
+[prelude.ts:190](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L190)
 
 ***
 
@@ -734,4 +758,4 @@ An `Option` containing the result of `fn` if both `Options` are `Some`, otherwis
 
 #### Defined in
 
-[prelude.ts:197](https://github.com/JiangJie/happy-rusty/blob/7218a182717eb5dbba4bfaf783977bc5e378815a/src/enum/prelude.ts#L197)
+[prelude.ts:202](https://github.com/JiangJie/happy-rusty/blob/28ebaeb1ee8fded97e00cb58a36e776fbc44e585/src/enum/prelude.ts#L202)
