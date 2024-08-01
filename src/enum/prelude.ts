@@ -34,6 +34,11 @@ export interface Option<T> {
     // #region Internal properties
 
     /**
+     * [object Option].
+     */
+    [Symbol.toStringTag]: 'Option',
+
+    /**
      * Identify `Some` or `None`.
      *
      * @private
@@ -277,6 +282,11 @@ export interface Option<T> {
     eq(other: Option<T>): boolean;
 
     // #endregion
+
+    /**
+     * Custom `toString` implementation that uses the `Option`'s contained value.
+     */
+    toString(): string;
 }
 
 /**
@@ -329,6 +339,11 @@ pub enum Result<T, E> {
  */
 export interface Result<T, E> {
     // #region Internal properties
+
+    /**
+     * [object Result].
+     */
+    [Symbol.toStringTag]: 'Result',
 
     /**
      * Identify `Ok` or `Err`.
@@ -588,6 +603,11 @@ export interface Result<T, E> {
      * @returns `this` but the success result type is `U`.
      */
     asErr<U>(): Result<U, E>;
+
+    /**
+     * Custom `toString` implementation that uses the `Result`'s contained value.
+     */
+    toString(): string;
 }
 
 /**
@@ -645,6 +665,7 @@ export type AsyncIOResult<T> = Promise<IOResult<T>>;
  */
 export function Some<T>(value: T): Option<T> {
     const some: Option<T> = {
+        [Symbol.toStringTag]: 'Option',
         [optionKindSymbol]: 'Some',
 
         isSome: (): true => true,
@@ -715,6 +736,10 @@ export function Some<T>(value: T): Option<T> {
             assertOption(other);
             return other.isSome() && other.unwrap() === value;
         },
+
+        toString: (): string => {
+            return `Some(${ value })`;
+        },
     } as const;
 
     return some;
@@ -725,6 +750,7 @@ export function Some<T>(value: T): Option<T> {
  * This constant is frozen to ensure it is immutable and cannot be altered, preserving the integrity of `None` throughout the application.
  */
 export const None = Object.freeze<None>({
+    [Symbol.toStringTag]: 'Option',
     [optionKindSymbol]: 'None',
 
     isSome: (): false => false,
@@ -773,6 +799,10 @@ export const None = Object.freeze<None>({
         assertOption(other);
         return other === None;
     },
+
+    toString: (): string => {
+        return 'None';
+    },
 }) as None;
 
 /**
@@ -794,6 +824,7 @@ export const None = Object.freeze<None>({
  */
 export function Ok<T, E>(value: T): Result<T, E> {
     const ok: Result<T, E> = {
+        [Symbol.toStringTag]: 'Result',
         [resultKindSymbol]: 'Ok',
 
         isOk: (): true => true,
@@ -856,6 +887,10 @@ export function Ok<T, E>(value: T): Result<T, E> {
         asErr(): never {
             throw new TypeError('Called `Result::asErr()` on an `Ok` value');
         },
+
+        toString(): string {
+            return `Ok(${ value })`;
+        },
     } as const;
 
     return ok;
@@ -880,6 +915,7 @@ export function Ok<T, E>(value: T): Result<T, E> {
  */
 export function Err<T, E>(error: E): Result<T, E> {
     const err: Result<T, E> = {
+        [Symbol.toStringTag]: 'Result',
         [resultKindSymbol]: 'Err',
 
         isOk: (): false => false,
@@ -933,6 +969,10 @@ export function Err<T, E>(error: E): Result<T, E> {
         },
         asErr<U>(): Result<U, E> {
             return err as unknown as Result<U, E>;
+        },
+
+        toString(): string {
+            return `Err(${ error })`;
         },
     } as const;
 

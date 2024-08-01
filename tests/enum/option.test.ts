@@ -5,6 +5,12 @@ import { Err, None, Ok, Some, type Option } from '../../src/mod.ts';
 Deno.test('Option:Some', async (t) => {
     const o = Some(10);
 
+    await t.step('Stringify', () => {
+        assert(Object.prototype.toString.call(o) === '[object Option]');
+        assert(o.toString() === 'Some(10)');
+        assert(`${ o }` === 'Some(10)');
+    });
+
     await t.step('Querying the variant', () => {
         assert(o.isSome());
         assert(!o.isNone());
@@ -85,6 +91,12 @@ Deno.test('Option:Some', async (t) => {
 Deno.test('Option:None', async (t) => {
     // const o: Option<number> = None;
     const o = None;
+
+    await t.step('Stringify', () => {
+        assert(Object.prototype.toString.call(o) === '[object Option]');
+        assert(o.toString() === 'None');
+        assert(`${ o }` === 'None');
+    });
 
     await t.step('Querying the variant', () => {
         assert(!o.isSome());

@@ -6,6 +6,12 @@ import { Err, None, Ok, Option, Some, promiseToResult, type Result } from '../..
 Deno.test('Result:Ok', async (t) => {
     const r: Result<number, Error> = Ok(1);
 
+    await t.step('Stringify', () => {
+        assert(Object.prototype.toString.call(r) === '[object Result]');
+        assert(r.toString() === 'Ok(1)');
+        assert(`${ r }` === 'Ok(1)');
+    });
+
     await t.step('Querying the variant', () => {
         assert(r.isOk());
         assert(!r.isErr());
@@ -84,6 +90,13 @@ Deno.test('Result:Ok', async (t) => {
 
 Deno.test('Result:Err', async (t) => {
     const r: Result<number, Error> = Err(new Error('lose'));
+
+    await t.step('Stringify', () => {
+        assert(Object.prototype.toString.call(r) === '[object Result]');
+        console.log(r.toString());
+        assert(r.toString() === 'Err(Error: lose)');
+        assert(`${ r }` === 'Err(Error: lose)');
+    });
 
     await t.step('Querying the variant', () => {
         assert(!r.isOk());
