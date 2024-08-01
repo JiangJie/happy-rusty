@@ -668,43 +668,69 @@ export function Some<T>(value: T): Option<T> {
         [Symbol.toStringTag]: 'Option',
         [optionKindSymbol]: 'Some',
 
-        isSome: (): true => true,
-        isNone: (): false => false,
-        isSomeAnd: (predicate: (value: T) => boolean): boolean => predicate(value),
+        isSome(): true {
+            return true;
+        },
+        isNone(): false {
+            return false;
+        },
+        isSomeAnd(predicate: (value: T) => boolean): boolean {
+            return predicate(value);
+        },
 
-        expect: (_msg: string): T => value,
-        unwrap: (): T => value,
-        unwrapOr: (_defaultValue: T): T => value,
-        unwrapOrElse: (_fn: () => T): T => value,
+        expect(_msg: string): T {
+            return value;
+        },
+        unwrap(): T {
+            return value;
+        },
+        unwrapOr(_defaultValue: T): T {
+            return value;
+        },
+        unwrapOrElse(_fn: () => T): T {
+            return value;
+        },
 
-        okOr: <E>(_error: E): Result<T, E> => Ok(value),
-        okOrElse: <E>(_err: () => E): Result<T, E> => Ok(value),
-        transpose: <T, E>(): Result<Option<T>, E> => {
+        okOr<E>(_error: E): Result<T, E> {
+            return Ok(value);
+        },
+        okOrElse<E>(_err: () => E): Result<T, E> {
+            return Ok(value);
+        },
+        transpose<T, E>(): Result<Option<T>, E> {
             const r = value as unknown as Result<T, E>;
             assertResult(r);
             return r.isOk() ? Ok(Some(r.unwrap())) : Err(r.unwrapErr());
         },
 
-        filter: (predicate: (value: T) => boolean): Option<T> => predicate(value) ? some : None,
-        flatten: <T>(): Option<T> => {
+        filter(predicate: (value: T) => boolean): Option<T> {
+            return predicate(value) ? some : None;
+        },
+        flatten<T>(): Option<T> {
             const o = value as unknown as Option<T>;
             assertOption(o);
             return o;
         },
-        map: <U>(fn: (value: T) => U): Option<U> => Some(fn(value)),
+        map<U>(fn: (value: T) => U): Option<U> {
+            return Some(fn(value));
+        },
 
-        mapOr: <U>(_defaultValue: U, fn: (value: T) => U): U => fn(value),
-        mapOrElse: <U>(_defaultFn: () => U, fn: (value: T) => U): U => fn(value),
+        mapOr<U>(_defaultValue: U, fn: (value: T) => U): U {
+            return fn(value);
+        },
+        mapOrElse<U>(_defaultFn: () => U, fn: (value: T) => U): U {
+            return fn(value);
+        },
 
-        zip: <U>(other: Option<U>): Option<[T, U]> => {
+        zip<U>(other: Option<U>): Option<[T, U]> {
             assertOption(other);
             return other.isSome() ? Some([value, other.unwrap()]) : None;
         },
-        zipWith: <U, R>(other: Option<U>, fn: (value: T, otherValue: U) => R): Option<R> => {
+        zipWith<U, R>(other: Option<U>, fn: (value: T, otherValue: U) => R): Option<R> {
             assertOption(other);
             return other.isSome() ? Some(fn(value, other.unwrap())) : None;
         },
-        unzip: <T, U>(): [Option<T>, Option<U>] => {
+        unzip<T, U>(): [Option<T>, Option<U>] {
             const tuple = value as unknown as [T, U];
 
             if (!Array.isArray(tuple) || tuple.length !== 2) {
@@ -715,29 +741,35 @@ export function Some<T>(value: T): Option<T> {
             return [Some(a), Some(b)];
         },
 
-        and: <U>(other: Option<U>): Option<U> => {
+        and<U>(other: Option<U>): Option<U> {
             assertOption(other);
             return other;
         },
-        andThen: <U>(fn: (value: T) => Option<U>): Option<U> => fn(value),
-        or: (_other: Option<T>): Option<T> => some,
-        orElse: (_fn: () => Option<T>): Option<T> => some,
-        xor: (other: Option<T>): Option<T> => {
+        andThen<U>(fn: (value: T) => Option<U>): Option<U> {
+            return fn(value);
+        },
+        or(_other: Option<T>): Option<T> {
+            return some;
+        },
+        orElse(_fn: () => Option<T>): Option<T> {
+            return some;
+        },
+        xor(other: Option<T>): Option<T> {
             assertOption(other);
             return other.isSome() ? None : some;
         },
 
-        inspect: (fn: (value: T) => void): Option<T> => {
+        inspect(fn: (value: T) => void): Option<T> {
             fn(value);
             return some;
         },
 
-        eq: (other: Option<T>): boolean => {
+        eq(other: Option<T>): boolean {
             assertOption(other);
             return other.isSome() && other.unwrap() === value;
         },
 
-        toString: (): string => {
+        toString(): string {
             return `Some(${ value })`;
         },
     } as const;
@@ -753,54 +785,94 @@ export const None = Object.freeze<None>({
     [Symbol.toStringTag]: 'Option',
     [optionKindSymbol]: 'None',
 
-    isSome: (): false => false,
-    isNone: (): true => true,
-    isSomeAnd: (_predicate: (value: never) => boolean): false => false,
+    isSome(): false {
+        return false;
+    },
+    isNone(): true {
+        return true;
+    },
+    isSomeAnd(_predicate: (value: never) => boolean): false {
+        return false;
+    },
 
-    expect: (msg: string): never => {
+    expect(msg: string): never {
         throw new TypeError(msg);
     },
-    unwrap: (): never => {
+    unwrap(): never {
         throw new TypeError('Called `Option::unwrap()` on a `None` value');
     },
-    unwrapOr: <T>(defaultValue: T): T => defaultValue,
-    unwrapOrElse: <T>(fn: () => T): T => fn(),
+    unwrapOr<T>(defaultValue: T): T {
+        return defaultValue;
+    },
+    unwrapOrElse<T>(fn: () => T): T {
+        return fn();
+    },
 
-    okOr: <E>(error: E): Result<never, E> => Err(error),
-    okOrElse: <E>(err: () => E): Result<never, E> => Err(err()),
-    transpose: (): Result<None, never> => Ok(None),
+    okOr<E>(error: E): Result<never, E> {
+        return Err(error);
+    },
+    okOrElse<E>(err: () => E): Result<never, E> {
+        return Err(err());
+    },
+    transpose(): Result<None, never> {
+        return Ok(None);
+    },
 
-    filter: (_predicate: (value: never) => boolean): None => None,
-    flatten: (): None => None,
-    map: <U>(_fn: (value: never) => U): None => None,
+    filter(_predicate: (value: never) => boolean): None {
+        return None;
+    },
+    flatten(): None {
+        return None;
+    },
+    map<U>(_fn: (value: never) => U): None {
+        return None;
+    },
 
-    mapOr: <U>(defaultValue: U, _fn: (value: never) => U): U => defaultValue,
-    mapOrElse: <U>(defaultFn: () => U, _fn: (value: never) => U): U => defaultFn(),
+    mapOr<U>(defaultValue: U, _fn: (value: never) => U): U {
+        return defaultValue;
+    },
+    mapOrElse<U>(defaultFn: () => U, _fn: (value: never) => U): U {
+        return defaultFn();
+    },
 
-    zip: <U>(_other: Option<U>): None => None,
-    zipWith: <U, R>(_other: Option<U>, _fn: (value: never, otherValue: U) => R): None => None,
-    unzip: (): [None, None] => [None, None],
+    zip<U>(_other: Option<U>): None {
+        return None;
+    },
+    zipWith<U, R>(_other: Option<U>, _fn: (value: never, otherValue: U) => R): None {
+        return None;
+    },
+    unzip(): [None, None] {
+        return [None, None];
+    },
 
-    and: <U>(_other: Option<U>): None => None,
-    andThen: <U>(_fn: (value: never) => Option<U>): None => None,
-    or: <T>(other: Option<T>): Option<T> => {
+    and<U>(_other: Option<U>): None {
+        return None;
+    },
+    andThen<U>(_fn: (value: never) => Option<U>): None {
+        return None;
+    },
+    or<T>(other: Option<T>): Option<T> {
         assertOption(other);
         return other;
     },
-    orElse: <T>(fn: () => Option<T>): Option<T> => fn(),
-    xor: <T>(other: Option<T>): Option<T> => {
+    orElse<T>(fn: () => Option<T>): Option<T> {
+        return fn();
+    },
+    xor<T>(other: Option<T>): Option<T> {
         assertOption(other);
         return other.isSome() ? other : None;
     },
 
-    inspect: (_fn: (value: never) => void): None => None,
+    inspect(_fn: (value: never) => void): None {
+        return None;
+    },
 
-    eq: <T>(other: Option<T>): boolean => {
+    eq<T>(other: Option<T>): boolean {
         assertOption(other);
         return other === None;
     },
 
-    toString: (): string => {
+    toString(): string {
         return 'None';
     },
 }) as None;
@@ -827,56 +899,92 @@ export function Ok<T, E>(value: T): Result<T, E> {
         [Symbol.toStringTag]: 'Result',
         [resultKindSymbol]: 'Ok',
 
-        isOk: (): true => true,
-        isErr: (): false => false,
-        isOkAnd: (predicate: (value: T) => boolean): boolean => predicate(value),
-        isErrAnd: (_predicate: (error: E) => boolean): false => false,
+        isOk(): true {
+            return true;
+        },
+        isErr(): false {
+            return false;
+        },
+        isOkAnd(predicate: (value: T) => boolean): boolean {
+            return predicate(value);
+        },
+        isErrAnd(_predicate: (error: E) => boolean): false {
+            return false;
+        },
 
-        expect: (_msg: string): T => value,
-        unwrap: (): T => value,
-        unwrapOr: (_defaultValue: T): T => value,
-        unwrapOrElse: (_fn: (error: E) => T): T => value,
+        expect(_msg: string): T {
+            return value;
+        },
+        unwrap(): T {
+            return value;
+        },
+        unwrapOr(_defaultValue: T): T {
+            return value;
+        },
+        unwrapOrElse(_fn: (error: E) => T): T {
+            return value;
+        },
 
-        expectErr: (msg: string): E => {
+        expectErr(msg: string): E {
             throw new TypeError(`${ msg }: ${ value }`);
         },
-        unwrapErr: (): E => {
+        unwrapErr(): E {
             throw new TypeError('Called `Result::unwrapErr()` on an `Ok` value');
         },
 
-        ok: (): Option<T> => Some(value),
-        err: (): None => None,
-        transpose: <T>(): Option<Result<T, E>> => {
+        ok(): Option<T> {
+            return Some(value);
+        },
+        err(): None {
+            return None;
+        },
+        transpose<T>(): Option<Result<T, E>> {
             const o = value as Option<T>;
             assertOption(o);
             return o.isSome() ? Some(Ok(o.unwrap())) : None;
         },
 
-        map: <U>(fn: (value: T) => U): Result<U, E> => Ok(fn(value)),
-        mapErr: <F>(_fn: (error: E) => F): Result<T, F> => Ok(value),
-        mapOr: <U>(_defaultValue: U, fn: (value: T) => U): U => fn(value),
-        mapOrElse: <U>(_defaultFn: (error: E) => U, fn: (value: T) => U): U => fn(value),
-        flatten: <T>(): Result<T, E> => {
+        map<U>(fn: (value: T) => U): Result<U, E> {
+            return Ok(fn(value));
+        },
+        mapErr<F>(_fn: (error: E) => F): Result<T, F> {
+            return Ok(value);
+        },
+        mapOr<U>(_defaultValue: U, fn: (value: T) => U): U {
+            return fn(value);
+        },
+        mapOrElse<U>(_defaultFn: (error: E) => U, fn: (value: T) => U): U {
+            return fn(value);
+        },
+        flatten<T>(): Result<T, E> {
             const r = value as Result<T, E>;
             assertResult(r);
             return r;
         },
 
-        and: <U>(other: Result<U, E>): Result<U, E> => {
+        and<U>(other: Result<U, E>): Result<U, E> {
             assertResult(other);
             return other;
         },
-        or: <F>(_other: Result<T, F>): Result<T, F> => ok as unknown as Result<T, F>,
-        andThen: <U>(fn: (value: T) => Result<U, E>): Result<U, E> => fn(value),
-        orElse: <F>(_fn: (error: E) => Result<T, F>): Result<T, F> => ok as unknown as Result<T, F>,
+        or<F>(_other: Result<T, F>): Result<T, F> {
+            return ok as unknown as Result<T, F>;
+        },
+        andThen<U>(fn: (value: T) => Result<U, E>): Result<U, E> {
+            return fn(value);
+        },
+        orElse<F>(_fn: (error: E) => Result<T, F>): Result<T, F> {
+            return ok as unknown as Result<T, F>;
+        },
 
-        inspect: (fn: (value: T) => void): Result<T, E> => {
+        inspect(fn: (value: T) => void): Result<T, E> {
             fn(value);
             return ok;
         },
-        inspectErr: (_fn: (error: E) => void): Result<T, E> => ok,
+        inspectErr(_fn: (error: E) => void): Result<T, E> {
+            return ok;
+        },
 
-        eq: (other: Result<T, E>): boolean => {
+        eq(other: Result<T, E>): boolean {
             assertResult(other);
             return other.isOk() && other.unwrap() === value;
         },
@@ -918,48 +1026,88 @@ export function Err<T, E>(error: E): Result<T, E> {
         [Symbol.toStringTag]: 'Result',
         [resultKindSymbol]: 'Err',
 
-        isOk: (): false => false,
-        isErr: (): true => true,
-        isOkAnd: (_predicate: (value: T) => boolean): false => false,
-        isErrAnd: (predicate: (error: E) => boolean): boolean => predicate(error),
+        isOk(): false {
+            return false;
+        },
+        isErr(): true {
+            return true;
+        },
+        isOkAnd(_predicate: (value: T) => boolean): false {
+            return false;
+        },
+        isErrAnd(predicate: (error: E) => boolean): boolean {
+            return predicate(error);
+        },
 
-        expect: (msg: string): T => {
+        expect(msg: string): T {
             throw new TypeError(`${ msg }: ${ error }`);
         },
-        unwrap: (): T => {
+        unwrap(): T {
             throw new TypeError('Called `Result::unwrap()` on an `Err` value');
         },
-        unwrapOr: (defaultValue: T): T => defaultValue,
-        unwrapOrElse: (fn: (error: E) => T): T => fn(error),
+        unwrapOr(defaultValue: T): T {
+            return defaultValue;
+        },
+        unwrapOrElse(fn: (error: E) => T): T {
+            return fn(error);
+        },
 
-        expectErr: (_msg: string): E => error,
-        unwrapErr: (): E => error,
+        expectErr(_msg: string): E {
+            return error;
+        },
+        unwrapErr(): E {
+            return error;
+        },
 
-        ok: (): None => None,
-        err: (): Option<E> => Some(error),
-        transpose: <T>(): Option<Result<T, E>> => Some(err as unknown as Result<T, E>),
+        ok(): None {
+            return None;
+        },
+        err(): Option<E> {
+            return Some(error);
+        },
+        transpose<T>(): Option<Result<T, E>> {
+            return Some(err as unknown as Result<T, E>);
+        },
 
-        map: <U>(_fn: (value: T) => U): Result<U, E> => err as unknown as Result<U, E>,
-        mapErr: <F>(fn: (error: E) => F): Result<T, F> => Err(fn(error)),
-        mapOr: <U>(defaultValue: U, _fn: (value: T) => U): U => defaultValue,
-        mapOrElse: <U>(defaultFn: (error: E) => U, _fn: (value: T) => U): U => defaultFn(error),
-        flatten: <T>(): Result<T, E> => err as unknown as Result<T, E>,
+        map<U>(_fn: (value: T) => U): Result<U, E> {
+            return err as unknown as Result<U, E>;
+        },
+        mapErr<F>(fn: (error: E) => F): Result<T, F> {
+            return Err(fn(error));
+        },
+        mapOr<U>(defaultValue: U, _fn: (value: T) => U): U {
+            return defaultValue;
+        },
+        mapOrElse<U>(defaultFn: (error: E) => U, _fn: (value: T) => U): U {
+            return defaultFn(error);
+        },
+        flatten<T>(): Result<T, E> {
+            return err as unknown as Result<T, E>;
+        },
 
-        and: <U>(_other: Result<U, E>): Result<U, E> => err as unknown as Result<U, E>,
-        or: <F>(other: Result<T, F>): Result<T, F> => {
+        and<U>(_other: Result<U, E>): Result<U, E> {
+            return err as unknown as Result<U, E>;
+        },
+        or<F>(other: Result<T, F>): Result<T, F> {
             assertResult(other);
             return other;
         },
-        andThen: <U>(_fn: (value: T) => Result<U, E>): Result<U, E> => err as unknown as Result<U, E>,
-        orElse: <F>(fn: (error: E) => Result<T, F>): Result<T, F> => fn(error),
+        andThen<U>(_fn: (value: T) => Result<U, E>): Result<U, E> {
+            return err as unknown as Result<U, E>;
+        },
+        orElse<F>(fn: (error: E) => Result<T, F>): Result<T, F> {
+            return fn(error);
+        },
 
-        inspect: (_fn: (value: T) => void): Result<T, E> => err,
-        inspectErr: (fn: (error: E) => void): Result<T, E> => {
+        inspect(_fn: (value: T) => void): Result<T, E> {
+            return err;
+        },
+        inspectErr(fn: (error: E) => void): Result<T, E> {
             fn(error);
             return err;
         },
 
-        eq: (other: Result<T, E>): boolean => {
+        eq(other: Result<T, E>): boolean {
             assertResult(other);
             return other.isErr() && other.unwrapErr() === error;
         },
