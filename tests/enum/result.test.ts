@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { assert, assertThrows } from "@std/assert";
 import { assertSpyCalls, spy } from '@std/testing/mock';
-import { Err, None, Ok, Option, Some, promiseToResult, type Result } from '../../src/mod.ts';
+import { Err, None, Ok, Option, Some, promiseToAsyncResult, type Result } from '../../src/mod.ts';
 
 Deno.test('Result:Ok', async (t) => {
     const r: Result<number, Error> = Ok(1);
@@ -174,11 +174,11 @@ Deno.test('Result:Err', async (t) => {
 Deno.test('Convert from Promise to Result', async (t) => {
     await t.step('Resolve will convert to Ok', async () => {
         const pOk = Promise.resolve(0);
-        assert((await promiseToResult(pOk)).unwrap() === 0);
+        assert((await promiseToAsyncResult(pOk)).unwrap() === 0);
     });
 
     await t.step('Reject will convert to Err', async () => {
         const pErr = Promise.reject(new Error('lose'));
-        assert((await promiseToResult(pErr)).unwrapErr().message === 'lose');
+        assert((await promiseToAsyncResult(pErr)).unwrapErr().message === 'lose');
     });
 });
