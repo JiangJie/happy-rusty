@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { assert, assertThrows } from "@std/assert";
 import { assertSpyCalls, spy } from '@std/testing/mock';
-import { Err, None, Ok, Option, Some, promiseToAsyncResult, type Result } from '../../src/mod.ts';
+import { Err, None, Ok, Some, promiseToAsyncResult, type Option, type Result } from '../../src/mod.ts';
 
 Deno.test('Result:Ok', async (t) => {
     const r: Result<number, Error> = Ok(1);
