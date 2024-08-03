@@ -459,7 +459,7 @@ export function Err<T, E>(error: E): Result<T, E> {
         },
 
         map<U>(_fn: (value: T) => U): Result<U, E> {
-            return err as unknown as Result<U, E>;
+            return Err(error);
         },
         mapErr<F>(fn: (error: E) => F): Result<T, F> {
             return Err(fn(error));
