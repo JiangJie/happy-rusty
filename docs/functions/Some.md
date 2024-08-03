@@ -42,4 +42,4 @@ if (maybeValue.isSome()) {
 
 ## Defined in
 
-[prelude.ts:55](https://github.com/JiangJie/happy-rusty/blob/ba112bb228eba4376da813b0604a1f67c4b2f569/src/enum/prelude.ts#L55)
+[prelude.ts:55](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/prelude.ts#L55)

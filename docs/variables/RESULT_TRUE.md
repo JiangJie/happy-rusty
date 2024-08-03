@@ -15,4 +15,4 @@ Can be used anywhere due to immutability.
 
 ## Defined in
 
-[constants.ts:13](https://github.com/JiangJie/happy-rusty/blob/ba112bb228eba4376da813b0604a1f67c4b2f569/src/enum/constants.ts#L13)
+[constants.ts:13](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/constants.ts#L13)

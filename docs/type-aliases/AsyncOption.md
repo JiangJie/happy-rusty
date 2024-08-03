@@ -21,4 +21,4 @@ This is a promise that resolves to either `Some(T)` if the value is present, or 
 
 ## Defined in
 
-[defines.ts:13](https://github.com/JiangJie/happy-rusty/blob/ba112bb228eba4376da813b0604a1f67c4b2f569/src/enum/defines.ts#L13)
+[defines.ts:13](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/defines.ts#L13)

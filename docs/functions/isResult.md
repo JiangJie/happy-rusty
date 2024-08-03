@@ -33,4 +33,4 @@ Checks if a value is a `Result`.
 
 ## Defined in
 
-[helpers.ts:24](https://github.com/JiangJie/happy-rusty/blob/ba112bb228eba4376da813b0604a1f67c4b2f569/src/enum/helpers.ts#L24)
+[helpers.ts:24](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/helpers.ts#L24)
