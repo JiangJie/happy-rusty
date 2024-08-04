@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Option, Result } from './core.ts';
-import { isOption, isResult } from './helpers.ts';
 import { OptionKindSymbol, ResultKindSymbol } from './symbols.ts';
+import { isOption, isResult } from './utils.ts';
 
 /**
  * Represents the absence of a value, as a specialized `Option` type.
