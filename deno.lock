@@ -37,7 +37,7 @@
         "npm:eslint@^9.8.0",
         "npm:rollup-plugin-dts@^6.1.1",
         "npm:rollup-plugin-esbuild@^6.1.1",
-        "npm:rollup@^4.19.2",
+        "npm:rollup@^4.20.0",
         "npm:typedoc-plugin-markdown@^4.2.3",
         "npm:typedoc@^0.26.5",
         "npm:typescript-eslint@^8.0.0",
