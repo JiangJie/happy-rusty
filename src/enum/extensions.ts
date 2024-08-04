@@ -13,12 +13,12 @@ import { Err, Ok } from './prelude.ts';
  * @example
  * ```ts
  * async function example() {
- *   const result = await promiseToAsyncResult(fetchData());
- *   if (result.isOk()) {
- *     console.log('Data:', result.unwrap());
- *   } else {
- *     console.error('Error:', result.unwrapErr());
- *   }
+ *     const result = await promiseToAsyncResult(fetchData());
+ *     result.inspect(x => {
+ *         console.log('Data:', x);
+ *     }).inspectErr(err => {
+ *         console.error('Error:', err);
+ *     });
  * }
  * ```
  */
