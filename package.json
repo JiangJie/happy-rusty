@@ -30,6 +30,7 @@
     "test:html": "deno test --coverage && deno coverage coverage && deno coverage coverage --html",
     "predocs": "pnpm dlx rimraf docs",
     "docs": "pnpm exec typedoc",
+    "eg": "deno run -A examples/main.ts",
     "prepublishOnly": "pnpm run build"
   },
   "repository": {
