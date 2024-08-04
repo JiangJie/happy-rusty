@@ -29,7 +29,7 @@ pub enum Result<T, E> {
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| `[toStringTag]` | `"Result"` | [object Result]. | [core.ts:304](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L304) |
+| `[toStringTag]` | `"Result"` | [object Result]. | [core.ts:304](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L304) |
 
 ## Methods
 
@@ -61,7 +61,7 @@ The passed `Result` if `this` is `Ok`, otherwise returns `this` (which is `Err`)
 
 #### Defined in
 
-[core.ts:489](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L489)
+[core.ts:489](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L489)
 
 ***
 
@@ -93,7 +93,7 @@ The result of `fn` if `this` is `Ok`, otherwise `this` as `Err`.
 
 #### Defined in
 
-[core.ts:505](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L505)
+[core.ts:505](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L505)
 
 ***
 
@@ -122,7 +122,7 @@ Just same as `result as unknown as Result<U, E>`.
 
 #### Defined in
 
-[core.ts:563](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L563)
+[core.ts:563](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L563)
 
 ***
 
@@ -150,7 +150,7 @@ Just same as `result as unknown as Result<T, F>`.
 
 #### Defined in
 
-[core.ts:552](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L552)
+[core.ts:552](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L552)
 
 ***
 
@@ -176,7 +176,7 @@ Tests whether `this` and `other` are both `Ok` containing equal values, or both 
 
 #### Defined in
 
-[core.ts:540](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L540)
+[core.ts:540](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L540)
 
 ***
 
@@ -196,7 +196,7 @@ If the result is `Ok`, returns `None`.
 
 #### Defined in
 
-[core.ts:413](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L413)
+[core.ts:413](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L413)
 
 ***
 
@@ -224,7 +224,7 @@ Throws an error with the provided message if the result is an `Err`.
 
 #### Defined in
 
-[core.ts:356](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L356)
+[core.ts:356](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L356)
 
 ***
 
@@ -252,7 +252,7 @@ Throws an error with the provided message if the result is an `Ok`.
 
 #### Defined in
 
-[core.ts:385](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L385)
+[core.ts:385](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L385)
 
 ***
 
@@ -284,7 +284,7 @@ If the result is `Ok(Err(E))` or `Err(E)`, returns `Err(E)`.
 
 #### Defined in
 
-[core.ts:473](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L473)
+[core.ts:473](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L473)
 
 ***
 
@@ -311,7 +311,7 @@ Does not modify the `Result`.
 
 #### Defined in
 
-[core.ts:523](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L523)
+[core.ts:523](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L523)
 
 ***
 
@@ -338,7 +338,7 @@ Does not modify the `Result`.
 
 #### Defined in
 
-[core.ts:531](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L531)
+[core.ts:531](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L531)
 
 ***
 
@@ -356,7 +356,7 @@ Returns `true` if the result is `Err`.
 
 #### Defined in
 
-[core.ts:329](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L329)
+[core.ts:329](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L329)
 
 ***
 
@@ -380,7 +380,7 @@ Returns `true` if the result is `Err` and the provided predicate returns `true` 
 
 #### Defined in
 
-[core.ts:341](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L341)
+[core.ts:341](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L341)
 
 ***
 
@@ -398,7 +398,7 @@ Returns `true` if the result is `Ok`.
 
 #### Defined in
 
-[core.ts:324](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L324)
+[core.ts:324](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L324)
 
 ***
 
@@ -422,7 +422,7 @@ Returns `true` if the result is `Ok` and the provided predicate returns `true` f
 
 #### Defined in
 
-[core.ts:335](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L335)
+[core.ts:335](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L335)
 
 ***
 
@@ -453,7 +453,7 @@ leaving an `Err` value untouched.
 
 #### Defined in
 
-[core.ts:434](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L434)
+[core.ts:434](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L434)
 
 ***
 
@@ -484,7 +484,7 @@ leaving an `Ok` value untouched.
 
 #### Defined in
 
-[core.ts:446](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L446)
+[core.ts:446](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L446)
 
 ***
 
@@ -515,7 +515,7 @@ Maps a `Result<T, E>` to `U` by applying a function to the contained `Ok` value 
 
 #### Defined in
 
-[core.ts:458](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L458)
+[core.ts:458](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L458)
 
 ***
 
@@ -546,7 +546,7 @@ Maps a `Result<T, E>` to `U` by applying a function to the contained `Ok` value 
 
 #### Defined in
 
-[core.ts:466](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L466)
+[core.ts:466](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L466)
 
 ***
 
@@ -566,7 +566,7 @@ If the result is `Err`, returns `None`.
 
 #### Defined in
 
-[core.ts:406](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L406)
+[core.ts:406](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L406)
 
 ***
 
@@ -598,7 +598,7 @@ Returns `this` if it is `Ok`, otherwise returns the passed `Result`.
 
 #### Defined in
 
-[core.ts:497](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L497)
+[core.ts:497](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L497)
 
 ***
 
@@ -630,7 +630,7 @@ The result of `fn` if `this` is `Err`, otherwise `this` as `Ok`.
 
 #### Defined in
 
-[core.ts:513](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L513)
+[core.ts:513](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L513)
 
 ***
 
@@ -648,7 +648,7 @@ Custom `toString` implementation that uses the `Result`'s contained value.
 
 #### Defined in
 
-[core.ts:568](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L568)
+[core.ts:568](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L568)
 
 ***
 
@@ -682,7 +682,7 @@ Transposes a `Result` of an `Option` into an `Option` of a `Result`.
 
 #### Defined in
 
-[core.ts:422](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L422)
+[core.ts:422](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L422)
 
 ***
 
@@ -704,7 +704,7 @@ Throws an error if the result is an `Err`.
 
 #### Defined in
 
-[core.ts:362](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L362)
+[core.ts:362](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L362)
 
 ***
 
@@ -726,7 +726,7 @@ Throws an error if the result is an `Ok`.
 
 #### Defined in
 
-[core.ts:391](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L391)
+[core.ts:391](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L391)
 
 ***
 
@@ -750,7 +750,7 @@ Returns the contained `Ok` value or a provided default.
 
 #### Defined in
 
-[core.ts:368](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L368)
+[core.ts:368](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L368)
 
 ***
 
@@ -774,4 +774,4 @@ Returns the contained `Ok` value or computes it from a closure if the result is 
 
 #### Defined in
 
-[core.ts:374](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/core.ts#L374)
+[core.ts:374](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/core.ts#L374)

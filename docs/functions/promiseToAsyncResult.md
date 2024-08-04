@@ -36,15 +36,15 @@ A promise that resolves to a `Result<T, E>`. If the input promise `p` resolves, 
 
 ```ts
 async function example() {
-  const result = await promiseToAsyncResult(fetchData());
-  if (result.isOk()) {
-    console.log('Data:', result.unwrap());
-  } else {
-    console.error('Error:', result.unwrapErr());
-  }
+    const result = await promiseToAsyncResult(fetchData());
+    result.inspect(x => {
+        console.log('Data:', x);
+    }).inspectErr(err => {
+        console.error('Error:', err);
+    });
 }
 ```
 
 ## Defined in
 
-[extensions.ts:25](https://github.com/JiangJie/happy-rusty/blob/568a73f526d9ce3608e5c5e0ed80e93107bc6adb/src/enum/extensions.ts#L25)
+[extensions.ts:25](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/extensions.ts#L25)

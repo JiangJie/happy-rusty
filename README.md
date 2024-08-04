@@ -15,8 +15,8 @@
 
 ## Supported
 
-- [option](https://doc.rust-lang.org/core/option/index.html)
-- [result](https://doc.rust-lang.org/core/result/index.html)
+- [Option](https://doc.rust-lang.org/core/option/index.html)
+- [Result](https://doc.rust-lang.org/core/result/index.html)
 
 ## Installation
 
@@ -63,5 +63,10 @@ import { Some, None, Ok, Err } from 'happy-rusty';
 ```
 
 Enjoy the happiness.
+
+## [Examples](examples/main.ts)
+
+- [Option](examples/option.ts)
+- [Result](examples/result.ts)
 
 ## [Docs](docs/README.md)

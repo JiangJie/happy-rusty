@@ -11,8 +11,8 @@
 
 ## 支持的特性
 
-- [option](https://doc.rust-lang.org/core/option/index.html)
-- [result](https://doc.rust-lang.org/core/result/index.html)
+- [Option](https://doc.rust-lang.org/core/option/index.html)
+- [Result](https://doc.rust-lang.org/core/result/index.html)
 
 ## 安装
 
@@ -57,5 +57,10 @@ bunx jsr add @happy-js/happy-rusty
 ```ts
 import { Some, None, Ok, Err } from 'happy-rusty';
 ```
+
+## [示例](examples/main.ts)
+
+- [Option](examples/option.ts)
+- [Result](examples/result.ts)
 
 ## [文档](docs/README.md)
