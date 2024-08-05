@@ -23,3 +23,8 @@ export const RESULT_FALSE: Result<boolean, any> = Ok(false);
  * Can be used anywhere due to immutability.
  */
 export const RESULT_ZERO: Result<number, any> = Ok(0);
+
+/**
+ * Result constant for `void` or `()`.
+ */
+export const RESULT_VOID: Result<void, any> = Ok();
