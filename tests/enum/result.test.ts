@@ -10,6 +10,7 @@ Deno.test('Result:Ok', async (t) => {
         assert(Object.prototype.toString.call(r) === '[object Result]');
         assert(r.toString() === 'Ok(1)');
         assert(`${ r }` === 'Ok(1)');
+        assert(`${ Ok() }` === 'Ok(undefined)');
     });
 
     await t.step('Querying the variant', () => {
