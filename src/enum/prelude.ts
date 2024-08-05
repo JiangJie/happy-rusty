@@ -283,7 +283,12 @@ export const None = Object.freeze<None>({
  * }
  * ```
  */
-export function Ok<T, E>(value: T): Result<T, E> {
+export function Ok<T, E>(value: T): Result<T, E>;
+/**
+ * Because javascript does not have a `()` type, use `void` instead.
+ */
+export function Ok<E>(): Result<void, E>;
+export function Ok<T, E>(value?: T): Result<T, E> {
     const ok: Result<T, E> = {
         [Symbol.toStringTag]: 'Result',
         [ResultKindSymbol]: 'Ok',
@@ -295,23 +300,23 @@ export function Ok<T, E>(value: T): Result<T, E> {
             return false;
         },
         isOkAnd(predicate: (value: T) => boolean): boolean {
-            return predicate(value);
+            return predicate(value as T);
         },
         isErrAnd(_predicate: (error: E) => boolean): false {
             return false;
         },
 
         expect(_msg: string): T {
-            return value;
+            return value as T;
         },
         unwrap(): T {
-            return value;
+            return value as T;
         },
         unwrapOr(_defaultValue: T): T {
-            return value;
+            return value as T;
         },
         unwrapOrElse(_fn: (error: E) => T): T {
-            return value;
+            return value as T;
         },
 
         expectErr(msg: string): E {
@@ -322,7 +327,7 @@ export function Ok<T, E>(value: T): Result<T, E> {
         },
 
         ok(): Option<T> {
-            return Some(value);
+            return Some(value as T);
         },
         err(): None {
             return None;
@@ -334,16 +339,16 @@ export function Ok<T, E>(value: T): Result<T, E> {
         },
 
         map<U>(fn: (value: T) => U): Result<U, E> {
-            return Ok(fn(value));
+            return Ok(fn(value as T));
         },
         mapErr<F>(_fn: (error: E) => F): Result<T, F> {
-            return Ok(value);
+            return Ok(value as T);
         },
         mapOr<U>(_defaultValue: U, fn: (value: T) => U): U {
-            return fn(value);
+            return fn(value as T);
         },
         mapOrElse<U>(_defaultFn: (error: E) => U, fn: (value: T) => U): U {
-            return fn(value);
+            return fn(value as T);
         },
         flatten<T>(): Result<T, E> {
             const r = value as Result<T, E>;
@@ -359,14 +364,14 @@ export function Ok<T, E>(value: T): Result<T, E> {
             return ok as unknown as Result<T, F>;
         },
         andThen<U>(fn: (value: T) => Result<U, E>): Result<U, E> {
-            return fn(value);
+            return fn(value as T);
         },
         orElse<F>(_fn: (error: E) => Result<T, F>): Result<T, F> {
             return ok as unknown as Result<T, F>;
         },
 
         inspect(fn: (value: T) => void): Result<T, E> {
-            fn(value);
+            fn(value as T);
             return ok;
         },
         inspectErr(_fn: (error: E) => void): Result<T, E> {
