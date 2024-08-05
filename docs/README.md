@@ -19,7 +19,11 @@
 | [AsyncIOResult](type-aliases/AsyncIOResult.md) | Represents an asynchronous I/O operation that yields a `Result<T, Error>`. This is a promise that resolves to `Ok(T)` if the I/O operation was successful, or `Err(Error)` if there was an error. |
 | [AsyncOption](type-aliases/AsyncOption.md) | Represents an asynchronous operation that yields an `Option<T>`. This is a promise that resolves to either `Some(T)` if the value is present, or `None` if the value is absent. |
 | [AsyncResult](type-aliases/AsyncResult.md) | Represents an asynchronous operation that yields a `Result<T, E>`. This is a promise that resolves to `Ok(T)` if the operation was successful, or `Err(E)` if there was an error. |
+| [AsyncVoidIOResult](type-aliases/AsyncVoidIOResult.md) | `VoidIOResult` wrapped by `Promise`. |
+| [AsyncVoidResult](type-aliases/AsyncVoidResult.md) | `VoidResult<E>` wrapped by `Promise`. |
 | [IOResult](type-aliases/IOResult.md) | Represents a synchronous operation that yields a `Result<T, Error>`. This is a result that is either `Ok(T)` if the operation was successful, or `Err(Error)` if there was an error. |
+| [VoidIOResult](type-aliases/VoidIOResult.md) | Similar to Rust's `Result<(), Error>`. |
+| [VoidResult](type-aliases/VoidResult.md) | Similar to Rust's `Result<(), E>`. |
 
 ## Variables
 
@@ -28,6 +32,7 @@
 | [None](variables/None.md) | A constant representing the `None` case of an `Option`, indicating the absence of a value. This constant is frozen to ensure it is immutable and cannot be altered, preserving the integrity of `None` throughout the application. |
 | [RESULT\_FALSE](variables/RESULT_FALSE.md) | Result constant for `false`. Can be used anywhere due to immutability. |
 | [RESULT\_TRUE](variables/RESULT_TRUE.md) | Result constant for `true`. Can be used anywhere due to immutability. |
+| [RESULT\_VOID](variables/RESULT_VOID.md) | Result constant for `void` or `()`. |
 | [RESULT\_ZERO](variables/RESULT_ZERO.md) | Result constant for `0`. Can be used anywhere due to immutability. |
 
 ## Functions

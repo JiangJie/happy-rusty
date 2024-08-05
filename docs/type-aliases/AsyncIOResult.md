@@ -21,4 +21,4 @@ This is a promise that resolves to `Ok(T)` if the I/O operation was successful, 
 
 ## Defined in
 
-[defines.ts:38](https://github.com/JiangJie/happy-rusty/blob/d91a6123f053d528d1e11023507d8f0c72720848/src/enum/defines.ts#L38)
+[defines.ts:52](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/defines.ts#L52)
