@@ -20,39 +20,18 @@
 
 ## Installation
 
-via pnpm
-
-```
+```sh
+# via pnpm
 pnpm add happy-rusty
-```
-
-or via yarn
-
-```
+# or via yarn
 yarn add happy-rusty
-```
-
-or just from npm
-
-```
+# or just from npm
 npm install --save happy-rusty
-```
-
-via JSR
-
-```
+# via JSR
 jsr add @happy-js/happy-rusty
-```
-
-for deno
-
-```
+# for deno
 deno add @happy-js/happy-rusty
-```
-
-for bun
-
-```
+# for bun
 bunx jsr add @happy-js/happy-rusty
 ```
 
