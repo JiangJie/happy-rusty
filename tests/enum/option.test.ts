@@ -11,19 +11,27 @@ Deno.test('Option:Some', async (t) => {
         assert(`${ o }` === 'Some(10)');
     });
 
-    await t.step('Querying the variant', () => {
+    await t.step('Querying the variant', async () => {
         assert(o.isSome());
         assert(!o.isNone());
         assert(o.isSomeAnd(v => v === 10));
         assert(!o.isSomeAnd(v => v === 20));
+
+        assert(await o.isSomeAndAsync(async v => {
+            return v === await Promise.resolve(10);
+        }));
     });
 
-    await t.step('Extracting the contained value', () => {
+    await t.step('Extracting the contained value', async () => {
         assert(o.expect('value is number 10') === 10);
 
         assert(o.unwrap() === 10);
         assert(o.unwrapOr(0) === 10);
         assert(o.unwrapOrElse(() => 0) === 10);
+
+        assert(await o.unwrapOrElseAsync(async () => {
+            return await Promise.resolve(0);
+        }) === 10);
     });
 
     await t.step('Transforming contained values', () => {
@@ -59,7 +67,7 @@ Deno.test('Option:Some', async (t) => {
         assert(y.eq(None));
     });
 
-    await t.step('Boolean operators', () => {
+    await t.step('Boolean operators', async () => {
         assert(o.and(Some(20)).eq(Some(20)));
         assert(o.and(None).eq(None));
         assert(o.andThen(() => Some(20)).eq(Some(20)));
@@ -70,6 +78,12 @@ Deno.test('Option:Some', async (t) => {
 
         assert(o.xor(Some(20)).eq(None));
         assert(o.xor(None).eq(Some(10)));
+
+        assert((await (await o.andThenAsync(async () => {
+            return Some(await Promise.resolve('0'));
+        })).orElseAsync(async () => {
+            return Some(await Promise.resolve('1'));
+        })).eq(Some('0')));
     });
 
     await t.step('Inspect will be called', () => {
@@ -98,18 +112,26 @@ Deno.test('Option:None', async (t) => {
         assert(`${ o }` === 'None');
     });
 
-    await t.step('Querying the variant', () => {
+    await t.step('Querying the variant', async () => {
         assert(!o.isSome());
         assert(o.isNone());
         assert(!o.isSomeAnd(v => v === 10));
+
+        assert(!(await o.isSomeAndAsync(async v => {
+            return v === await Promise.resolve(10);
+        })));
     });
 
-    await t.step('Extracting the contained value', () => {
+    await t.step('Extracting the contained value', async () => {
         assertThrows(() => o.expect('None has no value'), TypeError, 'None has no value');
 
         assertThrows(o.unwrap, TypeError);
         assert(o.unwrapOr(0) === 0);
         assert(o.unwrapOrElse(() => 0) === 0);
+
+        assert(await o.unwrapOrElseAsync(async () => {
+            return await Promise.resolve(0);
+        }) === 0);
     });
 
     await t.step('Transforming contained values', () => {
@@ -137,7 +159,7 @@ Deno.test('Option:None', async (t) => {
         assert(y.eq(None));
     });
 
-    await t.step('Boolean operators', () => {
+    await t.step('Boolean operators', async () => {
         assert(o.and(Some(20)).eq(None));
         assert(o.and(None).eq(None));
         assert(o.andThen(() => Some(20)).eq(None));
@@ -148,6 +170,12 @@ Deno.test('Option:None', async (t) => {
 
         assert(o.xor(Some(20)).eq(Some(20)));
         assert(o.xor(None).eq(None));
+
+        assert((await (await o.andThenAsync(async () => {
+            return Some(await Promise.resolve('0'));
+        })).orElseAsync(async () => {
+            return Some(await Promise.resolve('1'));
+        })).eq(Some('1')));
     });
 
     await t.step('Inspect will not be called', () => {

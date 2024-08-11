@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { assert, assertThrows } from "@std/assert";
 import { assertSpyCalls, spy } from '@std/testing/mock';
-import { Err, None, Ok, Some, promiseToAsyncResult, type Option, type Result } from '../../src/mod.ts';
+import { AsyncResult, Err, None, Ok, Some, promiseToAsyncResult, type Option, type Result } from '../../src/mod.ts';
 
 Deno.test('Result:Ok', async (t) => {
     const r: Result<number, Error> = Ok(1);
@@ -13,11 +13,18 @@ Deno.test('Result:Ok', async (t) => {
         assert(`${ Ok() }` === 'Ok(undefined)');
     });
 
-    await t.step('Querying the variant', () => {
+    await t.step('Querying the variant', async () => {
         assert(r.isOk());
         assert(!r.isErr());
         assert(r.isOkAnd(x => x === 1));
         assert(!r.isErrAnd(_x => true));
+
+        assert(await r.isOkAndAsync(async x => {
+            return x === await Promise.resolve(1);
+        }));
+        assert(!(await r.isErrAndAsync(async err => {
+            return err.message === await Promise.resolve('lose');
+        })));
     });
 
     await t.step('Equals comparison', () => {
@@ -26,7 +33,7 @@ Deno.test('Result:Ok', async (t) => {
         assertThrows(() => r.eq({} as unknown as Result<number, Error>), TypeError);
     });
 
-    await t.step('Extracting the contained value', () => {
+    await t.step('Extracting the contained value', async () => {
         assert(r.expect('value should greater than 0') === 1);
         assertThrows(() => r.expectErr('value should greater than 0'), TypeError, 'value should greater than 0');
 
@@ -34,6 +41,10 @@ Deno.test('Result:Ok', async (t) => {
         assertThrows(r.unwrapErr, TypeError);
         assert(r.unwrapOr(0) > 0);
         assert(r.unwrapOrElse((_err) => 0) > 0);
+
+        assert((await r.unwrapOrElseAsync(async err => {
+            return err.message === await Promise.resolve('lose') ? 0 : -1;
+        })) === 1);
     });
 
     await t.step('Transforming contained values', () => {
@@ -51,7 +62,7 @@ Deno.test('Result:Ok', async (t) => {
         assert(Ok<Result<number, Error>, Error>(r).flatten() === r);
     });
 
-    await t.step('Boolean operators', () => {
+    await t.step('Boolean operators', async () => {
         const other: Result<number, Error> = Ok(2);
         const otherErr: Result<number, Error> = Err(new Error());
 
@@ -63,6 +74,14 @@ Deno.test('Result:Ok', async (t) => {
 
         assert(r.andThen(x => Ok(x + 10)).eq(Ok(11)));
         assert(r.orElse(_x => other) === r);
+
+        assert((await r.andThenAsync(async (x) => {
+            return Ok(String(x + await Promise.resolve(10)));
+        })).eq(Ok('11')));
+
+        assert((await r.orElseAsync(async (x): AsyncResult<number, string> => {
+            return Err(x.message + await Promise.resolve(10));
+        })) === r.asOk());
     });
 
     await t.step('Inspect will be called', () => {
@@ -99,18 +118,25 @@ Deno.test('Result:Err', async (t) => {
         assert(`${ r }` === 'Err(Error: lose)');
     });
 
-    await t.step('Querying the variant', () => {
+    await t.step('Querying the variant', async () => {
         assert(!r.isOk());
         assert(r.isErr());
         assert(!r.isOkAnd(_x => true));
         assert(r.isErrAnd(x => x.message == 'lose'));
+
+        assert(!(await r.isOkAndAsync(async x => {
+            return x === await Promise.resolve(1);
+        })));
+        assert(await r.isErrAndAsync(async err => {
+            return err.message === await Promise.resolve('lose');
+        }));
     });
 
     await t.step('Equals comparison', () => {
         assert(r.eq(Err(r.unwrapErr())));
     });
 
-    await t.step('Extracting the contained value', () => {
+    await t.step('Extracting the contained value', async () => {
         assertThrows(() => r.expect('value should less than 1'), TypeError, 'value should less than 1');
         assert(r.expectErr('error').message === 'lose');
 
@@ -120,6 +146,10 @@ Deno.test('Result:Err', async (t) => {
         assert(r.unwrapOrElse((err) => err.message.length) === 4);
 
         assert(Err<Result<number, Error>, Error>(r.unwrapErr()).flatten().eq(r));
+
+        assert((await r.unwrapOrElseAsync(async err => {
+            return err.message === await Promise.resolve('lose') ? 0 : -1;
+        })) === 0);
     });
 
     await t.step('Transforming contained values', () => {
@@ -134,7 +164,7 @@ Deno.test('Result:Err', async (t) => {
         assert(r.mapOrElse(_err => 0, _v => 1) === 0);
     });
 
-    await t.step('Boolean operators', () => {
+    await t.step('Boolean operators', async () => {
         const other: Result<number, Error> = Ok(2);
         const otherErr: Result<number, Error> = Err(new Error());
 
@@ -146,6 +176,14 @@ Deno.test('Result:Err', async (t) => {
 
         assert(r.andThen(x => Ok(x + 10)) === r);
         assert(r.orElse(_x => other) === other);
+
+        assert(await r.andThenAsync(async (x): AsyncResult<number, Error> => {
+            return Ok(x + await Promise.resolve(10));
+        }) === r);
+
+        assert((await r.orElseAsync(async (x): AsyncResult<number, string> => {
+            return Err(x.message + await Promise.resolve(10));
+        })).eq(Err('lose10')));
     });
 
     await t.step('InspectErr will be called', () => {
