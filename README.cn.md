@@ -40,6 +40,8 @@ import { Some, None, Ok, Err } from 'happy-rusty';
 ## [示例](examples/main.ts)
 
 - [Option](examples/option.ts)
+- [AsyncOption](examples/option.async.ts)
 - [Result](examples/result.ts)
+- [AsyncResult](examples/result.async.ts)
 
 ## [文档](docs/README.md)

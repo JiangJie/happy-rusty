@@ -46,6 +46,8 @@ Enjoy the happiness.
 ## [Examples](examples/main.ts)
 
 - [Option](examples/option.ts)
+- [AsyncOption](examples/option.async.ts)
 - [Result](examples/result.ts)
+- [AsyncResult](examples/result.async.ts)
 
 ## [Docs](docs/README.md)

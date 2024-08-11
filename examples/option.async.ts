@@ -5,21 +5,21 @@ function getSomeNumber(): Option<number> {
     return Math.random() > 0.2 ? Some(Math.floor(Math.random() * 10)) : None;
 }
 
-const wrapped = getSomeNumber()
+const wrapped = (await (await getSomeNumber()
     .inspect(x => {
         console.log(`Some value is ${ x }`);
     })
-    .andThen(x => {
-        return x === 0 ? Some(true) : None;
-    })
+    .andThenAsync(async x => {
+        return x === await Promise.resolve(0) ? Some(true) : None;
+    }))
     .inspect(x => {
         console.assert(x);
     })
-    .orElse(() => {
-        return Some(false);
-    })
+    .orElseAsync(async () => {
+        return Some(await Promise.resolve(false));
+    }))
     .inspect(x => {
-        console.log(`after orElse value is ${ x }`);
+        console.log(`after orElseAsync value is ${ x }`);
     })
     .map(x => {
         return {
