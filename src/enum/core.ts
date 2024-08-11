@@ -26,8 +26,10 @@ export interface Option<T> {
 
     /**
      * [object Option].
+     *
+     * @private
      */
-    [Symbol.toStringTag]: 'Option',
+    readonly [Symbol.toStringTag]: 'Option',
 
     /**
      * Identify `Some` or `None`.
@@ -59,6 +61,11 @@ export interface Option<T> {
      * @param predicate - A function that takes the contained value and returns a boolean.
      */
     isSomeAnd(predicate: (value: T) => boolean): boolean;
+
+    /**
+     * Asynchronous version of `isSomeAnd`.
+     */
+    isSomeAndAsync(predicate: (value: T) => Promise<boolean>): Promise<boolean>;
 
     // #endregion
 
@@ -92,6 +99,11 @@ export interface Option<T> {
      * @param fn - A function that returns the default value.
      */
     unwrapOrElse(fn: () => T): T;
+
+    /**
+     * Asynchronous version of `unwrapOrElse`.
+     */
+    unwrapOrElseAsync(fn: () => Promise<T>): Promise<T>;
 
     // #endregion
 
@@ -229,6 +241,11 @@ export interface Option<T> {
     andThen<U>(fn: (value: T) => Option<U>): Option<U>;
 
     /**
+     * Asynchronous version of `andThen`.
+     */
+    andThenAsync<U>(fn: (value: T) => AsyncOption<U>): AsyncOption<U>;
+
+    /**
      * Returns the Option if it contains a value, otherwise returns `other`.
      * This can be used for providing a fallback `Option`.
      * @param other - The fallback `Option` to use if `this` is `None`.
@@ -243,6 +260,11 @@ export interface Option<T> {
      * @returns `this` if it is `Some`, otherwise the result of `fn`.
      */
     orElse(fn: () => Option<T>): Option<T>;
+
+    /**
+     * Asynchronous version of `orElse`.
+     */
+    orElseAsync(fn: () => AsyncOption<T>): AsyncOption<T>;
 
     /**
      * Returns `Some` if exactly one of `this`, `other` is `Some`, otherwise returns `None`.
@@ -300,8 +322,10 @@ export interface Result<T, E> {
 
     /**
      * [object Result].
+     *
+     * @private
      */
-    [Symbol.toStringTag]: 'Result',
+    readonly [Symbol.toStringTag]: 'Result',
 
     /**
      * Identify `Ok` or `Err`.
@@ -335,10 +359,20 @@ export interface Result<T, E> {
     isOkAnd(predicate: (value: T) => boolean): boolean;
 
     /**
+     * Asynchronous version of `isOkAnd`.
+     */
+    isOkAndAsync(predicate: (value: T) => Promise<boolean>): Promise<boolean>;
+
+    /**
      * Returns `true` if the result is `Err` and the provided predicate returns `true` for the contained error.
      * @param predicate - A function that takes the `Err` value and returns a boolean.
      */
     isErrAnd(predicate: (error: E) => boolean): boolean;
+
+    /**
+     * Asynchronous version of `isErrAnd`.
+     */
+    isErrAndAsync(predicate: (error: E) => Promise<boolean>): Promise<boolean>;
 
     // #endregion
 
@@ -372,6 +406,11 @@ export interface Result<T, E> {
      * @param fn - A function that takes the `Err` value and returns an `Ok` value.
      */
     unwrapOrElse(fn: (error: E) => T): T;
+
+    /**
+     * Asynchronous version of `unwrapOrElse`.
+     */
+    unwrapOrElseAsync(fn: (error: E) => Promise<T>): Promise<T>;
 
     /**
      * These methods extract the contained value in a `Result<T, E>` when it is the `Err` variant.
@@ -505,12 +544,22 @@ export interface Result<T, E> {
     andThen<U>(fn: (value: T) => Result<U, E>): Result<U, E>;
 
     /**
+     * Asynchronous version of `andThen`.
+     */
+    andThenAsync<U>(fn: (value: T) => AsyncResult<U, E>): AsyncResult<U, E>;
+
+    /**
      * Calls the provided function with the contained error if `this` is `Err`, otherwise returns `this` as `Ok`.
      * @typeParam F - The type of the error returned by the function.
      * @param fn - A function that takes the `Err` value and returns a `Result`.
      * @returns The result of `fn` if `this` is `Err`, otherwise `this` as `Ok`.
      */
     orElse<F>(fn: (error: E) => Result<T, F>): Result<T, F>;
+
+    /**
+     * Asynchronous version of `orElse`.
+     */
+    orElseAsync<F>(fn: (error: E) => AsyncResult<T, F>): AsyncResult<T, F>;
 
     // #endregion
 
@@ -567,3 +616,20 @@ export interface Result<T, E> {
      */
     toString(): string;
 }
+
+/**
+ * Represents an asynchronous operation that yields an `Option<T>`.
+ * This is a promise that resolves to either `Some(T)` if the value is present, or `None` if the value is absent.
+ *
+ * @typeParam T - The type of the value that may be contained within the `Option`.
+ */
+export type AsyncOption<T> = Promise<Option<T>>;
+
+/**
+ * Represents an asynchronous operation that yields a `Result<T, E>`.
+ * This is a promise that resolves to `Ok(T)` if the operation was successful, or `Err(E)` if there was an error.
+ *
+ * @typeParam T - The type of the value that is produced by a successful operation.
+ * @typeParam E - The type of the error that may be produced by a failed operation.
+ */
+export type AsyncResult<T, E> = Promise<Result<T, E>>;
