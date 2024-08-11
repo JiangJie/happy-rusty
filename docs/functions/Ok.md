@@ -45,7 +45,7 @@ if (goodResult.isOk()) {
 
 ### Defined in
 
-[prelude.ts:286](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L286)
+[prelude.ts:326](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L326)
 
 ## Ok()
 
@@ -67,4 +67,4 @@ Because javascript does not have a `()` type, use `void` instead.
 
 ### Defined in
 
-[prelude.ts:290](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L290)
+[prelude.ts:330](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L330)

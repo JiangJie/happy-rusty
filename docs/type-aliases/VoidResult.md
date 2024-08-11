@@ -20,4 +20,4 @@ Similar to Rust's `Result<(), E>`.
 
 ## Defined in
 
-[defines.ts:29](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/defines.ts#L29)
+[defines.ts:12](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/defines.ts#L12)

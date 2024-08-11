@@ -43,4 +43,4 @@ if (badResult.isErr()) {
 
 ## Defined in
 
-[prelude.ts:418](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L418)
+[prelude.ts:473](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L473)

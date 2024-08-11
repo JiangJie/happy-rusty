@@ -27,12 +27,6 @@ pub enum Option<T> {
 | ------ | ------ |
 | `T` | The type of the value contained in the `Some` variant. |
 
-## Properties
-
-| Property | Type | Description | Defined in |
-| ------ | ------ | ------ | ------ |
-| `[toStringTag]` | `"Option"` | [object Option]. | [core.ts:30](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L30) |
-
 ## Methods
 
 ### and()
@@ -64,7 +58,7 @@ This is sometimes called "and then" because it is similar to a logical AND opera
 
 #### Defined in
 
-[core.ts:220](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L220)
+[core.ts:232](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L232)
 
 ***
 
@@ -97,7 +91,37 @@ The result of `fn` if `this` is `Some`, otherwise `None`.
 
 #### Defined in
 
-[core.ts:229](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L229)
+[core.ts:241](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L241)
+
+***
+
+### andThenAsync()
+
+```ts
+andThenAsync<U>(fn): AsyncOption<U>
+```
+
+Asynchronous version of `andThen`.
+
+#### Type Parameters
+
+| Type Parameter |
+| ------ |
+| `U` |
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `fn` | (`value`) => [`AsyncOption`](../type-aliases/AsyncOption.md)\<`U`\> |
+
+#### Returns
+
+[`AsyncOption`](../type-aliases/AsyncOption.md)\<`U`\>
+
+#### Defined in
+
+[core.ts:246](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L246)
 
 ***
 
@@ -124,7 +148,7 @@ This method can be used for comparing `Option` instances in a value-sensitive ma
 
 #### Defined in
 
-[core.ts:273](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L273)
+[core.ts:295](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L295)
 
 ***
 
@@ -152,7 +176,7 @@ Throws an error with the provided message if the Option is a `None`.
 
 #### Defined in
 
-[core.ts:76](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L76)
+[core.ts:83](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L83)
 
 ***
 
@@ -178,7 +202,7 @@ Returns `None` if the Option is `None`, otherwise calls predicate with the wrapp
 
 #### Defined in
 
-[core.ts:138](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L138)
+[core.ts:150](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L150)
 
 ***
 
@@ -210,7 +234,7 @@ Converts from `Option<Option<T>>` to `Option<T>`.
 
 #### Defined in
 
-[core.ts:144](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L144)
+[core.ts:156](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L156)
 
 ***
 
@@ -237,7 +261,7 @@ This is primarily for side effects and does not transform the `Option`.
 
 #### Defined in
 
-[core.ts:263](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L263)
+[core.ts:285](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L285)
 
 ***
 
@@ -255,7 +279,7 @@ Returns `true` if the Option is a `None` value.
 
 #### Defined in
 
-[core.ts:55](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L55)
+[core.ts:57](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L57)
 
 ***
 
@@ -273,7 +297,7 @@ Returns `true` if the Option is a `Some` value.
 
 #### Defined in
 
-[core.ts:50](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L50)
+[core.ts:52](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L52)
 
 ***
 
@@ -297,7 +321,31 @@ Returns `true` if the Option is a `Some` value and the predicate returns `true` 
 
 #### Defined in
 
-[core.ts:61](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L61)
+[core.ts:63](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L63)
+
+***
+
+### isSomeAndAsync()
+
+```ts
+isSomeAndAsync(predicate): Promise<boolean>
+```
+
+Asynchronous version of `isSomeAnd`.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `predicate` | (`value`) => `Promise`\<`boolean`\> |
+
+#### Returns
+
+`Promise`\<`boolean`\>
+
+#### Defined in
+
+[core.ts:68](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L68)
 
 ***
 
@@ -327,7 +375,7 @@ Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
 
 #### Defined in
 
-[core.ts:151](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L151)
+[core.ts:163](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L163)
 
 ***
 
@@ -358,7 +406,7 @@ Maps an `Option<T>` to `U` by applying a function to the contained value (if any
 
 #### Defined in
 
-[core.ts:159](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L159)
+[core.ts:171](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L171)
 
 ***
 
@@ -389,7 +437,7 @@ Maps an `Option<T>` to `U` by applying a function to a contained value (if any),
 
 #### Defined in
 
-[core.ts:167](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L167)
+[core.ts:179](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L179)
 
 ***
 
@@ -419,7 +467,7 @@ Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` a
 
 #### Defined in
 
-[core.ts:109](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L109)
+[core.ts:121](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L121)
 
 ***
 
@@ -449,7 +497,7 @@ Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` a
 
 #### Defined in
 
-[core.ts:116](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L116)
+[core.ts:128](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L128)
 
 ***
 
@@ -476,7 +524,7 @@ This can be used for providing a fallback `Option`.
 
 #### Defined in
 
-[core.ts:237](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L237)
+[core.ts:254](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L254)
 
 ***
 
@@ -503,7 +551,31 @@ This method can be used for lazy fallbacks, as `fn` is only evaluated if `this` 
 
 #### Defined in
 
-[core.ts:245](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L245)
+[core.ts:262](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L262)
+
+***
+
+### orElseAsync()
+
+```ts
+orElseAsync(fn): AsyncOption<T>
+```
+
+Asynchronous version of `orElse`.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `fn` | () => [`AsyncOption`](../type-aliases/AsyncOption.md)\<`T`\> |
+
+#### Returns
+
+[`AsyncOption`](../type-aliases/AsyncOption.md)\<`T`\>
+
+#### Defined in
+
+[core.ts:267](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L267)
 
 ***
 
@@ -521,7 +593,7 @@ Custom `toString` implementation that uses the `Option`'s contained value.
 
 #### Defined in
 
-[core.ts:280](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L280)
+[core.ts:302](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L302)
 
 ***
 
@@ -556,7 +628,7 @@ Transposes an `Option` of a `Result` into a `Result` of an `Option`.
 
 #### Defined in
 
-[core.ts:126](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L126)
+[core.ts:138](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L138)
 
 ***
 
@@ -578,7 +650,7 @@ Throws an error if the value is a `None`.
 
 #### Defined in
 
-[core.ts:82](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L82)
+[core.ts:89](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L89)
 
 ***
 
@@ -602,7 +674,7 @@ Returns the contained `Some` value or a provided default.
 
 #### Defined in
 
-[core.ts:88](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L88)
+[core.ts:95](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L95)
 
 ***
 
@@ -626,7 +698,31 @@ Returns the contained `Some` value or computes it from a closure.
 
 #### Defined in
 
-[core.ts:94](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L94)
+[core.ts:101](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L101)
+
+***
+
+### unwrapOrElseAsync()
+
+```ts
+unwrapOrElseAsync(fn): Promise<T>
+```
+
+Asynchronous version of `unwrapOrElse`.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `fn` | () => `Promise`\<`T`\> |
+
+#### Returns
+
+`Promise`\<`T`\>
+
+#### Defined in
+
+[core.ts:106](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L106)
 
 ***
 
@@ -661,7 +757,7 @@ A tuple of `Options`, one for each element in the original `Option` of a tuple.
 
 #### Defined in
 
-[core.ts:203](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L203)
+[core.ts:215](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L215)
 
 ***
 
@@ -688,7 +784,7 @@ This can be thought of as an exclusive or operation on `Option` values.
 
 #### Defined in
 
-[core.ts:253](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L253)
+[core.ts:275](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L275)
 
 ***
 
@@ -722,7 +818,7 @@ An `Option` containing a tuple of the values if both are `Some`, otherwise `None
 
 #### Defined in
 
-[core.ts:181](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L181)
+[core.ts:193](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L193)
 
 ***
 
@@ -758,4 +854,4 @@ An `Option` containing the result of `fn` if both `Options` are `Some`, otherwis
 
 #### Defined in
 
-[core.ts:193](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L193)
+[core.ts:205](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L205)

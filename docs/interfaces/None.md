@@ -15,10 +15,9 @@ The type parameter is set to `never` because `None` does not hold a value.
 
 ## Properties
 
-| Property | Modifier | Type | Description | Overrides | Inherited from | Defined in |
-| ------ | ------ | ------ | ------ | ------ | ------ | ------ |
-| `[OptionKindSymbol]` | `readonly` | `"None"` | When using `None` alone, the following overrides can make type inference more accurate. | `Option.[OptionKindSymbol]` | - | [prelude.ts:15](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L15) |
-| `[toStringTag]` | `public` | `"Option"` | [object Option]. | - | [`Option`](Option.md).`[toStringTag]` | [core.ts:30](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L30) |
+| Property | Modifier | Type | Description | Overrides | Defined in |
+| ------ | ------ | ------ | ------ | ------ | ------ |
+| `[OptionKindSymbol]` | `readonly` | `"None"` | When using `None` alone, the following overrides can make type inference more accurate. | `Option.[OptionKindSymbol]` | [prelude.ts:15](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L15) |
 
 ## Methods
 
@@ -55,7 +54,7 @@ This is sometimes called "and then" because it is similar to a logical AND opera
 
 #### Defined in
 
-[prelude.ts:30](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L30)
+[prelude.ts:42](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L42)
 
 ***
 
@@ -92,7 +91,41 @@ The result of `fn` if `this` is `Some`, otherwise `None`.
 
 #### Defined in
 
-[prelude.ts:31](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L31)
+[prelude.ts:43](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L43)
+
+***
+
+### andThenAsync()
+
+```ts
+andThenAsync<U>(fn): Promise<None>
+```
+
+Asynchronous version of `andThen`.
+
+#### Type Parameters
+
+| Type Parameter |
+| ------ |
+| `U` |
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `fn` | (`value`) => [`AsyncOption`](../type-aliases/AsyncOption.md)\<`U`\> |
+
+#### Returns
+
+`Promise`\<[`None`](None.md)\>
+
+#### Overrides
+
+[`Option`](Option.md).[`andThenAsync`](Option.md#andthenasync)
+
+#### Defined in
+
+[prelude.ts:44](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L44)
 
 ***
 
@@ -129,7 +162,7 @@ This method can be used for comparing `Option` instances in a value-sensitive ma
 
 #### Defined in
 
-[prelude.ts:36](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L36)
+[prelude.ts:52](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L52)
 
 ***
 
@@ -155,13 +188,13 @@ Returns the contained `Some` value, with a provided error message if the value i
 
 Throws an error with the provided message if the Option is a `None`.
 
-#### Inherited from
+#### Overrides
 
 [`Option`](Option.md).[`expect`](Option.md#expect)
 
 #### Defined in
 
-[core.ts:76](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L76)
+[prelude.ts:22](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L22)
 
 ***
 
@@ -191,7 +224,7 @@ Returns `None` if the Option is `None`, otherwise calls predicate with the wrapp
 
 #### Defined in
 
-[prelude.ts:22](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L22)
+[prelude.ts:32](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L32)
 
 ***
 
@@ -215,7 +248,7 @@ Converts from `Option<Option<T>>` to `Option<T>`.
 
 #### Defined in
 
-[prelude.ts:23](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L23)
+[prelude.ts:33](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L33)
 
 ***
 
@@ -240,64 +273,64 @@ This is primarily for side effects and does not transform the `Option`.
 
 `this`, unmodified, for chaining additional methods.
 
-#### Inherited from
+#### Overrides
 
 [`Option`](Option.md).[`inspect`](Option.md#inspect)
 
 #### Defined in
 
-[core.ts:263](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L263)
+[prelude.ts:50](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L50)
 
 ***
 
 ### isNone()
 
 ```ts
-isNone(): boolean
+isNone(): true
 ```
 
 Returns `true` if the Option is a `None` value.
 
 #### Returns
 
-`boolean`
+`true`
 
-#### Inherited from
+#### Overrides
 
 [`Option`](Option.md).[`isNone`](Option.md#isnone)
 
 #### Defined in
 
-[core.ts:55](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L55)
+[prelude.ts:18](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L18)
 
 ***
 
 ### isSome()
 
 ```ts
-isSome(): boolean
+isSome(): false
 ```
 
 Returns `true` if the Option is a `Some` value.
 
 #### Returns
 
-`boolean`
+`false`
 
-#### Inherited from
+#### Overrides
 
 [`Option`](Option.md).[`isSome`](Option.md#issome)
 
 #### Defined in
 
-[core.ts:50](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L50)
+[prelude.ts:17](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L17)
 
 ***
 
 ### isSomeAnd()
 
 ```ts
-isSomeAnd(predicate): boolean
+isSomeAnd(predicate): false
 ```
 
 Returns `true` if the Option is a `Some` value and the predicate returns `true` for the contained value.
@@ -310,15 +343,43 @@ Returns `true` if the Option is a `Some` value and the predicate returns `true` 
 
 #### Returns
 
-`boolean`
+`false`
 
-#### Inherited from
+#### Overrides
 
 [`Option`](Option.md).[`isSomeAnd`](Option.md#issomeand)
 
 #### Defined in
 
-[core.ts:61](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L61)
+[prelude.ts:19](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L19)
+
+***
+
+### isSomeAndAsync()
+
+```ts
+isSomeAndAsync(predicate): Promise<false>
+```
+
+Asynchronous version of `isSomeAnd`.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `predicate` | (`value`) => `Promise`\<`boolean`\> |
+
+#### Returns
+
+`Promise`\<`false`\>
+
+#### Overrides
+
+[`Option`](Option.md).[`isSomeAndAsync`](Option.md#issomeandasync)
+
+#### Defined in
+
+[prelude.ts:20](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L20)
 
 ***
 
@@ -352,7 +413,7 @@ Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
 
 #### Defined in
 
-[prelude.ts:24](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L24)
+[prelude.ts:34](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L34)
 
 ***
 
@@ -381,13 +442,13 @@ Maps an `Option<T>` to `U` by applying a function to the contained value (if any
 
 `U`
 
-#### Inherited from
+#### Overrides
 
 [`Option`](Option.md).[`mapOr`](Option.md#mapor)
 
 #### Defined in
 
-[core.ts:159](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L159)
+[prelude.ts:35](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L35)
 
 ***
 
@@ -416,13 +477,13 @@ Maps an `Option<T>` to `U` by applying a function to a contained value (if any),
 
 `U`
 
-#### Inherited from
+#### Overrides
 
 [`Option`](Option.md).[`mapOrElse`](Option.md#maporelse)
 
 #### Defined in
 
-[core.ts:167](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L167)
+[prelude.ts:36](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L36)
 
 ***
 
@@ -450,13 +511,13 @@ Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` a
 
 [`Result`](Result.md)\<`never`, `E`\>
 
-#### Inherited from
+#### Overrides
 
 [`Option`](Option.md).[`okOr`](Option.md#okor)
 
 #### Defined in
 
-[core.ts:109](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L109)
+[prelude.ts:28](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L28)
 
 ***
 
@@ -484,13 +545,13 @@ Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` a
 
 [`Result`](Result.md)\<`never`, `E`\>
 
-#### Inherited from
+#### Overrides
 
 [`Option`](Option.md).[`okOrElse`](Option.md#okorelse)
 
 #### Defined in
 
-[core.ts:116](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L116)
+[prelude.ts:29](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L29)
 
 ***
 
@@ -527,7 +588,7 @@ This can be used for providing a fallback `Option`.
 
 #### Defined in
 
-[prelude.ts:32](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L32)
+[prelude.ts:45](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L45)
 
 ***
 
@@ -564,7 +625,41 @@ This method can be used for lazy fallbacks, as `fn` is only evaluated if `this` 
 
 #### Defined in
 
-[prelude.ts:33](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L33)
+[prelude.ts:46](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L46)
+
+***
+
+### orElseAsync()
+
+```ts
+orElseAsync<T>(fn): AsyncOption<T>
+```
+
+Asynchronous version of `orElse`.
+
+#### Type Parameters
+
+| Type Parameter |
+| ------ |
+| `T` |
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `fn` | () => [`AsyncOption`](../type-aliases/AsyncOption.md)\<`T`\> |
+
+#### Returns
+
+[`AsyncOption`](../type-aliases/AsyncOption.md)\<`T`\>
+
+#### Overrides
+
+[`Option`](Option.md).[`orElseAsync`](Option.md#orelseasync)
+
+#### Defined in
+
+[prelude.ts:47](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L47)
 
 ***
 
@@ -586,7 +681,7 @@ Custom `toString` implementation that uses the `Option`'s contained value.
 
 #### Defined in
 
-[core.ts:280](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L280)
+[core.ts:302](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/core.ts#L302)
 
 ***
 
@@ -612,7 +707,7 @@ Transposes an `Option` of a `Result` into a `Result` of an `Option`.
 
 #### Defined in
 
-[prelude.ts:20](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L20)
+[prelude.ts:30](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L30)
 
 ***
 
@@ -632,13 +727,13 @@ Returns the contained `Some` value.
 
 Throws an error if the value is a `None`.
 
-#### Inherited from
+#### Overrides
 
 [`Option`](Option.md).[`unwrap`](Option.md#unwrap)
 
 #### Defined in
 
-[core.ts:82](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/core.ts#L82)
+[prelude.ts:23](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L23)
 
 ***
 
@@ -672,7 +767,7 @@ Returns the contained `Some` value or a provided default.
 
 #### Defined in
 
-[prelude.ts:17](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L17)
+[prelude.ts:24](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L24)
 
 ***
 
@@ -706,7 +801,41 @@ Returns the contained `Some` value or computes it from a closure.
 
 #### Defined in
 
-[prelude.ts:18](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L18)
+[prelude.ts:25](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L25)
+
+***
+
+### unwrapOrElseAsync()
+
+```ts
+unwrapOrElseAsync<T>(fn): Promise<T>
+```
+
+Asynchronous version of `unwrapOrElse`.
+
+#### Type Parameters
+
+| Type Parameter |
+| ------ |
+| `T` |
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `fn` | () => `Promise`\<`T`\> |
+
+#### Returns
+
+`Promise`\<`T`\>
+
+#### Overrides
+
+[`Option`](Option.md).[`unwrapOrElseAsync`](Option.md#unwraporelseasync)
+
+#### Defined in
+
+[prelude.ts:26](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L26)
 
 ***
 
@@ -732,7 +861,7 @@ A tuple of `Options`, one for each element in the original `Option` of a tuple.
 
 #### Defined in
 
-[prelude.ts:28](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L28)
+[prelude.ts:40](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L40)
 
 ***
 
@@ -769,7 +898,7 @@ This can be thought of as an exclusive or operation on `Option` values.
 
 #### Defined in
 
-[prelude.ts:34](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L34)
+[prelude.ts:48](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L48)
 
 ***
 
@@ -807,7 +936,7 @@ An `Option` containing a tuple of the values if both are `Some`, otherwise `None
 
 #### Defined in
 
-[prelude.ts:26](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L26)
+[prelude.ts:38](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L38)
 
 ***
 
@@ -847,4 +976,4 @@ An `Option` containing the result of `fn` if both `Options` are `Some`, otherwis
 
 #### Defined in
 
-[prelude.ts:27](https://github.com/JiangJie/happy-rusty/blob/7d7f4ab2132e507f77594d030495f95b5688b84a/src/enum/prelude.ts#L27)
+[prelude.ts:39](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L39)
