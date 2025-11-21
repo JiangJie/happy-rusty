@@ -52,7 +52,6 @@ The codebase is organized around implementing Rust-style enums for JavaScript:
   - `utils.ts` - Type guard utilities (`isOption()`, `isResult()`)
   - `extensions.ts` - Additional utility functions
   - `constants.ts` - Shared constants
-  - `match.ts` - Pattern matching utilities
   - `mod.ts` - Re-exports all public APIs
 
 ### Key Design Patterns
@@ -103,6 +102,7 @@ Dual publishing to:
 
 - Test files: `tests/enum/option.test.ts` and `tests/enum/result.test.ts`
 - Uses Deno standard library: `@std/assert` and `@std/testing/mock`
+- Tests import from `'happy-rusty'` (path mapped in deno.json) instead of relative paths
 - Deno lock file is disabled (`"lock": false` in deno.json)
 - Run with: `deno test --coverage --clean`
 
