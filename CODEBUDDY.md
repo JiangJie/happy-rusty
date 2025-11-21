@@ -65,23 +65,45 @@ The codebase is organized around implementing Rust-style enums for JavaScript:
 
 4. **Async Support**: Parallel async versions of methods (e.g., `isSomeAndAsync`, `andThenAsync`) and `AsyncOption`/`AsyncResult` type aliases
 
+### Dual Toolchain Architecture (Important!)
+
+This project uses **two separate, non-conflicting** package managers:
+
+#### pnpm (Build & Development Tools)
+- **Purpose**: Manages Node.js build toolchain
+- **Dependencies**: TypeScript, ESLint, Rollup, TypeDoc
+- **Location**: `node_modules/` (from npm registry)
+- **Used for**: Building npm packages, linting, type checking, documentation
+
+#### Deno (Testing & Examples)
+- **Purpose**: Runs tests and examples
+- **Dependencies**: `@std/assert`, `@std/testing` (from JSR)
+- **Location**: `~/.cache/deno/` (not in node_modules)
+- **Used for**: Test execution, running examples
+
+**Key Point**: These toolchains are completely isolated:
+- Test code (`tests/`) is NEVER bundled into `dist/`
+- Deno dependencies are NEVER mixed with pnpm dependencies
+- `pnpm test` simply invokes `deno test` as a command
+
 ### Runtime vs Build Environments
 
 - **Runtime**: Supports Deno, Node.js (CommonJS/ESM), browsers, and Bun
 - **Build**: Uses pnpm for dependency management, Rollup for bundling
-- **Testing**: Uses Deno's built-in test runner (not Jest/Vitest)
+- **Testing**: Uses Deno's built-in test runner (isolated from build toolchain)
 - **Types**: Strict TypeScript with `bundler` module resolution
 
 ### Publishing
 
 Dual publishing to:
-- npm (via `dist/` built with Rollup)
-- JSR (directly from `src/mod.ts` source)
+- **npm**: Via `dist/` built with Rollup (CJS + ESM)
+- **JSR**: Directly from `src/mod.ts` source (Deno-native)
 
 ## Testing
 
 - Test files: `tests/enum/option.test.ts` and `tests/enum/result.test.ts`
 - Uses Deno standard library: `@std/assert` and `@std/testing/mock`
+- Deno lock file is disabled (`"lock": false` in deno.json)
 - Run with: `deno test --coverage --clean`
 
 ### Running a Single Test
@@ -92,6 +114,19 @@ deno test tests/enum/option.test.ts
 
 # Run with coverage
 deno test tests/enum/option.test.ts --coverage
+
+# Run specific test by name
+deno test --filter "Option:Some"
+```
+
+### Updating Dependencies
+
+```bash
+# Update pnpm dependencies (build tools)
+pnpm update --latest
+
+# Update deno dependencies (manually edit deno.json)
+# Check latest versions at: https://jsr.io/@std/assert
 ```
 
 ## Code Style
