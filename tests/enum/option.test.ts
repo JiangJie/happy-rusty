@@ -1,6 +1,6 @@
 import { assert, assertThrows } from '@std/assert';
 import { assertSpyCalls, spy } from '@std/testing/mock';
-import { Err, None, Ok, Some, type Option } from '../../src/mod.ts';
+import { Err, None, Ok, Some, type Option } from 'happy-rusty';
 
 Deno.test('Option:Some', async (t) => {
     const o = Some(10);
