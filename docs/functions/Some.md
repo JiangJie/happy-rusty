@@ -1,4 +1,4 @@
-[**happy-rusty**](../README.md) • **Docs**
+[**happy-rusty**](../README.md)
 
 ***
 
@@ -7,8 +7,10 @@
 # Function: Some()
 
 ```ts
-function Some<T>(value): Option<T>
+function Some<T>(value): Option<T>;
 ```
+
+Defined in: [prelude.ts:71](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L71)
 
 Creates an `Option<T>` representing the presence of a value.
 This function is typically used to construct an `Option` that contains a value, indicating that the operation yielding the value was successful.
@@ -39,7 +41,3 @@ if (maybeValue.isSome()) {
     console.log(maybeValue.unwrap()); // Outputs: 1
 }
 ```
-
-## Defined in
-
-[prelude.ts:71](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L71)

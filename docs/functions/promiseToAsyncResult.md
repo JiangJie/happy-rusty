@@ -1,4 +1,4 @@
-[**happy-rusty**](../README.md) • **Docs**
+[**happy-rusty**](../README.md)
 
 ***
 
@@ -7,8 +7,10 @@
 # Function: promiseToAsyncResult()
 
 ```ts
-function promiseToAsyncResult<T, E>(p): Promise<Result<T, E>>
+function promiseToAsyncResult<T, E>(p): Promise<Result<T, E>>;
 ```
+
+Defined in: [extensions.ts:25](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/extensions.ts#L25)
 
 Converts a Promise to a Result type, capturing the resolved value in an `Ok`, or the error in an `Err`.
 This allows for promise-based asynchronous operations to be handled in a way that is more in line with the Result pattern.
@@ -44,7 +46,3 @@ async function example() {
     });
 }
 ```
-
-## Defined in
-
-[extensions.ts:25](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/extensions.ts#L25)

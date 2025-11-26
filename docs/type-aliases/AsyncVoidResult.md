@@ -1,4 +1,4 @@
-[**happy-rusty**](../README.md) • **Docs**
+[**happy-rusty**](../README.md)
 
 ***
 
@@ -7,8 +7,10 @@
 # Type Alias: AsyncVoidResult\<E\>
 
 ```ts
-type AsyncVoidResult<E>: Promise<VoidResult<E>>;
+type AsyncVoidResult<E> = Promise<VoidResult<E>>;
 ```
+
+Defined in: [defines.ts:19](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/defines.ts#L19)
 
 `VoidResult<E>` wrapped by `Promise`.
 
@@ -17,7 +19,3 @@ type AsyncVoidResult<E>: Promise<VoidResult<E>>;
 | Type Parameter | Description |
 | ------ | ------ |
 | `E` | The type of the error that may be produced by a failed operation. |
-
-## Defined in
-
-[defines.ts:19](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/defines.ts#L19)

@@ -1,4 +1,4 @@
-[**happy-rusty**](../README.md) • **Docs**
+[**happy-rusty**](../README.md)
 
 ***
 
@@ -6,11 +6,13 @@
 
 # Function: Ok()
 
-## Ok(value)
+## Call Signature
 
 ```ts
-function Ok<T, E>(value): Result<T, E>
+function Ok<T, E>(value): Result<T, E>;
 ```
+
+Defined in: [prelude.ts:326](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L326)
 
 Creates a `Result<T, E>` representing a successful outcome containing a value.
 This function is used to construct a `Result` that signifies the operation was successful by containing the value `T`.
@@ -43,15 +45,13 @@ if (goodResult.isOk()) {
 }
 ```
 
-### Defined in
-
-[prelude.ts:326](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L326)
-
-## Ok()
+## Call Signature
 
 ```ts
-function Ok<E>(): Result<void, E>
+function Ok<E>(): Result<void, E>;
 ```
+
+Defined in: [prelude.ts:330](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L330)
 
 Because javascript does not have a `()` type, use `void` instead.
 
@@ -64,7 +64,3 @@ Because javascript does not have a `()` type, use `void` instead.
 ### Returns
 
 [`Result`](../interfaces/Result.md)\<`void`, `E`\>
-
-### Defined in
-
-[prelude.ts:330](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L330)

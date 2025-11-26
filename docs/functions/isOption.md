@@ -1,4 +1,4 @@
-[**happy-rusty**](../README.md) • **Docs**
+[**happy-rusty**](../README.md)
 
 ***
 
@@ -7,8 +7,10 @@
 # Function: isOption()
 
 ```ts
-function isOption<T>(o): o is Option<T>
+function isOption<T>(o): o is Option<T>;
 ```
+
+Defined in: [utils.ts:11](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/utils.ts#L11)
 
 Checks if a value is an `Option`.
 
@@ -29,7 +31,3 @@ Checks if a value is an `Option`.
 `o is Option<T>`
 
 `true` if the value is an `Option`, otherwise `false`.
-
-## Defined in
-
-[utils.ts:11](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/utils.ts#L11)

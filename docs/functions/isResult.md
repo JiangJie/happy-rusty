@@ -1,4 +1,4 @@
-[**happy-rusty**](../README.md) • **Docs**
+[**happy-rusty**](../README.md)
 
 ***
 
@@ -7,8 +7,10 @@
 # Function: isResult()
 
 ```ts
-function isResult<T, E>(r): r is Result<T, E>
+function isResult<T, E>(r): r is Result<T, E>;
 ```
+
+Defined in: [utils.ts:24](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/utils.ts#L24)
 
 Checks if a value is a `Result`.
 
@@ -30,7 +32,3 @@ Checks if a value is a `Result`.
 `r is Result<T, E>`
 
 `true` if the value is a `Result`, otherwise `false`.
-
-## Defined in
-
-[utils.ts:24](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/utils.ts#L24)

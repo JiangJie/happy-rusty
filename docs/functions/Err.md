@@ -1,4 +1,4 @@
-[**happy-rusty**](../README.md) • **Docs**
+[**happy-rusty**](../README.md)
 
 ***
 
@@ -7,8 +7,10 @@
 # Function: Err()
 
 ```ts
-function Err<T, E>(error): Result<T, E>
+function Err<T, E>(error): Result<T, E>;
 ```
+
+Defined in: [prelude.ts:473](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L473)
 
 Creates a `Result<T, E>` representing a failed outcome containing an error.
 This function is used to construct a `Result` that signifies the operation failed by containing the error `E`.
@@ -40,7 +42,3 @@ if (badResult.isErr()) {
   console.error(badResult.unwrapErr()); // Outputs: Error: Something went wrong
 }
 ```
-
-## Defined in
-
-[prelude.ts:473](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/prelude.ts#L473)

@@ -1,4 +1,4 @@
-[**happy-rusty**](../README.md) • **Docs**
+[**happy-rusty**](../README.md)
 
 ***
 
@@ -7,11 +7,9 @@
 # Type Alias: VoidIOResult
 
 ```ts
-type VoidIOResult: IOResult<void>;
+type VoidIOResult = IOResult<void>;
 ```
 
+Defined in: [defines.ts:40](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/defines.ts#L40)
+
 Similar to Rust's `Result<(), Error>`.
-
-## Defined in
-
-[defines.ts:40](https://github.com/JiangJie/happy-rusty/blob/6efe20969984552f52d79aee092bb6925a077fe7/src/enum/defines.ts#L40)
