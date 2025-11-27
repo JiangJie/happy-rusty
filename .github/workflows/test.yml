@@ -23,6 +23,7 @@ jobs:
 
       - name: Run test cases
         uses: denoland/setup-deno@v2
+      - run: deno install
       - run: pnpm test
 
       - name: Upload coverage reports to Codecov
