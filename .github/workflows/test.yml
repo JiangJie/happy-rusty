@@ -1,4 +1,4 @@
-# This workflow will run tests using bun and then upload the coverage reports to Codecov.
+# This workflow will run tests using deno and then upload the coverage reports to Codecov.
 
 name: Run Tests
 
@@ -13,19 +13,19 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
 
       - name: Install pnpm
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: latest
       - run: npm install pnpm -g
 
       - name: Run test cases
-        uses: denoland/setup-deno@v1
+        uses: denoland/setup-deno@v2
       - run: pnpm test
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
