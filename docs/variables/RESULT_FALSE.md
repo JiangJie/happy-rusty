@@ -10,7 +10,15 @@
 const RESULT_FALSE: Result<boolean, any>;
 ```
 
-Defined in: [constants.ts:19](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/constants.ts#L19)
+Defined in: [constants.ts:34](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/constants.ts#L34)
 
 Result constant for `false`.
 Can be used anywhere due to immutability.
+
+## Example
+
+```ts
+function validate(): Result<boolean, Error> {
+    return RESULT_FALSE;
+}
+```

@@ -10,6 +10,6 @@
 type AsyncVoidIOResult = AsyncIOResult<void>;
 ```
 
-Defined in: [defines.ts:45](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/defines.ts#L45)
+Defined in: [defines.ts:51](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/defines.ts#L51)
 
 `VoidIOResult` wrapped by `Promise`.

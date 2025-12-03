@@ -6,7 +6,7 @@
 
 # Interface: Result\<T, E\>
 
-Defined in: [core.ts:320](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L320)
+Defined in: [core.ts:505](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L505)
 
 The `Result` type is used for returning and propagating errors.
 It is an enum with the variants, `Ok(T)`, representing success and containing a value, and `Err(E)`, representing error and containing an error value.
@@ -35,7 +35,7 @@ pub enum Result<T, E> {
 and<U>(other): Result<U, E>;
 ```
 
-Defined in: [core.ts:528](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L528)
+Defined in: [core.ts:834](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L834)
 
 Returns `this` if the result is `Err`, otherwise returns the passed `Result`.
 
@@ -57,6 +57,22 @@ Returns `this` if the result is `Err`, otherwise returns the passed `Result`.
 
 The passed `Result` if `this` is `Ok`, otherwise returns `this` (which is `Err`).
 
+#### See
+
+or
+
+#### Example
+
+```ts
+const x = Ok(2);
+const y = Err('late error');
+console.log(x.and(y).unwrapErr()); // 'late error'
+
+const a = Err('early error');
+const b = Ok(5);
+console.log(a.and(b).unwrapErr()); // 'early error'
+```
+
 ***
 
 ### andThen()
@@ -65,7 +81,7 @@ The passed `Result` if `this` is `Ok`, otherwise returns `this` (which is `Err`)
 andThen<U>(fn): Result<U, E>;
 ```
 
-Defined in: [core.ts:544](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L544)
+Defined in: [core.ts:872](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L872)
 
 Calls the provided function with the contained value if `this` is `Ok`, otherwise returns `this` as `Err`.
 
@@ -87,6 +103,22 @@ Calls the provided function with the contained value if `this` is `Ok`, otherwis
 
 The result of `fn` if `this` is `Ok`, otherwise `this` as `Err`.
 
+#### See
+
+ - map
+ - orElse
+
+#### Example
+
+```ts
+const x = Ok(2);
+const result = x.andThen(v => v > 0 ? Ok(v * 2) : Err('negative'));
+console.log(result.unwrap()); // 4
+
+const y = Err('error');
+console.log(y.andThen(v => Ok(v * 2)).unwrapErr()); // 'error'
+```
+
 ***
 
 ### andThenAsync()
@@ -95,25 +127,40 @@ The result of `fn` if `this` is `Ok`, otherwise `this` as `Err`.
 andThenAsync<U>(fn): AsyncResult<U, E>;
 ```
 
-Defined in: [core.ts:549](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L549)
+Defined in: [core.ts:888](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L888)
 
 Asynchronous version of `andThen`.
 
 #### Type Parameters
 
-| Type Parameter |
-| ------ |
-| `U` |
+| Type Parameter | Description |
+| ------ | ------ |
+| `U` | The type of the value returned by the async function. |
 
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `fn` | (`value`) => [`AsyncResult`](../type-aliases/AsyncResult.md)\<`U`, `E`\> |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `fn` | (`value`) => [`AsyncResult`](../type-aliases/AsyncResult.md)\<`U`, `E`\> | An async function that takes the `Ok` value and returns a `Promise<Result<U, E>>`. |
 
 #### Returns
 
 [`AsyncResult`](../type-aliases/AsyncResult.md)\<`U`, `E`\>
+
+A promise that resolves to `this` as `Err` if `this` is `Err`, otherwise the result of `fn`.
+
+#### See
+
+ - andThen
+ - orElseAsync
+
+#### Example
+
+```ts
+const x = Ok(2);
+const result = await x.andThenAsync(async v => Ok(v * 2));
+console.log(result.unwrap()); // 4
+```
 
 ***
 
@@ -123,24 +170,36 @@ Asynchronous version of `andThen`.
 asErr<U>(): Result<U, E>;
 ```
 
-Defined in: [core.ts:612](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L612)
+Defined in: [core.ts:998](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L998)
 
-Transforms the current Result into a new Result where the type of the success result is replaced with a new type `U`.
-The type of the error result remains unchanged.
-Useful where you need to return an Error chained to another type.
-Just same as `result as unknown as Result<U, E>`.
+Transforms the current Result into a new Result where the type of the success value is replaced with a new type `U`.
+The type of the error remains unchanged.
+This is a type-level only operation, equivalent to `result as unknown as Result<U, E>`.
+Useful when you need to propagate an error to a different success type context.
 
 #### Type Parameters
 
 | Type Parameter | Description |
 | ------ | ------ |
-| `U` | The new type for the success result. |
+| `U` | The new type for the success value. |
 
 #### Returns
 
 `Result`\<`U`, `E`\>
 
-`this` but the success result type is `U`.
+`this` with the success type cast to `U`.
+
+#### See
+
+asOk
+
+#### Example
+
+```ts
+const x: Result<number, string> = Err('error');
+const y: Result<string, string> = x.asErr<string>();
+console.log(y.unwrapErr()); // 'error'
+```
 
 ***
 
@@ -150,23 +209,35 @@ Just same as `result as unknown as Result<U, E>`.
 asOk<F>(): Result<T, F>;
 ```
 
-Defined in: [core.ts:601](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L601)
+Defined in: [core.ts:980](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L980)
 
-Transforms the current Result into a new Result where the type of the error result is replaced with a new type `F`.
-The type of the success result remains unchanged.
-Just same as `result as unknown as Result<T, F>`.
+Transforms the current Result into a new Result where the type of the error is replaced with a new type `F`.
+The type of the success value remains unchanged.
+This is a type-level only operation, equivalent to `result as unknown as Result<T, F>`.
 
 #### Type Parameters
 
 | Type Parameter | Description |
 | ------ | ------ |
-| `F` | The new type for the error result. |
+| `F` | The new type for the error. |
 
 #### Returns
 
 `Result`\<`T`, `F`\>
 
-`this` but the error result type is `F`.
+`this` with the error type cast to `F`.
+
+#### See
+
+asErr
+
+#### Example
+
+```ts
+const x: Result<number, string> = Ok(5);
+const y: Result<number, Error> = x.asOk<Error>();
+console.log(y.unwrap()); // 5
+```
 
 ***
 
@@ -176,7 +247,7 @@ Just same as `result as unknown as Result<T, F>`.
 eq(other): boolean;
 ```
 
-Defined in: [core.ts:589](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L589)
+Defined in: [core.ts:961](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L961)
 
 Tests whether `this` and `other` are both `Ok` containing equal values, or both are `Err` containing equal errors.
 
@@ -200,7 +271,7 @@ Tests whether `this` and `other` are both `Ok` containing equal values, or both 
 err(): Option<E>;
 ```
 
-Defined in: [core.ts:452](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L452)
+Defined in: [core.ts:710](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L710)
 
 Converts from `Result<T, E>` to `Option<E>`.
 If the result is `Err`, returns `Some(E)`.
@@ -210,6 +281,20 @@ If the result is `Ok`, returns `None`.
 
 [`Option`](Option.md)\<`E`\>
 
+#### See
+
+ok
+
+#### Example
+
+```ts
+const x = Err('error');
+console.log(x.err().unwrap()); // 'error'
+
+const y = Ok(5);
+console.log(y.err().isNone()); // true
+```
+
 ***
 
 ### expect()
@@ -218,7 +303,7 @@ If the result is `Ok`, returns `None`.
 expect(msg): T;
 ```
 
-Defined in: [core.ts:390](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L390)
+Defined in: [core.ts:608](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L608)
 
 Returns the contained `Ok` value, with a provided error message if the result is `Err`.
 
@@ -236,6 +321,11 @@ Returns the contained `Ok` value, with a provided error message if the result is
 
 Throws an error with the provided message if the result is an `Err`.
 
+#### See
+
+ - unwrap
+ - expectErr
+
 ***
 
 ### expectErr()
@@ -244,7 +334,7 @@ Throws an error with the provided message if the result is an `Err`.
 expectErr(msg): E;
 ```
 
-Defined in: [core.ts:424](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L424)
+Defined in: [core.ts:662](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L662)
 
 Returns the contained `Err` value, with a provided error message if the result is `Ok`.
 
@@ -262,6 +352,11 @@ Returns the contained `Err` value, with a provided error message if the result i
 
 Throws an error with the provided message if the result is an `Ok`.
 
+#### See
+
+ - unwrapErr
+ - expect
+
 ***
 
 ### flatten()
@@ -270,7 +365,7 @@ Throws an error with the provided message if the result is an `Ok`.
 flatten<T>(this): Result<T, E>;
 ```
 
-Defined in: [core.ts:512](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L512)
+Defined in: [core.ts:807](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L807)
 
 Converts from `Result<Result<T, E>, E>` to `Result<T, E>`.
 If the result is `Ok(Ok(T))`, returns `Ok(T)`.
@@ -292,6 +387,16 @@ If the result is `Ok(Err(E))` or `Err(E)`, returns `Err(E)`.
 
 `Result`\<`T`, `E`\>
 
+#### Example
+
+```ts
+const x = Ok(Ok(5));
+console.log(x.flatten().unwrap()); // 5
+
+const y = Ok(Err('error'));
+console.log(y.flatten().unwrapErr()); // 'error'
+```
+
 ***
 
 ### inspect()
@@ -300,7 +405,7 @@ If the result is `Ok(Err(E))` or `Err(E)`, returns `Err(E)`.
 inspect(fn): this;
 ```
 
-Defined in: [core.ts:572](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L572)
+Defined in: [core.ts:938](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L938)
 
 Calls the provided function with the contained value if `this` is `Ok`, for side effects only.
 Does not modify the `Result`.
@@ -317,6 +422,17 @@ Does not modify the `Result`.
 
 `this`, unmodified.
 
+#### See
+
+inspectErr
+
+#### Example
+
+```ts
+const x = Ok(5);
+x.inspect(v => console.log(v)); // prints 5
+```
+
 ***
 
 ### inspectErr()
@@ -325,7 +441,7 @@ Does not modify the `Result`.
 inspectErr(fn): this;
 ```
 
-Defined in: [core.ts:580](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L580)
+Defined in: [core.ts:952](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L952)
 
 Calls the provided function with the contained error if `this` is `Err`, for side effects only.
 Does not modify the `Result`.
@@ -342,6 +458,17 @@ Does not modify the `Result`.
 
 `this`, unmodified.
 
+#### See
+
+inspect
+
+#### Example
+
+```ts
+const x = Err('error');
+x.inspectErr(e => console.log(e)); // prints 'error'
+```
+
 ***
 
 ### isErr()
@@ -350,7 +477,7 @@ Does not modify the `Result`.
 isErr(): boolean;
 ```
 
-Defined in: [core.ts:353](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L353)
+Defined in: [core.ts:538](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L538)
 
 Returns `true` if the result is `Err`.
 
@@ -366,7 +493,7 @@ Returns `true` if the result is `Err`.
 isErrAnd(predicate): boolean;
 ```
 
-Defined in: [core.ts:370](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L370)
+Defined in: [core.ts:577](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L577)
 
 Returns `true` if the result is `Err` and the provided predicate returns `true` for the contained error.
 
@@ -380,6 +507,17 @@ Returns `true` if the result is `Err` and the provided predicate returns `true` 
 
 `boolean`
 
+#### See
+
+isOkAnd
+
+#### Example
+
+```ts
+const x = Err('error');
+console.log(x.isErrAnd(e => e === 'error')); // true
+```
+
 ***
 
 ### isErrAndAsync()
@@ -388,19 +526,33 @@ Returns `true` if the result is `Err` and the provided predicate returns `true` 
 isErrAndAsync(predicate): Promise<boolean>;
 ```
 
-Defined in: [core.ts:375](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L375)
+Defined in: [core.ts:591](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L591)
 
 Asynchronous version of `isErrAnd`.
 
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `predicate` | (`error`) => `Promise`\<`boolean`\> |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `predicate` | (`error`) => `Promise`\<`boolean`\> | An async function that takes the `Err` value and returns a `Promise<boolean>`. |
 
 #### Returns
 
 `Promise`\<`boolean`\>
+
+A promise that resolves to `true` if the Result is `Err` and the predicate resolves to `true`.
+
+#### See
+
+ - isErrAnd
+ - isOkAndAsync
+
+#### Example
+
+```ts
+const x = Err('error');
+await x.isErrAndAsync(async e => e.length > 0); // true
+```
 
 ***
 
@@ -410,7 +562,7 @@ Asynchronous version of `isErrAnd`.
 isOk(): boolean;
 ```
 
-Defined in: [core.ts:348](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L348)
+Defined in: [core.ts:533](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L533)
 
 Returns `true` if the result is `Ok`.
 
@@ -426,7 +578,7 @@ Returns `true` if the result is `Ok`.
 isOkAnd(predicate): boolean;
 ```
 
-Defined in: [core.ts:359](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L359)
+Defined in: [core.ts:551](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L551)
 
 Returns `true` if the result is `Ok` and the provided predicate returns `true` for the contained value.
 
@@ -440,6 +592,18 @@ Returns `true` if the result is `Ok` and the provided predicate returns `true` f
 
 `boolean`
 
+#### See
+
+isErrAnd
+
+#### Example
+
+```ts
+const x = Ok(2);
+console.log(x.isOkAnd(v => v > 1)); // true
+console.log(x.isOkAnd(v => v > 5)); // false
+```
+
 ***
 
 ### isOkAndAsync()
@@ -448,19 +612,33 @@ Returns `true` if the result is `Ok` and the provided predicate returns `true` f
 isOkAndAsync(predicate): Promise<boolean>;
 ```
 
-Defined in: [core.ts:364](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L364)
+Defined in: [core.ts:565](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L565)
 
 Asynchronous version of `isOkAnd`.
 
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `predicate` | (`value`) => `Promise`\<`boolean`\> |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `predicate` | (`value`) => `Promise`\<`boolean`\> | An async function that takes the `Ok` value and returns a `Promise<boolean>`. |
 
 #### Returns
 
 `Promise`\<`boolean`\>
+
+A promise that resolves to `true` if the Result is `Ok` and the predicate resolves to `true`.
+
+#### See
+
+ - isOkAnd
+ - isErrAndAsync
+
+#### Example
+
+```ts
+const x = Ok(2);
+await x.isOkAndAsync(async v => v > 1); // true
+```
 
 ***
 
@@ -470,7 +648,7 @@ Asynchronous version of `isOkAnd`.
 map<U>(fn): Result<U, E>;
 ```
 
-Defined in: [core.ts:473](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L473)
+Defined in: [core.ts:752](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L752)
 
 Maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `Ok` value,
 leaving an `Err` value untouched.
@@ -491,6 +669,21 @@ leaving an `Err` value untouched.
 
 `Result`\<`U`, `E`\>
 
+#### See
+
+ - mapErr
+ - andThen
+
+#### Example
+
+```ts
+const x = Ok(5);
+console.log(x.map(v => v * 2).unwrap()); // 10
+
+const y = Err('error');
+console.log(y.map(v => v * 2).unwrapErr()); // 'error'
+```
+
 ***
 
 ### mapErr()
@@ -499,7 +692,7 @@ leaving an `Err` value untouched.
 mapErr<F>(fn): Result<T, F>;
 ```
 
-Defined in: [core.ts:485](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L485)
+Defined in: [core.ts:770](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L770)
 
 Maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained `Err` value,
 leaving an `Ok` value untouched.
@@ -520,6 +713,17 @@ leaving an `Ok` value untouched.
 
 `Result`\<`T`, `F`\>
 
+#### See
+
+map
+
+#### Example
+
+```ts
+const x = Err('error');
+console.log(x.mapErr(e => e.toUpperCase()).unwrapErr()); // 'ERROR'
+```
+
 ***
 
 ### mapOr()
@@ -528,7 +732,7 @@ leaving an `Ok` value untouched.
 mapOr<U>(defaultValue, fn): U;
 ```
 
-Defined in: [core.ts:497](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L497)
+Defined in: [core.ts:783](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L783)
 
 Maps a `Result<T, E>` to `U` by applying a function to the contained `Ok` value (if `Ok`), or returns the provided default (if `Err`).
 
@@ -549,6 +753,10 @@ Maps a `Result<T, E>` to `U` by applying a function to the contained `Ok` value 
 
 `U`
 
+#### See
+
+mapOrElse
+
 ***
 
 ### mapOrElse()
@@ -557,7 +765,7 @@ Maps a `Result<T, E>` to `U` by applying a function to the contained `Ok` value 
 mapOrElse<U>(defaultFn, fn): U;
 ```
 
-Defined in: [core.ts:505](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L505)
+Defined in: [core.ts:792](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L792)
 
 Maps a `Result<T, E>` to `U` by applying a function to the contained `Ok` value (if `Ok`), or computes a default (if `Err`).
 
@@ -578,6 +786,10 @@ Maps a `Result<T, E>` to `U` by applying a function to the contained `Ok` value 
 
 `U`
 
+#### See
+
+mapOr
+
 ***
 
 ### ok()
@@ -586,7 +798,7 @@ Maps a `Result<T, E>` to `U` by applying a function to the contained `Ok` value 
 ok(): Option<T>;
 ```
 
-Defined in: [core.ts:445](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L445)
+Defined in: [core.ts:694](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L694)
 
 Converts from `Result<T, E>` to `Option<T>`.
 If the result is `Ok`, returns `Some(T)`.
@@ -596,6 +808,20 @@ If the result is `Err`, returns `None`.
 
 [`Option`](Option.md)\<`T`\>
 
+#### See
+
+err
+
+#### Example
+
+```ts
+const x = Ok(5);
+console.log(x.ok().unwrap()); // 5
+
+const y = Err('error');
+console.log(y.ok().isNone()); // true
+```
+
 ***
 
 ### or()
@@ -604,7 +830,7 @@ If the result is `Err`, returns `None`.
 or<F>(other): Result<T, F>;
 ```
 
-Defined in: [core.ts:536](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L536)
+Defined in: [core.ts:853](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L853)
 
 Returns `this` if it is `Ok`, otherwise returns the passed `Result`.
 
@@ -626,6 +852,22 @@ Returns `this` if it is `Ok`, otherwise returns the passed `Result`.
 
 `this` if it is `Ok`, otherwise returns `other`.
 
+#### See
+
+and
+
+#### Example
+
+```ts
+const x = Err('error');
+const y = Ok(5);
+console.log(x.or(y).unwrap()); // 5
+
+const a = Ok(2);
+const b = Ok(100);
+console.log(a.or(b).unwrap()); // 2
+```
+
 ***
 
 ### orElse()
@@ -634,7 +876,7 @@ Returns `this` if it is `Ok`, otherwise returns the passed `Result`.
 orElse<F>(fn): Result<T, F>;
 ```
 
-Defined in: [core.ts:557](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L557)
+Defined in: [core.ts:906](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L906)
 
 Calls the provided function with the contained error if `this` is `Err`, otherwise returns `this` as `Ok`.
 
@@ -656,6 +898,21 @@ Calls the provided function with the contained error if `this` is `Err`, otherwi
 
 The result of `fn` if `this` is `Err`, otherwise `this` as `Ok`.
 
+#### See
+
+andThen
+
+#### Example
+
+```ts
+const x = Err('error');
+const result = x.orElse(e => Ok(e.length));
+console.log(result.unwrap()); // 5
+
+const y = Ok(2);
+console.log(y.orElse(e => Ok(0)).unwrap()); // 2
+```
+
 ***
 
 ### orElseAsync()
@@ -664,25 +921,40 @@ The result of `fn` if `this` is `Err`, otherwise `this` as `Ok`.
 orElseAsync<F>(fn): AsyncResult<T, F>;
 ```
 
-Defined in: [core.ts:562](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L562)
+Defined in: [core.ts:922](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L922)
 
 Asynchronous version of `orElse`.
 
 #### Type Parameters
 
-| Type Parameter |
-| ------ |
-| `F` |
+| Type Parameter | Description |
+| ------ | ------ |
+| `F` | The type of the error returned by the async function. |
 
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `fn` | (`error`) => [`AsyncResult`](../type-aliases/AsyncResult.md)\<`T`, `F`\> |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `fn` | (`error`) => [`AsyncResult`](../type-aliases/AsyncResult.md)\<`T`, `F`\> | An async function that takes the `Err` value and returns a `Promise<Result<T, F>>`. |
 
 #### Returns
 
 [`AsyncResult`](../type-aliases/AsyncResult.md)\<`T`, `F`\>
+
+A promise that resolves to `this` as `Ok` if `this` is `Ok`, otherwise the result of `fn`.
+
+#### See
+
+ - orElse
+ - andThenAsync
+
+#### Example
+
+```ts
+const x = Err('error');
+const result = await x.orElseAsync(async e => Ok(e.length));
+console.log(result.unwrap()); // 5
+```
 
 ***
 
@@ -692,7 +964,7 @@ Asynchronous version of `orElse`.
 toString(): string;
 ```
 
-Defined in: [core.ts:617](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L617)
+Defined in: [core.ts:1003](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L1003)
 
 Custom `toString` implementation that uses the `Result`'s contained value.
 
@@ -708,7 +980,7 @@ Custom `toString` implementation that uses the `Result`'s contained value.
 transpose<T>(this): Option<Result<T, E>>;
 ```
 
-Defined in: [core.ts:461](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L461)
+Defined in: [core.ts:730](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L730)
 
 Transposes a `Result` of an `Option` into an `Option` of a `Result`.
 
@@ -732,6 +1004,19 @@ Transposes a `Result` of an `Option` into an `Option` of a `Result`.
          `Some` containing `Err` if the result is `Err`,
          `None` if the result is `Ok` containing `None`.
 
+#### Example
+
+```ts
+const x = Ok(Some(5));
+console.log(x.transpose().unwrap().unwrap()); // 5
+
+const y: Result<Option<number>, string> = Err('error');
+console.log(y.transpose().unwrap().unwrapErr()); // 'error'
+
+const z = Ok(None);
+console.log(z.transpose().isNone()); // true
+```
+
 ***
 
 ### unwrap()
@@ -740,7 +1025,7 @@ Transposes a `Result` of an `Option` into an `Option` of a `Result`.
 unwrap(): T;
 ```
 
-Defined in: [core.ts:396](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L396)
+Defined in: [core.ts:617](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L617)
 
 Returns the contained `Ok` value.
 
@@ -752,6 +1037,12 @@ Returns the contained `Ok` value.
 
 Throws an error if the result is an `Err`.
 
+#### See
+
+ - expect
+ - unwrapOr
+ - unwrapErr
+
 ***
 
 ### unwrapErr()
@@ -760,7 +1051,7 @@ Throws an error if the result is an `Err`.
 unwrapErr(): E;
 ```
 
-Defined in: [core.ts:430](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L430)
+Defined in: [core.ts:670](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L670)
 
 Returns the contained `Err` value.
 
@@ -772,6 +1063,11 @@ Returns the contained `Err` value.
 
 Throws an error if the result is an `Ok`.
 
+#### See
+
+ - expectErr
+ - unwrap
+
 ***
 
 ### unwrapOr()
@@ -780,7 +1076,7 @@ Throws an error if the result is an `Ok`.
 unwrapOr(defaultValue): T;
 ```
 
-Defined in: [core.ts:402](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L402)
+Defined in: [core.ts:624](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L624)
 
 Returns the contained `Ok` value or a provided default.
 
@@ -794,6 +1090,10 @@ Returns the contained `Ok` value or a provided default.
 
 `T`
 
+#### See
+
+unwrapOrElse
+
 ***
 
 ### unwrapOrElse()
@@ -802,7 +1102,7 @@ Returns the contained `Ok` value or a provided default.
 unwrapOrElse(fn): T;
 ```
 
-Defined in: [core.ts:408](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L408)
+Defined in: [core.ts:636](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L636)
 
 Returns the contained `Ok` value or computes it from a closure if the result is `Err`.
 
@@ -816,6 +1116,17 @@ Returns the contained `Ok` value or computes it from a closure if the result is 
 
 `T`
 
+#### See
+
+unwrapOr
+
+#### Example
+
+```ts
+const x = Err('error');
+console.log(x.unwrapOrElse(e => e.length)); // 5
+```
+
 ***
 
 ### unwrapOrElseAsync()
@@ -824,16 +1135,29 @@ Returns the contained `Ok` value or computes it from a closure if the result is 
 unwrapOrElseAsync(fn): Promise<T>;
 ```
 
-Defined in: [core.ts:413](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L413)
+Defined in: [core.ts:649](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L649)
 
 Asynchronous version of `unwrapOrElse`.
 
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `fn` | (`error`) => `Promise`\<`T`\> |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `fn` | (`error`) => `Promise`\<`T`\> | An async function that takes the `Err` value and returns a `Promise<T>`. |
 
 #### Returns
 
 `Promise`\<`T`\>
+
+A promise that resolves to the contained `Ok` value or the result of the async function.
+
+#### See
+
+unwrapOrElse
+
+#### Example
+
+```ts
+const x = Err('error');
+await x.unwrapOrElseAsync(async e => e.length); // 5
+```

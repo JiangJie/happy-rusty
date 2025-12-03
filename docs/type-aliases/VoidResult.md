@@ -10,7 +10,7 @@
 type VoidResult<E> = Result<void, E>;
 ```
 
-Defined in: [defines.ts:12](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/defines.ts#L12)
+Defined in: [defines.ts:18](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/defines.ts#L18)
 
 Similar to Rust's `Result<(), E>`.
 

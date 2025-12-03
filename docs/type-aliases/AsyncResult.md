@@ -10,7 +10,7 @@
 type AsyncResult<T, E> = Promise<Result<T, E>>;
 ```
 
-Defined in: [core.ts:635](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L635)
+Defined in: [core.ts:1021](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L1021)
 
 Represents an asynchronous operation that yields a `Result<T, E>`.
 This is a promise that resolves to `Ok(T)` if the operation was successful, or `Err(E)` if there was an error.

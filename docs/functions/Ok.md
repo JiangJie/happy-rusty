@@ -12,7 +12,7 @@
 function Ok<T, E>(value): Result<T, E>;
 ```
 
-Defined in: [prelude.ts:326](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L326)
+Defined in: [prelude.ts:335](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L335)
 
 Creates a `Result<T, E>` representing a successful outcome containing a value.
 This function is used to construct a `Result` that signifies the operation was successful by containing the value `T`.
@@ -51,7 +51,7 @@ if (goodResult.isOk()) {
 function Ok<E>(): Result<void, E>;
 ```
 
-Defined in: [prelude.ts:330](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L330)
+Defined in: [prelude.ts:339](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L339)
 
 Because javascript does not have a `()` type, use `void` instead.
 

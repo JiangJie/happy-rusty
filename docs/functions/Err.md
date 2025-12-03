@@ -10,7 +10,7 @@
 function Err<T, E>(error): Result<T, E>;
 ```
 
-Defined in: [prelude.ts:473](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L473)
+Defined in: [prelude.ts:480](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L480)
 
 Creates a `Result<T, E>` representing a failed outcome containing an error.
 This function is used to construct a `Result` that signifies the operation failed by containing the error `E`.

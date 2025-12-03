@@ -10,7 +10,7 @@
 function isResult<T, E>(r): r is Result<T, E>;
 ```
 
-Defined in: [utils.ts:24](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/utils.ts#L24)
+Defined in: [utils.ts:44](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/utils.ts#L44)
 
 Checks if a value is a `Result`.
 
@@ -32,3 +32,12 @@ Checks if a value is a `Result`.
 `r is Result<T, E>`
 
 `true` if the value is a `Result`, otherwise `false`.
+
+## Example
+
+```ts
+const x = Ok(5);
+console.log(isResult(x)); // true
+console.log(isResult(null)); // false
+console.log(isResult({ value: 5 })); // false
+```

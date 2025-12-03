@@ -6,7 +6,7 @@
 
 # Interface: None
 
-Defined in: [prelude.ts:10](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L10)
+Defined in: [prelude.ts:21](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L21)
 
 Represents the absence of a value, as a specialized `Option` type.
 The type parameter is set to `never` because `None` does not hold a value.
@@ -19,7 +19,7 @@ The type parameter is set to `never` because `None` does not hold a value.
 
 | Property | Modifier | Type | Description | Overrides | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="optionkindsymbol"></a> `[OptionKindSymbol]` | `readonly` | `"None"` | When using `None` alone, the following overrides can make type inference more accurate. | `Option.[OptionKindSymbol]` | [prelude.ts:15](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L15) |
+| <a id="optionkindsymbol"></a> `[OptionKindSymbol]` | `readonly` | `"None"` | When using `None` alone, the following overrides can make type inference more accurate. | `Option.[OptionKindSymbol]` | [prelude.ts:26](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L26) |
 
 ## Methods
 
@@ -29,7 +29,7 @@ The type parameter is set to `never` because `None` does not hold a value.
 and<U>(other): None;
 ```
 
-Defined in: [prelude.ts:42](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L42)
+Defined in: [prelude.ts:53](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L53)
 
 Returns `None` if the Option is `None`, otherwise returns `other`.
 This is sometimes called "and then" because it is similar to a logical AND operation.
@@ -52,6 +52,22 @@ This is sometimes called "and then" because it is similar to a logical AND opera
 
 `None` if `this` is `None`, otherwise returns `other`.
 
+#### See
+
+ - or
+ - xor
+
+#### Example
+
+```ts
+const x = Some(2);
+const y = Some('hello');
+console.log(x.and(y).unwrap()); // 'hello'
+
+const z = None;
+console.log(z.and(y).isNone()); // true
+```
+
 #### Overrides
 
 [`Option`](Option.md).[`and`](Option.md#and)
@@ -64,7 +80,7 @@ This is sometimes called "and then" because it is similar to a logical AND opera
 andThen<U>(fn): None;
 ```
 
-Defined in: [prelude.ts:43](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L43)
+Defined in: [prelude.ts:54](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L54)
 
 Returns `None` if the Option is `None`, otherwise calls `fn` with the wrapped value and returns the result.
 This function can be used for control flow based on `Option` values.
@@ -87,6 +103,22 @@ This function can be used for control flow based on `Option` values.
 
 The result of `fn` if `this` is `Some`, otherwise `None`.
 
+#### See
+
+ - map
+ - orElse
+
+#### Example
+
+```ts
+const x = Some(2);
+const result = x.andThen(v => v > 0 ? Some(v * 2) : None);
+console.log(result.unwrap()); // 4
+
+const y = None;
+console.log(y.andThen(v => Some(v * 2)).isNone()); // true
+```
+
 #### Overrides
 
 [`Option`](Option.md).[`andThen`](Option.md#andthen)
@@ -99,25 +131,40 @@ The result of `fn` if `this` is `Some`, otherwise `None`.
 andThenAsync<U>(fn): Promise<None>;
 ```
 
-Defined in: [prelude.ts:44](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L44)
+Defined in: [prelude.ts:55](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L55)
 
 Asynchronous version of `andThen`.
 
 #### Type Parameters
 
-| Type Parameter |
-| ------ |
-| `U` |
+| Type Parameter | Description |
+| ------ | ------ |
+| `U` | The type of the value returned by the async function. |
 
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `fn` | (`value`) => [`AsyncOption`](../type-aliases/AsyncOption.md)\<`U`\> |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `fn` | (`value`) => [`AsyncOption`](../type-aliases/AsyncOption.md)\<`U`\> | An async function that takes the contained value and returns a `Promise<Option<U>>`. |
 
 #### Returns
 
 `Promise`\<`None`\>
+
+A promise that resolves to `None` if `this` is `None`, otherwise the result of `fn`.
+
+#### See
+
+ - andThen
+ - orElseAsync
+
+#### Example
+
+```ts
+const x = Some(2);
+const result = await x.andThenAsync(async v => Some(v * 2));
+console.log(result.unwrap()); // 4
+```
 
 #### Overrides
 
@@ -131,7 +178,7 @@ Asynchronous version of `andThen`.
 eq<T>(other): boolean;
 ```
 
-Defined in: [prelude.ts:52](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L52)
+Defined in: [prelude.ts:63](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L63)
 
 Tests whether `this` and `other` are both `Some` containing equal values, or both are `None`.
 This method can be used for comparing `Option` instances in a value-sensitive manner.
@@ -166,7 +213,7 @@ This method can be used for comparing `Option` instances in a value-sensitive ma
 expect(msg): never;
 ```
 
-Defined in: [prelude.ts:22](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L22)
+Defined in: [prelude.ts:33](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L33)
 
 Returns the contained `Some` value, with a provided error message if the value is a `None`.
 
@@ -184,6 +231,10 @@ Returns the contained `Some` value, with a provided error message if the value i
 
 Throws an error with the provided message if the Option is a `None`.
 
+#### See
+
+unwrap
+
 #### Overrides
 
 [`Option`](Option.md).[`expect`](Option.md#expect)
@@ -196,7 +247,7 @@ Throws an error with the provided message if the Option is a `None`.
 filter(predicate): None;
 ```
 
-Defined in: [prelude.ts:32](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L32)
+Defined in: [prelude.ts:43](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L43)
 
 Returns `None` if the Option is `None`, otherwise calls predicate with the wrapped value and returns:
 - `Some(t)` if predicate returns `true` (where `t` is the wrapped value), and
@@ -212,6 +263,14 @@ Returns `None` if the Option is `None`, otherwise calls predicate with the wrapp
 
 `None`
 
+#### Example
+
+```ts
+const x = Some(4);
+console.log(x.filter(v => v > 2).isSome()); // true
+console.log(x.filter(v => v > 5).isNone()); // true
+```
+
 #### Overrides
 
 [`Option`](Option.md).[`filter`](Option.md#filter)
@@ -224,7 +283,7 @@ Returns `None` if the Option is `None`, otherwise calls predicate with the wrapp
 flatten(): None;
 ```
 
-Defined in: [prelude.ts:33](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L33)
+Defined in: [prelude.ts:44](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L44)
 
 Converts from `Option<Option<T>>` to `Option<T>`.
 
@@ -233,6 +292,16 @@ Converts from `Option<Option<T>>` to `Option<T>`.
 `None`
 
 `None` if the Option is `None`, otherwise returns the contained `Option`.
+
+#### Example
+
+```ts
+const x = Some(Some(5));
+console.log(x.flatten().unwrap()); // 5
+
+const y = Some(None);
+console.log(y.flatten().isNone()); // true
+```
 
 #### Overrides
 
@@ -246,7 +315,7 @@ Converts from `Option<Option<T>>` to `Option<T>`.
 inspect(fn): this;
 ```
 
-Defined in: [prelude.ts:50](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L50)
+Defined in: [prelude.ts:61](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L61)
 
 Calls the provided function with the contained value if `this` is `Some`.
 This is primarily for side effects and does not transform the `Option`.
@@ -275,7 +344,7 @@ This is primarily for side effects and does not transform the `Option`.
 isNone(): true;
 ```
 
-Defined in: [prelude.ts:18](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L18)
+Defined in: [prelude.ts:29](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L29)
 
 Returns `true` if the Option is a `None` value.
 
@@ -295,7 +364,7 @@ Returns `true` if the Option is a `None` value.
 isSome(): false;
 ```
 
-Defined in: [prelude.ts:17](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L17)
+Defined in: [prelude.ts:28](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L28)
 
 Returns `true` if the Option is a `Some` value.
 
@@ -315,7 +384,7 @@ Returns `true` if the Option is a `Some` value.
 isSomeAnd(predicate): false;
 ```
 
-Defined in: [prelude.ts:19](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L19)
+Defined in: [prelude.ts:30](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L30)
 
 Returns `true` if the Option is a `Some` value and the predicate returns `true` for the contained value.
 
@@ -329,6 +398,14 @@ Returns `true` if the Option is a `Some` value and the predicate returns `true` 
 
 `false`
 
+#### Example
+
+```ts
+const x = Some(2);
+console.log(x.isSomeAnd(v => v > 1)); // true
+console.log(x.isSomeAnd(v => v > 5)); // false
+```
+
 #### Overrides
 
 [`Option`](Option.md).[`isSomeAnd`](Option.md#issomeand)
@@ -341,19 +418,32 @@ Returns `true` if the Option is a `Some` value and the predicate returns `true` 
 isSomeAndAsync(predicate): Promise<false>;
 ```
 
-Defined in: [prelude.ts:20](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L20)
+Defined in: [prelude.ts:31](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L31)
 
 Asynchronous version of `isSomeAnd`.
 
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `predicate` | (`value`) => `Promise`\<`boolean`\> |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `predicate` | (`value`) => `Promise`\<`boolean`\> | An async function that takes the contained value and returns a `Promise<boolean>`. |
 
 #### Returns
 
 `Promise`\<`false`\>
+
+A promise that resolves to `true` if the Option is `Some` and the predicate resolves to `true`.
+
+#### See
+
+isSomeAnd
+
+#### Example
+
+```ts
+const x = Some(2);
+await x.isSomeAndAsync(async v => v > 1); // true
+```
 
 #### Overrides
 
@@ -367,7 +457,7 @@ Asynchronous version of `isSomeAnd`.
 map<U>(fn): None;
 ```
 
-Defined in: [prelude.ts:34](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L34)
+Defined in: [prelude.ts:45](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L45)
 
 Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
 
@@ -387,6 +477,20 @@ Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
 
 `None`
 
+#### See
+
+andThen
+
+#### Example
+
+```ts
+const x = Some(5);
+console.log(x.map(v => v * 2).unwrap()); // 10
+
+const y = None;
+console.log(y.map(v => v * 2).isNone()); // true
+```
+
 #### Overrides
 
 [`Option`](Option.md).[`map`](Option.md#map)
@@ -399,7 +503,7 @@ Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
 mapOr<U>(defaultValue, fn): U;
 ```
 
-Defined in: [prelude.ts:35](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L35)
+Defined in: [prelude.ts:46](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L46)
 
 Maps an `Option<T>` to `U` by applying a function to the contained value (if any), or returns the provided default (if not).
 
@@ -420,6 +524,10 @@ Maps an `Option<T>` to `U` by applying a function to the contained value (if any
 
 `U`
 
+#### See
+
+mapOrElse
+
 #### Overrides
 
 [`Option`](Option.md).[`mapOr`](Option.md#mapor)
@@ -432,7 +540,7 @@ Maps an `Option<T>` to `U` by applying a function to the contained value (if any
 mapOrElse<U>(defaultFn, fn): U;
 ```
 
-Defined in: [prelude.ts:36](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L36)
+Defined in: [prelude.ts:47](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L47)
 
 Maps an `Option<T>` to `U` by applying a function to a contained value (if any), or computes a default (if not).
 
@@ -453,6 +561,10 @@ Maps an `Option<T>` to `U` by applying a function to a contained value (if any),
 
 `U`
 
+#### See
+
+mapOr
+
 #### Overrides
 
 [`Option`](Option.md).[`mapOrElse`](Option.md#maporelse)
@@ -465,7 +577,7 @@ Maps an `Option<T>` to `U` by applying a function to a contained value (if any),
 okOr<E>(error): Result<never, E>;
 ```
 
-Defined in: [prelude.ts:28](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L28)
+Defined in: [prelude.ts:39](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L39)
 
 Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err)`.
 
@@ -485,6 +597,20 @@ Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` a
 
 [`Result`](Result.md)\<`never`, `E`\>
 
+#### See
+
+okOrElse
+
+#### Example
+
+```ts
+const x = Some(5);
+console.log(x.okOr('error').isOk()); // true
+
+const y = None;
+console.log(y.okOr('error').unwrapErr()); // 'error'
+```
+
 #### Overrides
 
 [`Option`](Option.md).[`okOr`](Option.md#okor)
@@ -497,7 +623,7 @@ Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` a
 okOrElse<E>(err): Result<never, E>;
 ```
 
-Defined in: [prelude.ts:29](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L29)
+Defined in: [prelude.ts:40](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L40)
 
 Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err())`.
 
@@ -517,6 +643,17 @@ Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` a
 
 [`Result`](Result.md)\<`never`, `E`\>
 
+#### See
+
+okOr
+
+#### Example
+
+```ts
+const x = None;
+console.log(x.okOrElse(() => 'error').unwrapErr()); // 'error'
+```
+
 #### Overrides
 
 [`Option`](Option.md).[`okOrElse`](Option.md#okorelse)
@@ -529,7 +666,7 @@ Transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` a
 or<T>(other): Option<T>;
 ```
 
-Defined in: [prelude.ts:45](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L45)
+Defined in: [prelude.ts:56](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L56)
 
 Returns the Option if it contains a value, otherwise returns `other`.
 This can be used for providing a fallback `Option`.
@@ -552,6 +689,22 @@ This can be used for providing a fallback `Option`.
 
 `this` if it is `Some`, otherwise `other`.
 
+#### See
+
+ - and
+ - xor
+
+#### Example
+
+```ts
+const x = None;
+const y = Some(5);
+console.log(x.or(y).unwrap()); // 5
+
+const z = Some(2);
+console.log(z.or(y).unwrap()); // 2
+```
+
 #### Overrides
 
 [`Option`](Option.md).[`or`](Option.md#or)
@@ -564,7 +717,7 @@ This can be used for providing a fallback `Option`.
 orElse<T>(fn): Option<T>;
 ```
 
-Defined in: [prelude.ts:46](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L46)
+Defined in: [prelude.ts:57](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L57)
 
 Returns the Option if it contains a value, otherwise calls `fn` and returns the result.
 This method can be used for lazy fallbacks, as `fn` is only evaluated if `this` is `None`.
@@ -587,6 +740,21 @@ This method can be used for lazy fallbacks, as `fn` is only evaluated if `this` 
 
 `this` if it is `Some`, otherwise the result of `fn`.
 
+#### See
+
+andThen
+
+#### Example
+
+```ts
+const x = None;
+const result = x.orElse(() => Some(10));
+console.log(result.unwrap()); // 10
+
+const y = Some(5);
+console.log(y.orElse(() => Some(10)).unwrap()); // 5
+```
+
 #### Overrides
 
 [`Option`](Option.md).[`orElse`](Option.md#orelse)
@@ -599,7 +767,7 @@ This method can be used for lazy fallbacks, as `fn` is only evaluated if `this` 
 orElseAsync<T>(fn): AsyncOption<T>;
 ```
 
-Defined in: [prelude.ts:47](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L47)
+Defined in: [prelude.ts:58](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L58)
 
 Asynchronous version of `orElse`.
 
@@ -611,13 +779,28 @@ Asynchronous version of `orElse`.
 
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `fn` | () => [`AsyncOption`](../type-aliases/AsyncOption.md)\<`T`\> |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `fn` | () => [`AsyncOption`](../type-aliases/AsyncOption.md)\<`T`\> | An async function that produces a `Promise<Option<T>>`. |
 
 #### Returns
 
 [`AsyncOption`](../type-aliases/AsyncOption.md)\<`T`\>
+
+A promise that resolves to `this` if it is `Some`, otherwise the result of `fn`.
+
+#### See
+
+ - orElse
+ - andThenAsync
+
+#### Example
+
+```ts
+const x = None;
+const result = await x.orElseAsync(async () => Some(10));
+console.log(result.unwrap()); // 10
+```
 
 #### Overrides
 
@@ -631,7 +814,7 @@ Asynchronous version of `orElse`.
 toString(): string;
 ```
 
-Defined in: [core.ts:302](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/core.ts#L302)
+Defined in: [core.ts:487](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/core.ts#L487)
 
 Custom `toString` implementation that uses the `Option`'s contained value.
 
@@ -651,7 +834,7 @@ Custom `toString` implementation that uses the `Option`'s contained value.
 transpose(): Result<None, never>;
 ```
 
-Defined in: [prelude.ts:30](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L30)
+Defined in: [prelude.ts:41](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L41)
 
 Transposes an `Option` of a `Result` into a `Result` of an `Option`.
 
@@ -662,6 +845,19 @@ Transposes an `Option` of a `Result` into a `Result` of an `Option`.
 `Ok` containing `Some` if the Option is a `Some` containing `Ok`,
          `Err` containing the error if the Option is a `Some` containing `Err`,
          `Ok` containing `None` if the Option is `None`.
+
+#### Example
+
+```ts
+const x = Some(Ok(5));
+console.log(x.transpose().unwrap().unwrap()); // 5
+
+const y = Some(Err('error'));
+console.log(y.transpose().unwrapErr()); // 'error'
+
+const z: Option<Result<number, string>> = None;
+console.log(z.transpose().unwrap().isNone()); // true
+```
 
 #### Overrides
 
@@ -675,7 +871,7 @@ Transposes an `Option` of a `Result` into a `Result` of an `Option`.
 unwrap(): never;
 ```
 
-Defined in: [prelude.ts:23](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L23)
+Defined in: [prelude.ts:34](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L34)
 
 Returns the contained `Some` value.
 
@@ -686,6 +882,11 @@ Returns the contained `Some` value.
 #### Throws
 
 Throws an error if the value is a `None`.
+
+#### See
+
+ - expect
+ - unwrapOr
 
 #### Overrides
 
@@ -699,7 +900,7 @@ Throws an error if the value is a `None`.
 unwrapOr<T>(defaultValue): T;
 ```
 
-Defined in: [prelude.ts:24](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L24)
+Defined in: [prelude.ts:35](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L35)
 
 Returns the contained `Some` value or a provided default.
 
@@ -719,6 +920,10 @@ Returns the contained `Some` value or a provided default.
 
 `T`
 
+#### See
+
+unwrapOrElse
+
 #### Overrides
 
 [`Option`](Option.md).[`unwrapOr`](Option.md#unwrapor)
@@ -731,7 +936,7 @@ Returns the contained `Some` value or a provided default.
 unwrapOrElse<T>(fn): T;
 ```
 
-Defined in: [prelude.ts:25](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L25)
+Defined in: [prelude.ts:36](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L36)
 
 Returns the contained `Some` value or computes it from a closure.
 
@@ -751,6 +956,17 @@ Returns the contained `Some` value or computes it from a closure.
 
 `T`
 
+#### See
+
+unwrapOr
+
+#### Example
+
+```ts
+const x = None;
+console.log(x.unwrapOrElse(() => 10)); // 10
+```
+
 #### Overrides
 
 [`Option`](Option.md).[`unwrapOrElse`](Option.md#unwraporelse)
@@ -763,7 +979,7 @@ Returns the contained `Some` value or computes it from a closure.
 unwrapOrElseAsync<T>(fn): Promise<T>;
 ```
 
-Defined in: [prelude.ts:26](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L26)
+Defined in: [prelude.ts:37](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L37)
 
 Asynchronous version of `unwrapOrElse`.
 
@@ -775,13 +991,26 @@ Asynchronous version of `unwrapOrElse`.
 
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `fn` | () => `Promise`\<`T`\> |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `fn` | () => `Promise`\<`T`\> | An async function that returns a `Promise<T>` as the default value. |
 
 #### Returns
 
 `Promise`\<`T`\>
+
+A promise that resolves to the contained value or the result of the async function.
+
+#### See
+
+unwrapOrElse
+
+#### Example
+
+```ts
+const x = None;
+await x.unwrapOrElseAsync(async () => 10); // 10
+```
 
 #### Overrides
 
@@ -795,7 +1024,7 @@ Asynchronous version of `unwrapOrElse`.
 unzip(): [None, None];
 ```
 
-Defined in: [prelude.ts:40](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L40)
+Defined in: [prelude.ts:51](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L51)
 
 Converts from `Option<[T, U]>` to `[Option<T>, Option<U>]`.
 If `this` is `Some([a, b])`, returns `[Some(a), Some(b)]`.
@@ -806,6 +1035,19 @@ If `this` is `None`, returns `[None, None]`.
 \[`None`, `None`\]
 
 A tuple of `Options`, one for each element in the original `Option` of a tuple.
+
+#### See
+
+zip
+
+#### Example
+
+```ts
+const x = Some([1, 'hello'] as [number, string]);
+const [a, b] = x.unzip();
+console.log(a.unwrap()); // 1
+console.log(b.unwrap()); // 'hello'
+```
 
 #### Overrides
 
@@ -819,7 +1061,7 @@ A tuple of `Options`, one for each element in the original `Option` of a tuple.
 xor<T>(other): Option<T>;
 ```
 
-Defined in: [prelude.ts:48](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L48)
+Defined in: [prelude.ts:59](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L59)
 
 Returns `Some` if exactly one of `this`, `other` is `Some`, otherwise returns `None`.
 This can be thought of as an exclusive or operation on `Option` values.
@@ -842,6 +1084,23 @@ This can be thought of as an exclusive or operation on `Option` values.
 
 `Some` if exactly one of `this` and `other` is `Some`, otherwise `None`.
 
+#### See
+
+ - and
+ - or
+
+#### Example
+
+```ts
+const x = Some(2);
+const y = None;
+console.log(x.xor(y).unwrap()); // 2
+
+const a = Some(2);
+const b = Some(3);
+console.log(a.xor(b).isNone()); // true
+```
+
 #### Overrides
 
 [`Option`](Option.md).[`xor`](Option.md#xor)
@@ -854,7 +1113,7 @@ This can be thought of as an exclusive or operation on `Option` values.
 zip<U>(other): None;
 ```
 
-Defined in: [prelude.ts:38](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L38)
+Defined in: [prelude.ts:49](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L49)
 
 Combines `this` with another `Option` by zipping their contained values.
 If `this` is `Some(s)` and `other` is `Some(o)`, returns `Some([s, o])`.
@@ -878,6 +1137,22 @@ If either `this` or `other` is `None`, returns `None`.
 
 An `Option` containing a tuple of the values if both are `Some`, otherwise `None`.
 
+#### See
+
+ - zipWith
+ - unzip
+
+#### Example
+
+```ts
+const x = Some(1);
+const y = Some('hello');
+console.log(x.zip(y).unwrap()); // [1, 'hello']
+
+const z = None;
+console.log(x.zip(z).isNone()); // true
+```
+
 #### Overrides
 
 [`Option`](Option.md).[`zip`](Option.md#zip)
@@ -890,7 +1165,7 @@ An `Option` containing a tuple of the values if both are `Some`, otherwise `None
 zipWith<U, R>(other, fn): None;
 ```
 
-Defined in: [prelude.ts:39](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/prelude.ts#L39)
+Defined in: [prelude.ts:50](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/prelude.ts#L50)
 
 Zips `this` with another `Option` using a provided function to combine their contained values.
 If `this` is `Some(s)` and `other` is `Some(o)`, returns `Some(fn(s, o))`.
@@ -915,6 +1190,18 @@ If either `this` or `other` is `None`, returns `None`.
 `None`
 
 An `Option` containing the result of `fn` if both `Options` are `Some`, otherwise `None`.
+
+#### See
+
+zip
+
+#### Example
+
+```ts
+const x = Some(2);
+const y = Some(3);
+console.log(x.zipWith(y, (a, b) => a * b).unwrap()); // 6
+```
 
 #### Overrides
 

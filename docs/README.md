@@ -32,7 +32,7 @@
 | [None](variables/None.md) | A constant representing the `None` case of an `Option`, indicating the absence of a value. This constant is frozen to ensure it is immutable and cannot be altered, preserving the integrity of `None` throughout the application. |
 | [RESULT\_FALSE](variables/RESULT_FALSE.md) | Result constant for `false`. Can be used anywhere due to immutability. |
 | [RESULT\_TRUE](variables/RESULT_TRUE.md) | Result constant for `true`. Can be used anywhere due to immutability. |
-| [RESULT\_VOID](variables/RESULT_VOID.md) | Result constant for `void` or `()`. |
+| [RESULT\_VOID](variables/RESULT_VOID.md) | Result constant for `void` or `()`. Can be used anywhere due to immutability. |
 | [RESULT\_ZERO](variables/RESULT_ZERO.md) | Result constant for `0`. Can be used anywhere due to immutability. |
 
 ## Functions

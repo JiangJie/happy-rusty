@@ -10,10 +10,13 @@
 function promiseToAsyncResult<T, E>(p): Promise<Result<T, E>>;
 ```
 
-Defined in: [extensions.ts:25](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/extensions.ts#L25)
+Defined in: [extensions.ts:40](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/extensions.ts#L40)
 
 Converts a Promise to a Result type, capturing the resolved value in an `Ok`, or the error in an `Err`.
 This allows for promise-based asynchronous operations to be handled in a way that is more in line with the Result pattern.
+
+Note: JavaScript promises can reject with any value, not just `Error` objects.
+The error is cast to type `E`, so ensure your error handling accounts for this.
 
 ## Type Parameters
 
@@ -34,7 +37,7 @@ This allows for promise-based asynchronous operations to be handled in a way tha
 
 A promise that resolves to a `Result<T, E>`. If the input promise `p` resolves, the resulting promise will resolve with `Ok<T>`. If the input promise `p` rejects, the resulting promise will resolve with `Err<E>`.
 
-## Example
+## Examples
 
 ```ts
 async function example() {
@@ -45,4 +48,9 @@ async function example() {
         console.error('Error:', err);
     });
 }
+```
+
+```ts
+// With custom error type
+const result = await promiseToAsyncResult<User, ApiError>(fetchUser(id));
 ```

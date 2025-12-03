@@ -10,7 +10,7 @@
 function isOption<T>(o): o is Option<T>;
 ```
 
-Defined in: [utils.ts:11](https://github.com/JiangJie/happy-rusty/blob/8ea803ae7583fa93c071f42c7f7dce6fad15eccc/src/enum/utils.ts#L11)
+Defined in: [utils.ts:24](https://github.com/JiangJie/happy-rusty/blob/515388c18573244f703829df2cc835aa1c8022b5/src/enum/utils.ts#L24)
 
 Checks if a value is an `Option`.
 
@@ -31,3 +31,12 @@ Checks if a value is an `Option`.
 `o is Option<T>`
 
 `true` if the value is an `Option`, otherwise `false`.
+
+## Example
+
+```ts
+const x = Some(5);
+console.log(isOption(x)); // true
+console.log(isOption(null)); // false
+console.log(isOption({ value: 5 })); // false
+```
