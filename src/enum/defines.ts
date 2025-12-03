@@ -1,5 +1,11 @@
 /**
- * Exports some commonly used types.
+ * @fileoverview
+ * Type aliases for commonly used `Result` type combinations.
+ *
+ * These types provide convenient shortcuts for common patterns like:
+ * - Operations that return nothing on success (`VoidResult`)
+ * - I/O operations that may fail with an Error (`IOResult`)
+ * - Async versions of the above
  */
 
 import type { AsyncResult, Result } from './core.ts';

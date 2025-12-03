@@ -1,3 +1,14 @@
+/**
+ * @fileoverview
+ * Constructors and factory functions for creating `Option` and `Result` types.
+ *
+ * This module exports:
+ * - `Some<T>(value)` - Creates an Option containing a value
+ * - `None` - Constant representing absence of value
+ * - `Ok<T, E>(value)` - Creates a successful Result
+ * - `Err<T, E>(error)` - Creates a failed Result
+ * - `None` interface - Type overrides for better type inference
+ */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { AsyncOption, AsyncResult, Option, Result } from './core.ts';
 import { OptionKindSymbol, ResultKindSymbol } from './symbols.ts';
@@ -109,18 +120,16 @@ export function Some<T>(value: T): Option<T> {
             return Ok(value);
         },
         transpose<T, E>(): Result<Option<T>, E> {
-            const r = value as unknown as Result<T, E>;
-            assertResult(r);
-            return r.isOk() ? Ok(Some(r.unwrap())) : Err(r.unwrapErr());
+            assertResult<T, E>(value);
+            return value.isOk() ? Ok(Some(value.unwrap())) : Err(value.unwrapErr());
         },
 
         filter(predicate: (value: T) => boolean): Option<T> {
             return predicate(value) ? some : None;
         },
         flatten<T>(): Option<T> {
-            const o = value as unknown as Option<T>;
-            assertOption(o);
-            return o;
+            assertOption<T>(value);
+            return value;
         },
         map<U>(fn: (value: T) => U): Option<U> {
             return Some(fn(value));
@@ -134,18 +143,18 @@ export function Some<T>(value: T): Option<T> {
         },
 
         zip<U>(other: Option<U>): Option<[T, U]> {
-            assertOption(other);
+            assertOption<U>(other);
             return other.isSome() ? Some([value, other.unwrap()]) : None;
         },
         zipWith<U, R>(other: Option<U>, fn: (value: T, otherValue: U) => R): Option<R> {
-            assertOption(other);
+            assertOption<U>(other);
             return other.isSome() ? Some(fn(value, other.unwrap())) : None;
         },
         unzip<T, U>(): [Option<T>, Option<U>] {
             const tuple = value as unknown as [T, U];
 
             if (!Array.isArray(tuple) || tuple.length !== 2) {
-                throw new TypeError('Unzip format is incorrect.');
+                throw new TypeError(`Option::unzip() requires a 2-element tuple, received ${ Array.isArray(tuple) ? `array with ${ tuple.length } elements` : typeof tuple }.`);
             }
 
             const [a, b] = tuple;
@@ -153,7 +162,7 @@ export function Some<T>(value: T): Option<T> {
         },
 
         and<U>(other: Option<U>): Option<U> {
-            assertOption(other);
+            assertOption<U>(other);
             return other;
         },
         andThen<U>(fn: (value: T) => Option<U>): Option<U> {
@@ -172,7 +181,7 @@ export function Some<T>(value: T): Option<T> {
             return Promise.resolve(some);
         },
         xor(other: Option<T>): Option<T> {
-            assertOption(other);
+            assertOption<T>(other);
             return other.isSome() ? None : some;
         },
 
@@ -182,7 +191,7 @@ export function Some<T>(value: T): Option<T> {
         },
 
         eq(other: Option<T>): boolean {
-            assertOption(other);
+            assertOption<T>(other);
             return other.isSome() && other.unwrap() === value;
         },
 
@@ -219,7 +228,7 @@ export const None = Object.freeze<None>({
         throw new TypeError(msg);
     },
     unwrap(): never {
-        throw new TypeError('Called `Option::unwrap()` on a `None` value');
+        throw new TypeError('Option::unwrap() called on a `None` value.');
     },
     unwrapOr<T>(defaultValue: T): T {
         return defaultValue;
@@ -278,7 +287,7 @@ export const None = Object.freeze<None>({
         return Promise.resolve(None);
     },
     or<T>(other: Option<T>): Option<T> {
-        assertOption(other);
+        assertOption<T>(other);
         return other;
     },
     orElse<T>(fn: () => Option<T>): Option<T> {
@@ -288,7 +297,7 @@ export const None = Object.freeze<None>({
         return fn();
     },
     xor<T>(other: Option<T>): Option<T> {
-        assertOption(other);
+        assertOption<T>(other);
         return other.isSome() ? other : None;
     },
 
@@ -297,7 +306,7 @@ export const None = Object.freeze<None>({
     },
 
     eq<T>(other: Option<T>): boolean {
-        assertOption(other);
+        assertOption<T>(other);
         return other === None;
     },
 
@@ -372,7 +381,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
             throw new TypeError(`${ msg }: ${ value }`);
         },
         unwrapErr(): E {
-            throw new TypeError('Called `Result::unwrapErr()` on an `Ok` value');
+            throw new TypeError('Result::unwrapErr() called on an `Ok` value.');
         },
 
         ok(): Option<T> {
@@ -382,9 +391,8 @@ export function Ok<T, E>(value?: T): Result<T, E> {
             return None;
         },
         transpose<T>(): Option<Result<T, E>> {
-            const o = value as Option<T>;
-            assertOption(o);
-            return o.isSome() ? Some(Ok(o.unwrap())) : None;
+            assertOption<T>(value);
+            return value.isSome() ? Some(Ok(value.unwrap())) : None;
         },
 
         map<U>(fn: (value: T) => U): Result<U, E> {
@@ -400,13 +408,12 @@ export function Ok<T, E>(value?: T): Result<T, E> {
             return fn(value as T);
         },
         flatten<T>(): Result<T, E> {
-            const r = value as Result<T, E>;
-            assertResult(r);
-            return r;
+            assertResult<T, E>(value);
+            return value;
         },
 
         and<U>(other: Result<U, E>): Result<U, E> {
-            assertResult(other);
+            assertResult<T, E>(other);
             return other;
         },
         or<F>(_other: Result<T, F>): Result<T, F> {
@@ -434,7 +441,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
         },
 
         eq(other: Result<T, E>): boolean {
-            assertResult(other);
+            assertResult<T, E>(other);
             return other.isOk() && other.unwrap() === value;
         },
 
@@ -442,7 +449,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
             return ok as unknown as Result<T, F>;
         },
         asErr(): never {
-            throw new TypeError('Called `Result::asErr()` on an `Ok` value');
+            throw new TypeError('Result::asErr() called on an `Ok` value.');
         },
 
         toString(): string {
@@ -498,7 +505,7 @@ export function Err<T, E>(error: E): Result<T, E> {
             throw new TypeError(`${ msg }: ${ error }`);
         },
         unwrap(): T {
-            throw new TypeError('Called `Result::unwrap()` on an `Err` value');
+            throw new TypeError('Result::unwrap() called on an `Err` value.');
         },
         unwrapOr(defaultValue: T): T {
             return defaultValue;
@@ -547,7 +554,7 @@ export function Err<T, E>(error: E): Result<T, E> {
             return err as unknown as Result<U, E>;
         },
         or<F>(other: Result<T, F>): Result<T, F> {
-            assertResult(other);
+            assertResult<T, E>(other);
             return other;
         },
         andThen<U>(_fn: (value: T) => Result<U, E>): Result<U, E> {
@@ -572,12 +579,12 @@ export function Err<T, E>(error: E): Result<T, E> {
         },
 
         eq(other: Result<T, E>): boolean {
-            assertResult(other);
+            assertResult<T, E>(other);
             return other.isErr() && other.unwrapErr() === error;
         },
 
         asOk(): never {
-            throw new TypeError('Called `Result::asOk()` on an `Err` value');
+            throw new TypeError('Result::asOk() called on an `Err` value.');
         },
         asErr<U>(): Result<U, E> {
             return err as unknown as Result<U, E>;
@@ -592,15 +599,40 @@ export function Err<T, E>(error: E): Result<T, E> {
 }
 
 /**
+ * Safely converts a value to a string representation for error messages.
+ * Handles cases where `toString()` might throw or values are null/undefined.
+ *
+ * @param value - The value to stringify.
+ * @returns A safe string representation of the value.
+ */
+function safeStringify(value: unknown): string {
+    try {
+        if (value === null) {
+            return 'null';
+        }
+        if (value === undefined) {
+            return 'undefined';
+        }
+        if (typeof value === 'object') {
+            return Object.prototype.toString.call(value);
+        }
+        return String(value);
+    } catch {
+        return '[unable to stringify]';
+    }
+}
+
+/**
  * Asserts that a given value is an `Option`.
  *
  * @typeParam T - The expected type of the value contained within the `Option`.
  * @param o - The value to be checked as an `Option`.
  * @throws {TypeError} If the value is not an `Option`.
+ * @see isOption
  */
-function assertOption<T>(o: Option<T>): void {
+function assertOption<T>(o: unknown): asserts o is Option<T> {
     if (!isOption(o)) {
-        throw new TypeError(`This(${ o }) is not an Option`);
+        throw new TypeError(`Expected an Option, but received: ${ safeStringify(o) }.`);
     }
 }
 
@@ -611,9 +643,10 @@ function assertOption<T>(o: Option<T>): void {
  * @typeParam E - The expected type of the error value contained within the `Result`.
  * @param r - The value to be checked as a `Result`.
  * @throws {TypeError} If the value is not a `Result`.
+ * @see isResult
  */
-function assertResult<T, E>(r: Result<T, E>): void {
+function assertResult<T, E>(r: unknown): asserts r is Result<T, E> {
     if (!isResult(r)) {
-        throw new TypeError(`This(${ r }) is not a Result`);
+        throw new TypeError(`Expected a Result, but received: ${ safeStringify(r) }.`);
     }
 }

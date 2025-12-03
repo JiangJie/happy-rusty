@@ -58,8 +58,23 @@ Deno.test('Option:Some', async (t) => {
         assertThrows(() => o.zip(null as unknown as Option<string>), TypeError);
         assertThrows(() => o.zip('foo' as unknown as Option<string>), TypeError);
         assertThrows(() => o.zip({} as unknown as Option<string>), TypeError);
+        // Test assertOption with undefined (covers safeStringify undefined branch)
+        assertThrows(() => o.zip(undefined as unknown as Option<string>), TypeError, 'Expected an Option, but received: undefined');
+        // Test assertOption with proxy that throws on Symbol.toStringTag (covers safeStringify catch branch)
+        const badProxy = new Proxy({}, {
+            get(_target, prop) {
+                if (prop === Symbol.toStringTag) {
+                    throw new Error('Cannot get toStringTag');
+                }
+                return undefined;
+            },
+        });
+        assertThrows(() => o.zip(badProxy as unknown as Option<string>), TypeError, 'Expected an Option, but received: [unable to stringify]');
 
-        assertThrows((o as unknown as Option<[number, number]>).unzip, TypeError);
+        // Test unzip with non-tuple values
+        assertThrows(() => (o as unknown as Option<[number, number]>).unzip(), TypeError, 'Option::unzip() requires a 2-element tuple');
+        assertThrows(() => (Some([1]) as unknown as Option<[number, number]>).unzip(), TypeError, 'Option::unzip() requires a 2-element tuple');
+        assertThrows(() => (Some([1, 2, 3]) as unknown as Option<[number, number]>).unzip(), TypeError, 'Option::unzip() requires a 2-element tuple');
 
         const x = o.zipWith(Some(20), (value, otherValue) => value + otherValue);
         const y = o.zipWith(None as Option<number>, (value, otherValue) => value + otherValue);
