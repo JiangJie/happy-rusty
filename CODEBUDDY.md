@@ -131,7 +131,8 @@ pnpm update --latest
 
 ## Code Style
 
-- ESLint with TypeScript strict and stylistic configs
-- No semicolons (enforced by linter)
+- ESLint with TypeScript strict and stylistic configs, plus `@stylistic/eslint-plugin`
+- Semicolons required (enforced by `@stylistic/semi`)
+- Trailing commas required in multiline (enforced by `@stylistic/comma-dangle`)
 - Strict TypeScript settings: `noUnusedLocals`, `noUnusedParameters`, `strictNullChecks`
 - File extensions required in imports (`.ts` suffix)
