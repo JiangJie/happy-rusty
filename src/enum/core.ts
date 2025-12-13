@@ -27,14 +27,14 @@ export interface Option<T> {
     /**
      * [object Option].
      *
-     * @private
+     * @internal
      */
     readonly [Symbol.toStringTag]: 'Option',
 
     /**
      * Identify `Some` or `None`.
      *
-     * @private
+     * @internal
      */
     readonly [OptionKindSymbol]: 'Some' | 'None';
 
@@ -508,14 +508,14 @@ export interface Result<T, E> {
     /**
      * [object Result].
      *
-     * @private
+     * @internal
      */
     readonly [Symbol.toStringTag]: 'Result',
 
     /**
      * Identify `Ok` or `Err`.
      *
-     * @private
+     * @internal
      */
     readonly [ResultKindSymbol]: 'Ok' | 'Err';
 
