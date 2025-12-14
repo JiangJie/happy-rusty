@@ -1,9 +1,7 @@
+import type { RollupOptions } from 'rollup';
 import { dts } from 'rollup-plugin-dts';
 
-/**
- * @type {import('rollup').RollupOptions[]}
- */
-export default [
+const config: RollupOptions[] = [
     {
         input: 'src/mod.ts',
         plugins: [
@@ -17,3 +15,5 @@ export default [
         treeshake: 'smallest',
     },
 ];
+
+export default config;

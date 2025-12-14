@@ -23,7 +23,7 @@
     "check": "pnpm exec tsc --noEmit",
     "lint": "pnpm exec eslint .",
     "prebuild": "pnpm run check && pnpm run lint",
-    "build": "pnpm exec vite build && pnpm exec rollup --config rollup.config.mjs",
+    "build": "pnpm exec vite build && pnpm exec rollup --config rollup.config.ts",
     "test": "pnpm exec vitest run --coverage",
     "test:watch": "pnpm exec vitest",
     "test:ui": "pnpm exec vitest --ui",
