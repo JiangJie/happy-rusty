@@ -205,6 +205,24 @@ export function Some<T>(value: T): Option<T> {
 /**
  * A constant representing the `None` case of an `Option`, indicating the absence of a value.
  * This constant is frozen to ensure it is immutable and cannot be altered, preserving the integrity of `None` throughout the application.
+ *
+ * @example
+ * ```ts
+ * // Use None to represent absence of a value
+ * function findUser(id: number): Option<User> {
+ *     const user = users.find(u => u.id === id);
+ *     return user ? Some(user) : None;
+ * }
+ *
+ * // None is a singleton, so you can compare by reference
+ * const result = findUser(999);
+ * if (result === None) {
+ *     console.log('User not found');
+ * }
+ *
+ * // Use with Option methods
+ * const name = None.unwrapOr('Anonymous'); // 'Anonymous'
+ * ```
  */
 export const None = Object.freeze<None>({
     [Symbol.toStringTag]: 'Option',
@@ -333,7 +351,31 @@ export const None = Object.freeze<None>({
  */
 export function Ok<T, E>(value: T): Result<T, E>;
 /**
- * Because javascript does not have a `()` type, use `void` instead.
+ * Creates a `Result<void, E>` representing a successful outcome with no value.
+ * This overload is used when the operation succeeds but doesn't produce a meaningful value.
+ *
+ * In Rust, this would be `Ok(())` using the unit type `()`.
+ * Since JavaScript doesn't have a unit type, we use `void` instead.
+ *
+ * @typeParam E - The type of the error that the result could potentially contain.
+ * @returns A `Result<void, E>` representing a successful operation with no value.
+ *
+ * @example
+ * ```ts
+ * function saveToFile(path: string): Result<void, Error> {
+ *     try {
+ *         fs.writeFileSync(path, data);
+ *         return Ok(); // Success with no return value
+ *     } catch (e) {
+ *         return Err(e as Error);
+ *     }
+ * }
+ *
+ * const result = saveToFile('/tmp/data.txt');
+ * if (result.isOk()) {
+ *     console.log('File saved successfully');
+ * }
+ * ```
  */
 export function Ok<E>(): Result<void, E>;
 export function Ok<T, E>(value?: T): Result<T, E> {

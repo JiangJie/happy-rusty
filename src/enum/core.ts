@@ -25,14 +25,30 @@ export interface Option<T> {
     // #region Internal properties
 
     /**
-     * [object Option].
+     * The well-known symbol `Symbol.toStringTag` used by `Object.prototype.toString()`.
+     * Returns `'Option'` so that `Object.prototype.toString.call(option)` produces `'[object Option]'`.
+     *
+     * This enables reliable type identification even across different execution contexts (e.g., iframes, different module instances).
+     *
+     * @example
+     * ```ts
+     * const x = Some(5);
+     * console.log(Object.prototype.toString.call(x)); // '[object Option]'
+     * ```
      *
      * @internal
      */
     readonly [Symbol.toStringTag]: 'Option',
 
     /**
-     * Identify `Some` or `None`.
+     * A unique symbol property used to identify the variant of this `Option`.
+     * Returns `'Some'` if the Option contains a value, or `'None'` if it represents absence.
+     *
+     * This is used internally by the `isOption` utility function to verify that an object is a valid `Option` instance,
+     * and to distinguish between `Some` and `None` variants without calling methods.
+     *
+     * Note: The symbol itself is not exported as part of the public API.
+     * Use the `isOption` utility function or the `isSome()`/`isNone()` methods for type checking.
      *
      * @internal
      */
@@ -48,11 +64,27 @@ export interface Option<T> {
 
     /**
      * Returns `true` if the Option is a `Some` value.
+     * @example
+     * ```ts
+     * const x = Some(2);
+     * console.log(x.isSome()); // true
+     *
+     * const y = None;
+     * console.log(y.isSome()); // false
+     * ```
      */
     isSome(): boolean;
 
     /**
      * Returns `true` if the Option is a `None` value.
+     * @example
+     * ```ts
+     * const x = Some(2);
+     * console.log(x.isNone()); // false
+     *
+     * const y = None;
+     * console.log(y.isNone()); // true
+     * ```
      */
     isNone(): boolean;
 
@@ -94,6 +126,14 @@ export interface Option<T> {
      * @param msg - The error message to provide if the value is a `None`.
      * @throws {TypeError} Throws an error with the provided message if the Option is a `None`.
      * @see unwrap
+     * @example
+     * ```ts
+     * const x = Some(5);
+     * console.log(x.expect('value should exist')); // 5
+     *
+     * const y = None;
+     * y.expect('value should exist'); // throws TypeError: value should exist
+     * ```
      */
     expect(msg: string): T;
 
@@ -102,6 +142,14 @@ export interface Option<T> {
      * @throws {TypeError} Throws an error if the value is a `None`.
      * @see expect
      * @see unwrapOr
+     * @example
+     * ```ts
+     * const x = Some(5);
+     * console.log(x.unwrap()); // 5
+     *
+     * const y = None;
+     * y.unwrap(); // throws TypeError
+     * ```
      */
     unwrap(): T;
 
@@ -109,6 +157,14 @@ export interface Option<T> {
      * Returns the contained `Some` value or a provided default.
      * @param defaultValue - The value to return if the Option is a `None`.
      * @see unwrapOrElse
+     * @example
+     * ```ts
+     * const x = Some(5);
+     * console.log(x.unwrapOr(10)); // 5
+     *
+     * const y = None;
+     * console.log(y.unwrapOr(10)); // 10
+     * ```
      */
     unwrapOr(defaultValue: T): T;
 
@@ -249,6 +305,14 @@ export interface Option<T> {
      * @param defaultValue - The value to return if the Option is `None`.
      * @param fn - A function that takes the contained value and returns a new value.
      * @see mapOrElse
+     * @example
+     * ```ts
+     * const x = Some(5);
+     * console.log(x.mapOr(0, v => v * 2)); // 10
+     *
+     * const y = None;
+     * console.log(y.mapOr(0, v => v * 2)); // 0
+     * ```
      */
     mapOr<U>(defaultValue: U, fn: (value: T) => U): U;
 
@@ -258,6 +322,14 @@ export interface Option<T> {
      * @param defaultFn - A function that returns the default value.
      * @param fn - A function that takes the contained value and returns a new value.
      * @see mapOr
+     * @example
+     * ```ts
+     * const x = Some(5);
+     * console.log(x.mapOrElse(() => 0, v => v * 2)); // 10
+     *
+     * const y = None;
+     * console.log(y.mapOrElse(() => 0, v => v * 2)); // 0
+     * ```
      */
     mapOrElse<U>(defaultFn: () => U, fn: (value: T) => U): U;
 
@@ -466,6 +538,16 @@ export interface Option<T> {
      * This is primarily for side effects and does not transform the `Option`.
      * @param fn - A function to call with the contained value.
      * @returns `this`, unmodified, for chaining additional methods.
+     * @example
+     * ```ts
+     * const x = Some(5);
+     * // Prints "value: 5" and returns Some(10)
+     * const doubled = x.inspect(v => console.log('value:', v)).map(v => v * 2);
+     *
+     * const y = None;
+     * // Does nothing and returns None
+     * y.inspect(v => console.log('value:', v));
+     * ```
      */
     inspect(fn: (value: T) => void): this;
 
@@ -476,6 +558,16 @@ export interface Option<T> {
      * This method can be used for comparing `Option` instances in a value-sensitive manner.
      * @param other - The other `Option` to compare with.
      * @returns `true` if `this` and `other` are both `Some` with equal values, or both are `None`, otherwise `false`.
+     * @example
+     * ```ts
+     * const a = Some(5);
+     * const b = Some(5);
+     * const c = Some(10);
+     * console.log(a.eq(b)); // true
+     * console.log(a.eq(c)); // false
+     * console.log(None.eq(None)); // true
+     * console.log(a.eq(None)); // false
+     * ```
      */
     eq(other: Option<T>): boolean;
 
@@ -483,6 +575,11 @@ export interface Option<T> {
 
     /**
      * Custom `toString` implementation that uses the `Option`'s contained value.
+     * @example
+     * ```ts
+     * console.log(Some(5).toString()); // 'Some(5)'
+     * console.log(None.toString()); // 'None'
+     * ```
      */
     toString(): string;
 }
@@ -506,14 +603,30 @@ export interface Result<T, E> {
     // #region Internal properties
 
     /**
-     * [object Result].
+     * The well-known symbol `Symbol.toStringTag` used by `Object.prototype.toString()`.
+     * Returns `'Result'` so that `Object.prototype.toString.call(result)` produces `'[object Result]'`.
+     *
+     * This enables reliable type identification even across different execution contexts (e.g., iframes, different module instances).
+     *
+     * @example
+     * ```ts
+     * const x = Ok(5);
+     * console.log(Object.prototype.toString.call(x)); // '[object Result]'
+     * ```
      *
      * @internal
      */
     readonly [Symbol.toStringTag]: 'Result',
 
     /**
-     * Identify `Ok` or `Err`.
+     * A unique symbol property used to identify the variant of this `Result`.
+     * Returns `'Ok'` if the Result represents success, or `'Err'` if it represents failure.
+     *
+     * This is used internally by the `isResult` utility function to verify that an object is a valid `Result` instance,
+     * and to distinguish between `Ok` and `Err` variants without calling methods.
+     *
+     * Note: The symbol itself is not exported as part of the public API.
+     * Use the `isResult` utility function or the `isOk()`/`isErr()` methods for type checking.
      *
      * @internal
      */
@@ -529,11 +642,27 @@ export interface Result<T, E> {
 
     /**
      * Returns `true` if the result is `Ok`.
+     * @example
+     * ```ts
+     * const x = Ok(5);
+     * console.log(x.isOk()); // true
+     *
+     * const y = Err('error');
+     * console.log(y.isOk()); // false
+     * ```
      */
     isOk(): boolean;
 
     /**
      * Returns `true` if the result is `Err`.
+     * @example
+     * ```ts
+     * const x = Ok(5);
+     * console.log(x.isErr()); // false
+     *
+     * const y = Err('error');
+     * console.log(y.isErr()); // true
+     * ```
      */
     isErr(): boolean;
 
@@ -604,6 +733,14 @@ export interface Result<T, E> {
      * @throws {TypeError} Throws an error with the provided message if the result is an `Err`.
      * @see unwrap
      * @see expectErr
+     * @example
+     * ```ts
+     * const x = Ok(5);
+     * console.log(x.expect('should have value')); // 5
+     *
+     * const y = Err('error');
+     * y.expect('should have value'); // throws TypeError: should have value: error
+     * ```
      */
     expect(msg: string): T;
 
@@ -613,6 +750,14 @@ export interface Result<T, E> {
      * @see expect
      * @see unwrapOr
      * @see unwrapErr
+     * @example
+     * ```ts
+     * const x = Ok(5);
+     * console.log(x.unwrap()); // 5
+     *
+     * const y = Err('error');
+     * y.unwrap(); // throws TypeError
+     * ```
      */
     unwrap(): T;
 
@@ -620,6 +765,14 @@ export interface Result<T, E> {
      * Returns the contained `Ok` value or a provided default.
      * @param defaultValue - The value to return if the result is an `Err`.
      * @see unwrapOrElse
+     * @example
+     * ```ts
+     * const x = Ok(5);
+     * console.log(x.unwrapOr(10)); // 5
+     *
+     * const y = Err('error');
+     * console.log(y.unwrapOr(10)); // 10
+     * ```
      */
     unwrapOr(defaultValue: T): T;
 
@@ -658,6 +811,14 @@ export interface Result<T, E> {
      * @throws {TypeError} Throws an error with the provided message if the result is an `Ok`.
      * @see unwrapErr
      * @see expect
+     * @example
+     * ```ts
+     * const x = Err('error');
+     * console.log(x.expectErr('should have error')); // 'error'
+     *
+     * const y = Ok(5);
+     * y.expectErr('should have error'); // throws TypeError: should have error: 5
+     * ```
      */
     expectErr(msg: string): E;
 
@@ -666,6 +827,14 @@ export interface Result<T, E> {
      * @throws {TypeError} Throws an error if the result is an `Ok`.
      * @see expectErr
      * @see unwrap
+     * @example
+     * ```ts
+     * const x = Err('error');
+     * console.log(x.unwrapErr()); // 'error'
+     *
+     * const y = Ok(5);
+     * y.unwrapErr(); // throws TypeError
+     * ```
      */
     unwrapErr(): E;
 
@@ -779,6 +948,14 @@ export interface Result<T, E> {
      * @param defaultValue - The value to return if the result is `Err`.
      * @param fn - A function that takes the `Ok` value and returns a new value.
      * @see mapOrElse
+     * @example
+     * ```ts
+     * const x = Ok(5);
+     * console.log(x.mapOr(0, v => v * 2)); // 10
+     *
+     * const y = Err('error');
+     * console.log(y.mapOr(0, v => v * 2)); // 0
+     * ```
      */
     mapOr<U>(defaultValue: U, fn: (value: T) => U): U;
 
@@ -788,6 +965,14 @@ export interface Result<T, E> {
      * @param defaultFn - A function that returns the default value.
      * @param fn - A function that takes the `Ok` value and returns a new value.
      * @see mapOr
+     * @example
+     * ```ts
+     * const x = Ok(5);
+     * console.log(x.mapOrElse(e => 0, v => v * 2)); // 10
+     *
+     * const y = Err('error');
+     * console.log(y.mapOrElse(e => e.length, v => v * 2)); // 5
+     * ```
      */
     mapOrElse<U>(defaultFn: (error: E) => U, fn: (value: T) => U): U;
 
@@ -957,6 +1142,19 @@ export interface Result<T, E> {
      * Tests whether `this` and `other` are both `Ok` containing equal values, or both are `Err` containing equal errors.
      * @param other - The other `Result` to compare with.
      * @returns `true` if `this` and `other` are both `Ok` with equal values, or both are `Err` with equal errors, otherwise `false`.
+     * @example
+     * ```ts
+     * const a = Ok(5);
+     * const b = Ok(5);
+     * const c = Ok(10);
+     * console.log(a.eq(b)); // true
+     * console.log(a.eq(c)); // false
+     *
+     * const d = Err('error');
+     * const e = Err('error');
+     * console.log(d.eq(e)); // true
+     * console.log(a.eq(d)); // false
+     * ```
      */
     eq(other: Result<T, E>): boolean;
 
@@ -999,6 +1197,11 @@ export interface Result<T, E> {
 
     /**
      * Custom `toString` implementation that uses the `Result`'s contained value.
+     * @example
+     * ```ts
+     * console.log(Ok(5).toString()); // 'Ok(5)'
+     * console.log(Err('error').toString()); // 'Err(error)'
+     * ```
      */
     toString(): string;
 }
