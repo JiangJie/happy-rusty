@@ -22,7 +22,7 @@ pnpm run eg
 
 ### Building
 ```bash
-# Full build (includes type check, lint, and rollup)
+# Full build (includes type check, lint, vite build, and rollup dts)
 pnpm run build
 
 # Type checking only
@@ -31,6 +31,23 @@ pnpm run check
 # Linting only
 pnpm run lint
 ```
+
+### Build Architecture
+
+The build process is split into two separate steps:
+
+1. **Vite** - Compiles TypeScript to JavaScript (CJS + ESM)
+2. **Rollup + rollup-plugin-dts** - Generates bundled `.d.ts` type declarations
+
+**Why not use a single tool?**
+
+- **api-extractor issue**: When using `@microsoft/api-extractor` to generate `.d.ts` files, it sorts exports alphabetically. This causes issues when `None extends Option<never>` because `None` (N) is processed before `Option` (O), resulting in internal renaming like `Option_2`. See [rushstack#3017](https://github.com/microsoft/rushstack/issues/3017).
+
+- **vite-plugin-dts issue**: The popular `vite-plugin-dts` uses `@microsoft/api-extractor` internally for bundling declarations, so it produces the same `Option_2` renaming artifact.
+
+- **rollup-plugin-dts** preserves source order and correctly handles interface inheritance, producing clean `.d.ts` output without renaming artifacts.
+
+- **Vite** provides fast, optimized JavaScript bundling with esbuild under the hood, while Rollup with `rollup-plugin-dts` specializes in type declaration bundling.
 
 ### Documentation
 ```bash
@@ -70,7 +87,7 @@ This project uses **two separate, non-conflicting** package managers:
 
 #### pnpm (Build & Development Tools)
 - **Purpose**: Manages Node.js build toolchain
-- **Dependencies**: TypeScript, ESLint, Rollup, TypeDoc
+- **Dependencies**: TypeScript, ESLint, Vite, Rollup, TypeDoc
 - **Location**: `node_modules/` (from npm registry)
 - **Used for**: Building npm packages, linting, type checking, documentation
 
@@ -88,14 +105,14 @@ This project uses **two separate, non-conflicting** package managers:
 ### Runtime vs Build Environments
 
 - **Runtime**: Supports Deno, Node.js (CommonJS/ESM), browsers, and Bun
-- **Build**: Uses pnpm for dependency management, Rollup for bundling
+- **Build**: Uses pnpm for dependency management, Vite for JS bundling, Rollup for `.d.ts` generation
 - **Testing**: Uses Deno's built-in test runner (isolated from build toolchain)
 - **Types**: Strict TypeScript with `bundler` module resolution
 
 ### Publishing
 
 Dual publishing to:
-- **npm**: Via `dist/` built with Rollup (CJS + ESM)
+- **npm**: Via `dist/` built with Vite (CJS + ESM) and Rollup (`.d.ts`)
 - **JSR**: Directly from `src/mod.ts` source (Deno-native)
 
 ## Testing
