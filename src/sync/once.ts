@@ -273,7 +273,7 @@ export function Once<T>(): Once<T> {
     let initialized = false;
     let pendingPromise: Promise<T> | undefined;
 
-    const once: Once<T> = {
+    return {
         get(): Option<T> {
             return initialized ? Some(value as T) : None;
         },
@@ -337,7 +337,7 @@ export function Once<T>(): Once<T> {
                 return Ok(value as T);
             }
 
-        // If already initializing, wait for it
+            // If already initializing, wait for it
             if (pendingPromise) {
                 try {
                     await pendingPromise;
@@ -386,6 +386,4 @@ export function Once<T>(): Once<T> {
             return initialized;
         },
     };
-
-    return once;
 }

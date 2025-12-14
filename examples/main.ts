@@ -1,7 +1,7 @@
 /**
  * Happy-Rusty Examples
  *
- * Run with: node examples/main.ts
+ * Run with: deno run -A examples/main.ts
  *
  * Each example demonstrates real-world usage patterns for Option and Result types.
  */
@@ -34,6 +34,11 @@ console.log('\n┌────────────────────�
 console.log('│  Once: One-Time Initialization                 │');
 console.log('└────────────────────────────────────────────────┘\n');
 await import('./once.ts');
+
+console.log('\n┌────────────────────────────────────────────────┐');
+console.log('│  Lazy: Deferred Initialization                 │');
+console.log('└────────────────────────────────────────────────┘\n');
+await import('./lazy.ts');
 
 console.log('\n╔════════════════════════════════════════════════╗');
 console.log('║              Examples Complete                 ║');
