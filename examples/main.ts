@@ -30,6 +30,11 @@ console.log('│  Async Result: API Calls with Error Handling   │');
 console.log('└────────────────────────────────────────────────┘\n');
 await import('./result.async.ts');
 
+console.log('\n┌────────────────────────────────────────────────┐');
+console.log('│  Once: One-Time Initialization                 │');
+console.log('└────────────────────────────────────────────────┘\n');
+await import('./once.ts');
+
 console.log('\n╔════════════════════════════════════════════════╗');
 console.log('║              Examples Complete                 ║');
 console.log('╚════════════════════════════════════════════════╝');

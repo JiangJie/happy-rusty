@@ -4,3 +4,4 @@
  * Exports all Option and Result types, constructors, and utilities.
  */
 export * from './enum/mod.ts';
+export * from './sync/mod.ts';
