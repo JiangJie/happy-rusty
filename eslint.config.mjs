@@ -27,4 +27,12 @@ export default defineConfig([
             }],
         },
     },
+    {
+        files: ['**/*.test.ts'],
+        rules: {
+            '@typescript-eslint/no-empty-function': ['error', {
+                allow: ['arrowFunctions', 'functions'],
+            }],
+        },
+    },
 ]);
