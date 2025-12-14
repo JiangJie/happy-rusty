@@ -29,7 +29,7 @@
     "test:ui": "pnpm exec vitest --ui",
     "predocs": "pnpm dlx rimraf docs",
     "docs": "pnpm exec typedoc",
-    "eg": "node examples/main.ts",
+    "eg": "deno run -A examples/main.ts",
     "prepublishOnly": "pnpm run build"
   },
   "repository": {
