@@ -9,7 +9,6 @@
  * - `Err<T, E>(error)` - Creates a failed Result
  * - `None` interface - Type overrides for better type inference
  */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { AsyncOption, AsyncResult, Option, Result } from './core.ts';
 import { OptionKindSymbol, ResultKindSymbol } from './symbols.ts';
 import { isOption, isResult } from './utils.ts';

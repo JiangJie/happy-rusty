@@ -4,7 +4,10 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
-    globalIgnores(['dist']),
+    globalIgnores([
+        'dist',
+        'coverage',
+    ]),
     {
         files: ['**/*.ts'],
         plugins: {
@@ -18,6 +21,10 @@ export default defineConfig([
         rules: {
             '@stylistic/semi': ['error', 'always'],
             '@stylistic/comma-dangle': ['error', 'always-multiline'],
+            '@typescript-eslint/no-unused-vars': ['error', {
+                argsIgnorePattern: '^_',
+                varsIgnorePattern: '^_',
+            }],
         },
     },
 ]);
