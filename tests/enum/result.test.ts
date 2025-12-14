@@ -1,223 +1,216 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { assert, assertThrows } from "@std/assert";
-import { assertSpyCalls, spy } from '@std/testing/mock';
-import { AsyncResult, Err, None, Ok, Some, promiseToAsyncResult, type Option, type Result } from 'happy-rusty';
+import { describe, it, expect, vi } from 'vitest';
+import { type AsyncResult, Err, None, Ok, Some, promiseToAsyncResult, type Option, type Result } from '../../src/mod.ts';
 
-Deno.test('Result:Ok', async (t) => {
+describe('Result:Ok', () => {
     const r: Result<number, Error> = Ok(1);
 
-    await t.step('Stringify', () => {
-        assert(Object.prototype.toString.call(r) === '[object Result]');
-        assert(r.toString() === 'Ok(1)');
-        assert(`${ r }` === 'Ok(1)');
-        assert(`${ Ok() }` === 'Ok(undefined)');
+    it('Stringify', () => {
+        expect(Object.prototype.toString.call(r)).toBe('[object Result]');
+        expect(r.toString()).toBe('Ok(1)');
+        expect(`${ r }`).toBe('Ok(1)');
+        expect(`${ Ok() }`).toBe('Ok(undefined)');
     });
 
-    await t.step('Querying the variant', async () => {
-        assert(r.isOk());
-        assert(!r.isErr());
-        assert(r.isOkAnd(x => x === 1));
-        assert(!r.isErrAnd(_x => true));
+    it('Querying the variant', async () => {
+        expect(r.isOk()).toBe(true);
+        expect(r.isErr()).toBe(false);
+        expect(r.isOkAnd(x => x === 1)).toBe(true);
+        expect(r.isErrAnd(_x => true)).toBe(false);
 
-        assert(await r.isOkAndAsync(async x => {
+        expect(await r.isOkAndAsync(async x => {
             return x === await Promise.resolve(1);
-        }));
-        assert(!(await r.isErrAndAsync(async err => {
+        })).toBe(true);
+        expect(await r.isErrAndAsync(async err => {
             return err.message === await Promise.resolve('lose');
-        })));
+        })).toBe(false);
     });
 
-    await t.step('Equals comparison', () => {
-        assert(r.eq(Ok(r.unwrap())));
-        assertThrows(() => r.eq(null as unknown as Result<number, Error>), TypeError);
-        assertThrows(() => r.eq({} as unknown as Result<number, Error>), TypeError);
+    it('Equals comparison', () => {
+        expect(r.eq(Ok(r.unwrap()))).toBe(true);
+        expect(() => r.eq(null as unknown as Result<number, Error>)).toThrow(TypeError);
+        expect(() => r.eq({} as unknown as Result<number, Error>)).toThrow(TypeError);
     });
 
-    await t.step('Extracting the contained value', async () => {
-        assert(r.expect('value should greater than 0') === 1);
-        assertThrows(() => r.expectErr('value should greater than 0'), TypeError, 'value should greater than 0');
+    it('Extracting the contained value', async () => {
+        expect(r.expect('value should greater than 0')).toBe(1);
+        expect(() => r.expectErr('value should greater than 0')).toThrow('value should greater than 0');
 
-        assert(r.unwrap() > 0);
-        assertThrows(r.unwrapErr, TypeError);
-        assert(r.unwrapOr(0) > 0);
-        assert(r.unwrapOrElse((_err) => 0) > 0);
+        expect(r.unwrap()).toBeGreaterThan(0);
+        expect(() => r.unwrapErr()).toThrow(TypeError);
+        expect(r.unwrapOr(0)).toBeGreaterThan(0);
+        expect(r.unwrapOrElse((_err) => 0)).toBeGreaterThan(0);
 
-        assert((await r.unwrapOrElseAsync(async err => {
+        expect(await r.unwrapOrElseAsync(async err => {
             return err.message === await Promise.resolve('lose') ? 0 : -1;
-        })) === 1);
+        })).toBe(1);
     });
 
-    await t.step('Transforming contained values', () => {
-        assert(r.ok().eq(Some(1)));
-        assert(r.err().eq(None));
+    it('Transforming contained values', () => {
+        expect(r.ok().eq(Some(1))).toBe(true);
+        expect(r.err().eq(None)).toBe(true);
 
-        assert(Ok(Some(1)).transpose().unwrap().unwrap() === 1);
-        assert(Ok(None).transpose().eq(None));
+        expect(Ok(Some(1)).transpose().unwrap().unwrap()).toBe(1);
+        expect(Ok(None).transpose().eq(None)).toBe(true);
 
-        assert(r.map(_v => 1).eq(Ok(1)));
-        assert(r.mapErr(_err => 0).unwrap() === 1);
-        assert(r.mapOr(0, _v => 2) === 2);
-        assert(r.mapOrElse(_err => 0, _v => 2) === 2);
+        expect(r.map(_v => 1).eq(Ok(1))).toBe(true);
+        expect(r.mapErr(_err => 0).unwrap()).toBe(1);
+        expect(r.mapOr(0, _v => 2)).toBe(2);
+        expect(r.mapOrElse(_err => 0, _v => 2)).toBe(2);
 
-        assert(Ok<Result<number, Error>, Error>(r).flatten() === r);
+        expect(Ok<Result<number, Error>, Error>(r).flatten()).toBe(r);
     });
 
-    await t.step('Boolean operators', async () => {
+    it('Boolean operators', async () => {
         const other: Result<number, Error> = Ok(2);
         const otherErr: Result<number, Error> = Err(new Error());
 
-        assert(r.and(other) === other);
-        assert(r.and(otherErr) === otherErr);
+        expect(r.and(other)).toBe(other);
+        expect(r.and(otherErr)).toBe(otherErr);
 
-        assert(r.or(other) === r);
-        assert(r.or(otherErr) === r);
+        expect(r.or(other)).toBe(r);
+        expect(r.or(otherErr)).toBe(r);
 
-        assert(r.andThen(x => Ok(x + 10)).eq(Ok(11)));
-        assert(r.orElse(_x => other) === r);
+        expect(r.andThen(x => Ok(x + 10)).eq(Ok(11))).toBe(true);
+        expect(r.orElse(_x => other)).toBe(r);
 
-        assert((await r.andThenAsync(async (x) => {
+        expect((await r.andThenAsync(async (x) => {
             return Ok(String(x + await Promise.resolve(10)));
-        })).eq(Ok('11')));
+        })).eq(Ok('11'))).toBe(true);
 
-        assert((await r.orElseAsync(async (x): AsyncResult<number, string> => {
+        expect(await r.orElseAsync(async (x): AsyncResult<number, string> => {
             return Err(x.message + await Promise.resolve(10));
-        })) === r.asOk());
+        })).toBe(r.asOk());
     });
 
-    await t.step('Inspect will be called', () => {
-        const print = (value: number) => {
+    it('Inspect will be called', () => {
+        const print = vi.fn((value: number) => {
             console.log(`value is ${ value }`);
-        };
-        const printSpy = spy(print);
+        });
 
-        r.inspect(printSpy);
-        assertSpyCalls(printSpy, 1);
+        r.inspect(print);
+        expect(print).toHaveBeenCalledTimes(1);
 
-        const printErr = (error: Error) => {
+        const printErr = vi.fn((error: Error) => {
             console.log(`error is ${ error.message }`);
-        };
-        const printErrSpy = spy(printErr);
+        });
 
-        r.inspectErr(printErrSpy);
-        assertSpyCalls(printErrSpy, 0);
+        r.inspectErr(printErr);
+        expect(printErr).toHaveBeenCalledTimes(0);
     });
 
-    await t.step('Convert type', () => {
-        assert(r.asOk() === r);
-        assertThrows(() => r.asErr(), TypeError);
+    it('Convert type', () => {
+        expect(r.asOk()).toBe(r);
+        expect(() => r.asErr()).toThrow(TypeError);
     });
 });
 
-Deno.test('Result:Err', async (t) => {
+describe('Result:Err', () => {
     const r: Result<number, Error> = Err(new Error('lose'));
 
-    await t.step('Stringify', () => {
-        assert(Object.prototype.toString.call(r) === '[object Result]');
-        console.log(r.toString());
-        assert(r.toString() === 'Err(Error: lose)');
-        assert(`${ r }` === 'Err(Error: lose)');
+    it('Stringify', () => {
+        expect(Object.prototype.toString.call(r)).toBe('[object Result]');
+        expect(r.toString()).toBe('Err(Error: lose)');
+        expect(`${ r }`).toBe('Err(Error: lose)');
     });
 
-    await t.step('Querying the variant', async () => {
-        assert(!r.isOk());
-        assert(r.isErr());
-        assert(!r.isOkAnd(_x => true));
-        assert(r.isErrAnd(x => x.message == 'lose'));
+    it('Querying the variant', async () => {
+        expect(r.isOk()).toBe(false);
+        expect(r.isErr()).toBe(true);
+        expect(r.isOkAnd(_x => true)).toBe(false);
+        expect(r.isErrAnd(x => x.message == 'lose')).toBe(true);
 
-        assert(!(await r.isOkAndAsync(async x => {
+        expect(await r.isOkAndAsync(async x => {
             return x === await Promise.resolve(1);
-        })));
-        assert(await r.isErrAndAsync(async err => {
+        })).toBe(false);
+        expect(await r.isErrAndAsync(async err => {
             return err.message === await Promise.resolve('lose');
-        }));
+        })).toBe(true);
     });
 
-    await t.step('Equals comparison', () => {
-        assert(r.eq(Err(r.unwrapErr())));
+    it('Equals comparison', () => {
+        expect(r.eq(Err(r.unwrapErr()))).toBe(true);
     });
 
-    await t.step('Extracting the contained value', async () => {
-        assertThrows(() => r.expect('value should less than 1'), TypeError, 'value should less than 1');
-        assert(r.expectErr('error').message === 'lose');
+    it('Extracting the contained value', async () => {
+        expect(() => r.expect('value should less than 1')).toThrow('value should less than 1');
+        expect(r.expectErr('error').message).toBe('lose');
 
-        assertThrows(r.unwrap, Error);
-        assert(r.unwrapErr().message === 'lose');
-        assert(r.unwrapOr(0) === 0);
-        assert(r.unwrapOrElse((err) => err.message.length) === 4);
+        expect(() => r.unwrap()).toThrow(Error);
+        expect(r.unwrapErr().message).toBe('lose');
+        expect(r.unwrapOr(0)).toBe(0);
+        expect(r.unwrapOrElse((err) => err.message.length)).toBe(4);
 
-        assert(Err<Result<number, Error>, Error>(r.unwrapErr()).flatten().eq(r));
+        expect(Err<Result<number, Error>, Error>(r.unwrapErr()).flatten().eq(r)).toBe(true);
 
-        assert((await r.unwrapOrElseAsync(async err => {
+        expect(await r.unwrapOrElseAsync(async err => {
             return err.message === await Promise.resolve('lose') ? 0 : -1;
-        })) === 0);
+        })).toBe(0);
     });
 
-    await t.step('Transforming contained values', () => {
-        assert(r.ok().eq(None));
-        assert(r.err().unwrap().message === 'lose');
+    it('Transforming contained values', () => {
+        expect(r.ok().eq(None)).toBe(true);
+        expect(r.err().unwrap().message).toBe('lose');
 
-        assert(Err<Option<number>, Error>(r.unwrapErr()).transpose().unwrap().unwrapErr() === r.unwrapErr());
+        expect(Err<Option<number>, Error>(r.unwrapErr()).transpose().unwrap().unwrapErr()).toBe(r.unwrapErr());
 
-        assert(r.map(_v => 1).eq(Err(r.unwrapErr())));
-        assert(r.mapErr(_err => 0).unwrapErr() === 0);
-        assert(r.mapOr(0, _v => 1) === 0);
-        assert(r.mapOrElse(_err => 0, _v => 1) === 0);
+        expect(r.map(_v => 1).eq(Err(r.unwrapErr()))).toBe(true);
+        expect(r.mapErr(_err => 0).unwrapErr()).toBe(0);
+        expect(r.mapOr(0, _v => 1)).toBe(0);
+        expect(r.mapOrElse(_err => 0, _v => 1)).toBe(0);
     });
 
-    await t.step('Boolean operators', async () => {
+    it('Boolean operators', async () => {
         const other: Result<number, Error> = Ok(2);
         const otherErr: Result<number, Error> = Err(new Error());
 
-        assert(r.and(other) === r);
-        assert(r.and(otherErr) === r);
+        expect(r.and(other)).toBe(r);
+        expect(r.and(otherErr)).toBe(r);
 
-        assert(r.or(other) === other);
-        assert(r.or(otherErr) === otherErr);
+        expect(r.or(other)).toBe(other);
+        expect(r.or(otherErr)).toBe(otherErr);
 
-        assert(r.andThen(x => Ok(x + 10)) === r);
-        assert(r.orElse(_x => other) === other);
+        expect(r.andThen(x => Ok(x + 10))).toBe(r);
+        expect(r.orElse(_x => other)).toBe(other);
 
-        assert(await r.andThenAsync(async (x): AsyncResult<number, Error> => {
+        expect(await r.andThenAsync(async (x): AsyncResult<number, Error> => {
             return Ok(x + await Promise.resolve(10));
-        }) === r);
+        })).toBe(r);
 
-        assert((await r.orElseAsync(async (x): AsyncResult<number, string> => {
+        expect((await r.orElseAsync(async (x): AsyncResult<number, string> => {
             return Err(x.message + await Promise.resolve(10));
-        })).eq(Err('lose10')));
+        })).eq(Err('lose10'))).toBe(true);
     });
 
-    await t.step('InspectErr will be called', () => {
-        const print = (value: number) => {
+    it('InspectErr will be called', () => {
+        const print = vi.fn((value: number) => {
             console.log(`value is ${ value }`);
-        };
-        const printSpy = spy(print);
+        });
 
-        r.inspect(printSpy);
-        assertSpyCalls(printSpy, 0);
+        r.inspect(print);
+        expect(print).toHaveBeenCalledTimes(0);
 
-        const printErr = (error: Error) => {
+        const printErr = vi.fn((error: Error) => {
             console.log(`error is ${ error.message }`);
-        };
-        const printErrSpy = spy(printErr);
+        });
 
-        r.inspectErr(printErrSpy);
-        assertSpyCalls(printErrSpy, 1);
+        r.inspectErr(printErr);
+        expect(printErr).toHaveBeenCalledTimes(1);
     });
 
-    await t.step('Convert type', () => {
-        assertThrows(() => r.asOk(), TypeError);
-        assert(r.asErr() === r);
+    it('Convert type', () => {
+        expect(() => r.asOk()).toThrow(TypeError);
+        expect(r.asErr()).toBe(r);
     });
 });
 
-Deno.test('Convert from Promise to Result', async (t) => {
-    await t.step('Resolve will convert to Ok', async () => {
+describe('Convert from Promise to Result', () => {
+    it('Resolve will convert to Ok', async () => {
         const pOk = Promise.resolve(0);
-        assert((await promiseToAsyncResult(pOk)).unwrap() === 0);
+        expect((await promiseToAsyncResult(pOk)).unwrap()).toBe(0);
     });
 
-    await t.step('Reject will convert to Err', async () => {
+    it('Reject will convert to Err', async () => {
         const pErr = Promise.reject(new Error('lose'));
-        assert((await promiseToAsyncResult(pErr)).unwrapErr().message === 'lose');
+        expect((await promiseToAsyncResult(pErr)).unwrapErr().message).toBe('lose');
     });
 });

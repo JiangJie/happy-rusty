@@ -23,8 +23,5 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noPropertyAccessFromIndexSignature": true
-  },
-  "include": [
-    "./src"
-  ]
+  }
 }

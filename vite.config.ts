@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
     build: {
@@ -20,6 +20,14 @@ export default defineConfig({
                 },
             ],
             treeshake: 'smallest',
+        },
+    },
+    test: {
+        include: ['**/*.test.ts'],
+        coverage: {
+            provider: 'v8',
+            reporter: ['text', 'json', 'html', 'lcov'],
+            include: ['src/**/*.ts'],
         },
     },
 });

@@ -1,65 +1,64 @@
-import { assert, assertThrows } from '@std/assert';
-import { assertSpyCalls, spy } from '@std/testing/mock';
-import { Err, None, Ok, Some, type Option } from 'happy-rusty';
+import { describe, it, expect, vi } from 'vitest';
+import { Err, None, Ok, Some, type Option } from '../../src/mod.ts';
 
-Deno.test('Option:Some', async (t) => {
+describe('Option:Some', () => {
     const o = Some(10);
 
-    await t.step('Stringify', () => {
-        assert(Object.prototype.toString.call(o) === '[object Option]');
-        assert(o.toString() === 'Some(10)');
-        assert(`${ o }` === 'Some(10)');
+    it('Stringify', () => {
+        expect(Object.prototype.toString.call(o)).toBe('[object Option]');
+        expect(o.toString()).toBe('Some(10)');
+        expect(`${ o }`).toBe('Some(10)');
     });
 
-    await t.step('Querying the variant', async () => {
-        assert(o.isSome());
-        assert(!o.isNone());
-        assert(o.isSomeAnd(v => v === 10));
-        assert(!o.isSomeAnd(v => v === 20));
+    it('Querying the variant', async () => {
+        expect(o.isSome()).toBe(true);
+        expect(o.isNone()).toBe(false);
+        expect(o.isSomeAnd(v => v === 10)).toBe(true);
+        expect(o.isSomeAnd(v => v === 20)).toBe(false);
 
-        assert(await o.isSomeAndAsync(async v => {
+        expect(await o.isSomeAndAsync(async v => {
             return v === await Promise.resolve(10);
-        }));
+        })).toBe(true);
     });
 
-    await t.step('Extracting the contained value', async () => {
-        assert(o.expect('value is number 10') === 10);
+    it('Extracting the contained value', async () => {
+        expect(o.expect('value is number 10')).toBe(10);
 
-        assert(o.unwrap() === 10);
-        assert(o.unwrapOr(0) === 10);
-        assert(o.unwrapOrElse(() => 0) === 10);
+        expect(o.unwrap()).toBe(10);
+        expect(o.unwrapOr(0)).toBe(10);
+        expect(o.unwrapOrElse(() => 0)).toBe(10);
 
-        assert(await o.unwrapOrElseAsync(async () => {
+        expect(await o.unwrapOrElseAsync(async () => {
             return await Promise.resolve(0);
-        }) === 10);
+        })).toBe(10);
     });
 
-    await t.step('Transforming contained values', () => {
-        assert(o.okOr(new Error('value is number')).isOk());
-        assert(o.okOrElse(() => new Error('value is number')).isOk());
+    it('Transforming contained values', () => {
+        expect(o.okOr(new Error('value is number')).isOk()).toBe(true);
+        expect(o.okOrElse(() => new Error('value is number')).isOk()).toBe(true);
 
-        assert(Some(Ok(10)).transpose().isOk());
-        assert(Some(Err(new Error())).transpose().isErr());
+        expect(Some(Ok(10)).transpose().isOk()).toBe(true);
+        expect(Some(Err(new Error())).transpose().isErr()).toBe(true);
 
-        assert(o.map((v) => v + 1).eq(Some(11)));
-        assert(o.mapOr(0, (v) => v + 1) === 11);
-        assert(o.mapOrElse(() => 0, (v) => v + 1) === 11);
+        expect(o.map((v) => v + 1).eq(Some(11))).toBe(true);
+        expect(o.mapOr(0, (v) => v + 1)).toBe(11);
+        expect(o.mapOrElse(() => 0, (v) => v + 1)).toBe(11);
 
-        assert(o.filter((v) => v % 2 == 0).eq(Some(10)));
-        assert(o.filter((v) => v % 2 == 1).eq(None));
+        expect(o.filter((v) => v % 2 == 0).eq(Some(10))).toBe(true);
+        expect(o.filter((v) => v % 2 == 1).eq(None)).toBe(true);
 
-        assert(Some(o).flatten().eq(o));
+        expect(Some(o).flatten().eq(o)).toBe(true);
 
         const [a, b] = o.zip(Some('foo')).unzip();
-        assert(a.eq(Some(10)));
-        assert(b.eq(Some('foo')));
-        assert(o.zip(None).eq(None));
+        expect(a.eq(Some(10))).toBe(true);
+        expect(b.eq(Some('foo'))).toBe(true);
+        expect(o.zip(None).eq(None)).toBe(true);
 
-        assertThrows(() => o.zip(null as unknown as Option<string>), TypeError);
-        assertThrows(() => o.zip('foo' as unknown as Option<string>), TypeError);
-        assertThrows(() => o.zip({} as unknown as Option<string>), TypeError);
+        expect(() => o.zip(null as unknown as Option<string>)).toThrow(TypeError);
+        expect(() => o.zip('foo' as unknown as Option<string>)).toThrow(TypeError);
+        expect(() => o.zip({} as unknown as Option<string>)).toThrow(TypeError);
         // Test assertOption with undefined (covers safeStringify undefined branch)
-        assertThrows(() => o.zip(undefined as unknown as Option<string>), TypeError, 'Expected an Option, but received: undefined');
+        expect(() => o.zip(undefined as unknown as Option<string>)).toThrow('Expected an Option, but received: undefined');
         // Test assertOption with proxy that throws on Symbol.toStringTag (covers safeStringify catch branch)
         const badProxy = new Proxy({}, {
             get(_target, prop) {
@@ -69,142 +68,139 @@ Deno.test('Option:Some', async (t) => {
                 return undefined;
             },
         });
-        assertThrows(() => o.zip(badProxy as unknown as Option<string>), TypeError, 'Expected an Option, but received: [unable to stringify]');
+        expect(() => o.zip(badProxy as unknown as Option<string>)).toThrow('Expected an Option, but received: [unable to stringify]');
 
         // Test unzip with non-tuple values
-        assertThrows(() => (o as unknown as Option<[number, number]>).unzip(), TypeError, 'Option::unzip() requires a 2-element tuple');
-        assertThrows(() => (Some([1]) as unknown as Option<[number, number]>).unzip(), TypeError, 'Option::unzip() requires a 2-element tuple');
-        assertThrows(() => (Some([1, 2, 3]) as unknown as Option<[number, number]>).unzip(), TypeError, 'Option::unzip() requires a 2-element tuple');
+        expect(() => (o as unknown as Option<[number, number]>).unzip()).toThrow('Option::unzip() requires a 2-element tuple');
+        expect(() => (Some([1]) as unknown as Option<[number, number]>).unzip()).toThrow('Option::unzip() requires a 2-element tuple');
+        expect(() => (Some([1, 2, 3]) as unknown as Option<[number, number]>).unzip()).toThrow('Option::unzip() requires a 2-element tuple');
 
         const x = o.zipWith(Some(20), (value, otherValue) => value + otherValue);
         const y = o.zipWith(None as Option<number>, (value, otherValue) => value + otherValue);
-        assert(x.eq(Some(30)));
-        assert(y.eq(None));
+        expect(x.eq(Some(30))).toBe(true);
+        expect(y.eq(None)).toBe(true);
     });
 
-    await t.step('Boolean operators', async () => {
-        assert(o.and(Some(20)).eq(Some(20)));
-        assert(o.and(None).eq(None));
-        assert(o.andThen(() => Some(20)).eq(Some(20)));
+    it('Boolean operators', async () => {
+        expect(o.and(Some(20)).eq(Some(20))).toBe(true);
+        expect(o.and(None).eq(None)).toBe(true);
+        expect(o.andThen(() => Some(20)).eq(Some(20))).toBe(true);
 
-        assert(o.or(Some(20)).eq(Some(10)));
-        assert(o.or(None).eq(Some(10)));
-        assert(o.orElse(() => Some(20)).eq(Some(10)));
+        expect(o.or(Some(20)).eq(Some(10))).toBe(true);
+        expect(o.or(None).eq(Some(10))).toBe(true);
+        expect(o.orElse(() => Some(20)).eq(Some(10))).toBe(true);
 
-        assert(o.xor(Some(20)).eq(None));
-        assert(o.xor(None).eq(Some(10)));
+        expect(o.xor(Some(20)).eq(None)).toBe(true);
+        expect(o.xor(None).eq(Some(10))).toBe(true);
 
-        assert((await (await o.andThenAsync(async () => {
+        expect((await (await o.andThenAsync(async () => {
             return Some(await Promise.resolve('0'));
         })).orElseAsync(async () => {
             return Some(await Promise.resolve('1'));
-        })).eq(Some('0')));
+        })).eq(Some('0'))).toBe(true);
     });
 
-    await t.step('Inspect will be called', () => {
-        const print = (value: number) => {
+    it('Inspect will be called', () => {
+        const print = vi.fn((value: number) => {
             console.log(`value is ${ value }`);
-        };
-        const printSpy = spy(print);
+        });
 
-        o.inspect(printSpy);
-        assertSpyCalls(printSpy, 1);
+        o.inspect(print);
+        expect(print).toHaveBeenCalledTimes(1);
     });
 
-    await t.step('Equals comparison', () => {
-        assert(o.eq(Some(10)));
-        assert(!o.eq(None));
+    it('Equals comparison', () => {
+        expect(o.eq(Some(10))).toBe(true);
+        expect(o.eq(None)).toBe(false);
     });
 });
 
-Deno.test('Option:None', async (t) => {
-    // const o: Option<number> = None;
+describe('Option:None', () => {
     const o = None;
 
-    await t.step('Stringify', () => {
-        assert(Object.prototype.toString.call(o) === '[object Option]');
-        assert(o.toString() === 'None');
-        assert(`${ o }` === 'None');
+    it('Stringify', () => {
+        expect(Object.prototype.toString.call(o)).toBe('[object Option]');
+        expect(o.toString()).toBe('None');
+        expect(`${ o }`).toBe('None');
     });
 
-    await t.step('Querying the variant', async () => {
-        assert(!o.isSome());
-        assert(o.isNone());
-        assert(!o.isSomeAnd(v => v === 10));
+    it('Querying the variant', async () => {
+        expect(o.isSome()).toBe(false);
+        expect(o.isNone()).toBe(true);
+        expect(o.isSomeAnd(v => v === 10)).toBe(false);
 
-        assert(!(await o.isSomeAndAsync(async v => {
+        expect(await o.isSomeAndAsync(async v => {
             return v === await Promise.resolve(10);
-        })));
+        })).toBe(false);
     });
 
-    await t.step('Extracting the contained value', async () => {
-        assertThrows(() => o.expect('None has no value'), TypeError, 'None has no value');
+    it('Extracting the contained value', async () => {
+        expect(() => o.expect('None has no value')).toThrow('None has no value');
 
-        assertThrows(o.unwrap, TypeError);
-        assert(o.unwrapOr(0) === 0);
-        assert(o.unwrapOrElse(() => 0) === 0);
+        expect(() => o.unwrap()).toThrow(TypeError);
+        expect(o.unwrapOr(0)).toBe(0);
+        expect(o.unwrapOrElse(() => 0)).toBe(0);
 
-        assert(await o.unwrapOrElseAsync(async () => {
+        expect(await o.unwrapOrElseAsync(async () => {
             return await Promise.resolve(0);
-        }) === 0);
+        })).toBe(0);
     });
 
-    await t.step('Transforming contained values', () => {
-        assert(o.okOr(new Error('None has no value')).unwrapErr().message === 'None has no value');
-        assert(o.okOrElse(() => new Error('None has no value')).unwrapErr().message === 'None has no value');
+    it('Transforming contained values', () => {
+        expect(o.okOr(new Error('None has no value')).unwrapErr().message).toBe('None has no value');
+        expect(o.okOrElse(() => new Error('None has no value')).unwrapErr().message).toBe('None has no value');
 
-        assert(None.transpose().eq(Ok(None)));
+        expect(None.transpose().eq(Ok(None))).toBe(true);
 
-        assert(o.map((v) => v + 1).eq(None));
-        assert(o.mapOr(0, (v) => v + 1) === 0);
-        assert(o.mapOrElse(() => 0, (v) => v + 1) === 0);
+        expect(o.map((v) => v + 1).eq(None)).toBe(true);
+        expect(o.mapOr(0, (v) => v + 1)).toBe(0);
+        expect(o.mapOrElse(() => 0, (v) => v + 1)).toBe(0);
 
-        assert(o.filter((v) => v > 0).eq(None));
+        expect(o.filter((v) => v > 0).eq(None)).toBe(true);
 
-        assert(None.flatten().eq(None));
+        expect(None.flatten().eq(None)).toBe(true);
 
         const x = o.zip(Some('foo'));
-        assert(x.eq(None));
+        expect(x.eq(None)).toBe(true);
 
         const [a, b] = x.unzip();
-        assert(a.eq(None));
-        assert(b.eq(None));
+        expect(a.eq(None)).toBe(true);
+        expect(b.eq(None)).toBe(true);
 
         const y = o.zipWith(Some(20), (value, otherValue) => value + otherValue);
-        assert(y.eq(None));
+        expect(y.eq(None)).toBe(true);
     });
 
-    await t.step('Boolean operators', async () => {
-        assert(o.and(Some(20)).eq(None));
-        assert(o.and(None).eq(None));
-        assert(o.andThen(() => Some(20)).eq(None));
+    it('Boolean operators', async () => {
+        expect(o.and(Some(20)).eq(None)).toBe(true);
+        expect(o.and(None).eq(None)).toBe(true);
+        expect(o.andThen(() => Some(20)).eq(None)).toBe(true);
 
-        assert(o.or(Some(20)).eq(Some(20)));
-        assert(o.or(None).eq(None));
-        assert(o.orElse(() => Some(20)).eq(Some(20)));
+        expect(o.or(Some(20)).eq(Some(20))).toBe(true);
+        expect(o.or(None).eq(None)).toBe(true);
+        expect(o.orElse(() => Some(20)).eq(Some(20))).toBe(true);
 
-        assert(o.xor(Some(20)).eq(Some(20)));
-        assert(o.xor(None).eq(None));
+        expect(o.xor(Some(20)).eq(Some(20))).toBe(true);
+        expect(o.xor(None).eq(None)).toBe(true);
 
-        assert((await (await o.andThenAsync(async () => {
+        expect((await (await o.andThenAsync(async () => {
             return Some(await Promise.resolve('0'));
         })).orElseAsync(async () => {
             return Some(await Promise.resolve('1'));
-        })).eq(Some('1')));
+        })).eq(Some('1'))).toBe(true);
     });
 
-    await t.step('Inspect will not be called', () => {
-        const print = (value: number) => {
+    it('Inspect will not be called', () => {
+        const print = vi.fn((value: number) => {
             console.log(`value is ${ value }`);
-        };
-        const printSpy = spy(print);
+        });
 
-        o.inspect(printSpy);
-        assertSpyCalls(printSpy, 0);
+        o.inspect(print);
+        expect(print).toHaveBeenCalledTimes(0);
     });
 
-    await t.step('Equals comparison', () => {
-        assert(!o.eq(Some(10)));
-        assert(o.eq(None));
+    it('Equals comparison', () => {
+        expect(o.eq(Some(10))).toBe(false);
+        expect(o.eq(None)).toBe(true);
     });
 });

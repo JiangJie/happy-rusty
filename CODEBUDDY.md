@@ -10,14 +10,14 @@ This file provides guidance to CodeBuddy Code when working with code in this rep
 
 ### Testing
 ```bash
-# Run all tests with coverage (uses Deno)
+# Run all tests with coverage
 pnpm run test
 
-# Run tests with HTML coverage report
-pnpm run test:html
+# Run tests in watch mode
+pnpm run test:watch
 
-# Run example code
-pnpm run eg
+# Run tests with UI
+pnpm run test:ui
 ```
 
 ### Building
@@ -81,32 +81,23 @@ The codebase is organized around implementing Rust-style enums for JavaScript:
 
 4. **Async Support**: Parallel async versions of methods (e.g., `isSomeAndAsync`, `andThenAsync`) and `AsyncOption`/`AsyncResult` type aliases
 
-### Dual Toolchain Architecture (Important!)
+### Toolchain
 
-This project uses **two separate, non-conflicting** package managers:
+This project uses **pnpm** for all development tasks:
 
-#### pnpm (Build & Development Tools)
-- **Purpose**: Manages Node.js build toolchain
-- **Dependencies**: TypeScript, ESLint, Vite, Rollup, TypeDoc
+#### pnpm (Build, Test & Development Tools)
+- **Purpose**: Manages Node.js build toolchain and testing
+- **Dependencies**: TypeScript, ESLint, Vite, Vitest, Rollup, TypeDoc
 - **Location**: `node_modules/` (from npm registry)
-- **Used for**: Building npm packages, linting, type checking, documentation
+- **Used for**: Building npm packages, testing, linting, type checking, documentation
 
-#### Deno (Testing & Examples)
-- **Purpose**: Runs tests and examples
-- **Dependencies**: `@std/assert`, `@std/testing` (from JSR)
-- **Location**: `~/.cache/deno/` (not in node_modules)
-- **Used for**: Test execution, running examples
-
-**Key Point**: These toolchains are completely isolated:
-- Test code (`tests/`) is NEVER bundled into `dist/`
-- Deno dependencies are NEVER mixed with pnpm dependencies
-- `pnpm test` simply invokes `deno test` as a command
+**Key Point**: Test code (`tests/`) is NEVER bundled into `dist/`.
 
 ### Runtime vs Build Environments
 
 - **Runtime**: Supports Deno, Node.js (CommonJS/ESM), browsers, and Bun
 - **Build**: Uses pnpm for dependency management, Vite for JS bundling, Rollup for `.d.ts` generation
-- **Testing**: Uses Deno's built-in test runner (isolated from build toolchain)
+- **Testing**: Uses Vitest test runner with V8 coverage
 - **Types**: Strict TypeScript with `bundler` module resolution
 
 ### Publishing
@@ -118,32 +109,28 @@ Dual publishing to:
 ## Testing
 
 - Test files: `tests/enum/option.test.ts` and `tests/enum/result.test.ts`
-- Uses Deno standard library: `@std/assert` and `@std/testing/mock`
-- Tests import from `'happy-rusty'` (path mapped in deno.json) instead of relative paths
-- Deno lock file is disabled (`"lock": false` in deno.json)
-- Run with: `deno test --coverage --clean`
+- Uses Vitest with `@vitest/coverage-v8` for coverage
+- Tests import from `../../src/mod.ts` using relative paths
+- Run with: `pnpm run test`
 
 ### Running a Single Test
 
 ```bash
 # Run specific test file
-deno test tests/enum/option.test.ts
+pnpm exec vitest run tests/enum/option.test.ts
 
-# Run with coverage
-deno test tests/enum/option.test.ts --coverage
+# Run tests matching a pattern
+pnpm exec vitest run -t "Option:Some"
 
-# Run specific test by name
-deno test --filter "Option:Some"
+# Run in watch mode for a specific file
+pnpm exec vitest tests/enum/option.test.ts
 ```
 
 ### Updating Dependencies
 
 ```bash
-# Update pnpm dependencies (build tools)
+# Update pnpm dependencies
 pnpm update --latest
-
-# Update deno dependencies (manually edit deno.json)
-# Check latest versions at: https://jsr.io/@std/assert
 ```
 
 ## Code Style
