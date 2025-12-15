@@ -59,9 +59,9 @@ pnpm run docs
 
 ### Core Structure
 
-The codebase is organized around implementing Rust-style enums for JavaScript:
+The codebase is organized around implementing Rust-style enums and synchronization primitives for JavaScript:
 
-- **`src/enum/`** - Main implementation directory
+- **`src/enum/`** - Option and Result implementation
   - `core.ts` - Defines the `Option<T>` and `Result<T, E>` interfaces with all their methods
   - `prelude.ts` - Exports `Some()`, `None`, `Ok()`, and `Err()` constructors; includes `None` interface with type overrides for better inference
   - `defines.ts` - Type aliases like `VoidResult<E>`, `IOResult<T>`, `AsyncIOResult<T>`
@@ -70,6 +70,18 @@ The codebase is organized around implementing Rust-style enums for JavaScript:
   - `extensions.ts` - Bridge utilities like `promiseToAsyncResult()` for converting Promise-based APIs to Result pattern
   - `constants.ts` - Pre-defined immutable Result constants (`RESULT_TRUE`, `RESULT_FALSE`, `RESULT_ZERO`, `RESULT_VOID`)
   - `mod.ts` - Re-exports all public APIs
+
+- **`src/sync/`** - Rust-inspired synchronization primitives
+  - `once.ts` - `Once<T>` for one-time initialization (like Rust's `OnceLock`), supports sync/async init with `getOrInit()`, `getOrInitAsync()`, and fallible variants `getOrTryInit()`, `getOrTryInitAsync()`
+  - `lazy.ts` - `Lazy<T>` and `LazyAsync<T>` for lazy initialization (like Rust's `LazyLock`), initializer provided at construction time
+  - `mutex.ts` - `Mutex<T>` for async mutual exclusion, serializes async operations with `withLock()`, `lock()`, `tryLock()`
+  - `mod.ts` - Re-exports all sync primitives
+
+- **`src/ops/`** - Rust-inspired control flow types
+  - `control_flow.ts` - `ControlFlow<B, C>` enum with `Break(value)` and `Continue(value)` variants for short-circuiting operations
+  - `mod.ts` - Re-exports all ops types
+
+- **`src/mod.ts`** - Main entry point, re-exports everything from enum/, sync/, and ops/
 
 ### Key Design Patterns
 
@@ -80,6 +92,8 @@ The codebase is organized around implementing Rust-style enums for JavaScript:
 3. **Method Chaining**: All transformation methods (`map`, `andThen`, etc.) return new `Option` or `Result` instances
 
 4. **Async Support**: Parallel async versions of methods (e.g., `isSomeAndAsync`, `andThenAsync`) and `AsyncOption`/`AsyncResult` type aliases
+
+5. **Concurrent-Safe Async Primitives**: `Once`, `Lazy`, and `Mutex` handle concurrent async calls correctly - only one initialization runs, others wait for it
 
 ### Toolchain
 
@@ -108,7 +122,13 @@ Dual publishing to:
 
 ## Testing
 
-- Test files: `tests/enum/option.test.ts` and `tests/enum/result.test.ts`
+- Test files located in `tests/` directory, mirroring `src/` structure:
+  - `tests/enum/option.test.ts` - Option tests
+  - `tests/enum/result.test.ts` - Result tests
+  - `tests/sync/once.test.ts` - Once tests
+  - `tests/sync/lazy.test.ts` - Lazy tests
+  - `tests/sync/mutex.test.ts` - Mutex tests
+  - `tests/ops/control_flow.test.ts` - ControlFlow tests
 - Uses Vitest with `@vitest/coverage-v8` for coverage
 - Tests import from `../../src/mod.ts` using relative paths
 - Run with: `pnpm run test`

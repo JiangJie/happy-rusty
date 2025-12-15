@@ -19,6 +19,8 @@ Rust's `Option` and `Result` for JavaScript/TypeScript - Better error handling a
 
 - **Option&lt;T&gt;** - Represents an optional value: every `Option` is either `Some(T)` or `None`
 - **Result&lt;T, E&gt;** - Represents either success (`Ok(T)`) or failure (`Err(E)`)
+- **Sync Primitives** - Rust-inspired `Once<T>`, `Lazy<T>`, `LazyAsync<T>`, and `Mutex<T>`
+- **Control Flow** - `ControlFlow<B, C>` with `Break` and `Continue` for short-circuiting operations
 - **Full TypeScript support** with strict type inference
 - **Async support** - Async versions of all transformation methods
 - **Zero dependencies**
@@ -175,12 +177,74 @@ function doSomething(): Result<void, Error> {
 }
 ```
 
+### Sync Primitives
+
+```ts
+import { Once, Lazy, LazyAsync, Mutex } from 'happy-rusty';
+
+// Once - one-time initialization (like Rust's OnceLock)
+const config = Once<Config>();
+config.set(loadConfig());           // Set once
+config.get();                       // Some(config) or None
+config.getOrInit(() => defaultCfg); // Get or initialize
+
+// Lazy - lazy initialization with initializer at construction
+const expensive = Lazy(() => computeExpensiveValue());
+expensive.force();  // Compute on first access, cached thereafter
+
+// LazyAsync - async lazy initialization
+const db = LazyAsync(async () => await Database.connect(url));
+await db.force();  // Only one connection, concurrent calls wait
+
+// Mutex - async mutual exclusion
+const state = Mutex({ count: 0 });
+await state.withLock(async (s) => {
+    s.count += 1;  // Exclusive access
+});
+```
+
+### Control Flow
+
+```ts
+import { Break, Continue, ControlFlow } from 'happy-rusty';
+
+// Short-circuit operations
+function findFirst<T>(arr: T[], pred: (t: T) => boolean): Option<T> {
+    for (const item of arr) {
+        const flow = pred(item) ? Break(item) : Continue();
+        if (flow.isBreak()) {
+            return Some(flow.breakValue().unwrap());
+        }
+    }
+    return None;
+}
+
+// Custom fold with early exit
+function tryFold<T, Acc>(
+    arr: T[],
+    init: Acc,
+    f: (acc: Acc, item: T) => ControlFlow<Acc, Acc>
+): Acc {
+    let acc = init;
+    for (const item of arr) {
+        const flow = f(acc, item);
+        if (flow.isBreak()) return flow.breakValue().unwrap();
+        acc = flow.continueValue().unwrap();
+    }
+    return acc;
+}
+```
+
 ## Examples
 
 - [Option basics](examples/option.ts)
 - [AsyncOption](examples/option.async.ts)
 - [Result basics](examples/result.ts)
 - [AsyncResult](examples/result.async.ts)
+- [Once](examples/once.ts)
+- [Lazy](examples/lazy.ts)
+- [Mutex](examples/mutex.ts)
+- [ControlFlow](examples/control_flow.ts)
 
 ## Documentation
 

@@ -19,6 +19,8 @@
 
 - **Option&lt;T&gt;** - 表示可选值：每个 `Option` 要么是 `Some(T)`，要么是 `None`
 - **Result&lt;T, E&gt;** - 表示成功（`Ok(T)`）或失败（`Err(E)`）
+- **同步原语** - Rust 风格的 `Once<T>`、`Lazy<T>`、`LazyAsync<T>` 和 `Mutex<T>`
+- **控制流** - 用于短路操作的 `ControlFlow<B, C>`，包含 `Break` 和 `Continue`
 - **完整的 TypeScript 支持**，具有严格的类型推断
 - **异步支持** - 所有转换方法都有异步版本
 - **零依赖**
@@ -175,12 +177,74 @@ function doSomething(): Result<void, Error> {
 }
 ```
 
+### 同步原语
+
+```ts
+import { Once, Lazy, LazyAsync, Mutex } from 'happy-rusty';
+
+// Once - 一次性初始化（类似 Rust 的 OnceLock）
+const config = Once<Config>();
+config.set(loadConfig());           // 只能设置一次
+config.get();                       // Some(config) 或 None
+config.getOrInit(() => defaultCfg); // 获取或初始化
+
+// Lazy - 惰性初始化，在构造时提供初始化函数
+const expensive = Lazy(() => computeExpensiveValue());
+expensive.force();  // 首次访问时计算，之后缓存
+
+// LazyAsync - 异步惰性初始化
+const db = LazyAsync(async () => await Database.connect(url));
+await db.force();  // 只建立一次连接，并发调用会等待
+
+// Mutex - 异步互斥锁
+const state = Mutex({ count: 0 });
+await state.withLock(async (s) => {
+    s.count += 1;  // 独占访问
+});
+```
+
+### 控制流
+
+```ts
+import { Break, Continue, ControlFlow } from 'happy-rusty';
+
+// 短路操作
+function findFirst<T>(arr: T[], pred: (t: T) => boolean): Option<T> {
+    for (const item of arr) {
+        const flow = pred(item) ? Break(item) : Continue();
+        if (flow.isBreak()) {
+            return Some(flow.breakValue().unwrap());
+        }
+    }
+    return None;
+}
+
+// 带提前退出的自定义 fold
+function tryFold<T, Acc>(
+    arr: T[],
+    init: Acc,
+    f: (acc: Acc, item: T) => ControlFlow<Acc, Acc>
+): Acc {
+    let acc = init;
+    for (const item of arr) {
+        const flow = f(acc, item);
+        if (flow.isBreak()) return flow.breakValue().unwrap();
+        acc = flow.continueValue().unwrap();
+    }
+    return acc;
+}
+```
+
 ## 示例
 
 - [Option 基础用法](examples/option.ts)
 - [AsyncOption](examples/option.async.ts)
 - [Result 基础用法](examples/result.ts)
 - [AsyncResult](examples/result.async.ts)
+- [Once](examples/once.ts)
+- [Lazy](examples/lazy.ts)
+- [Mutex](examples/mutex.ts)
+- [ControlFlow](examples/control_flow.ts)
 
 ## 文档
 
