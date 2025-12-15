@@ -37,10 +37,10 @@ import { Err, Ok } from './prelude.ts';
  * const result = await promiseToAsyncResult<User, ApiError>(fetchUser(id));
  * ```
  */
-export function promiseToAsyncResult<T, E = Error>(p: Promise<T>): Promise<Result<T, E>> {
-    return p.then((x): Result<T, E> => {
-        return Ok(x);
-    }).catch((err: unknown): Result<T, E> => {
+export async function promiseToAsyncResult<T, E = Error>(p: Promise<T>): Promise<Result<T, E>> {
+    try {
+        return Ok(await p);
+    } catch (err) {
         return Err(err as E);
-    });
+    }
 }
