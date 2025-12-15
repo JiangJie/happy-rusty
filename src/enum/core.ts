@@ -113,6 +113,38 @@ export interface Option<T> {
      */
     isSomeAndAsync(predicate: (value: T) => Promise<boolean>): Promise<boolean>;
 
+    /**
+     * Returns `true` if the Option is `None`, or the predicate returns `true` for the contained value.
+     * @param predicate - A function that takes the contained value and returns a boolean.
+     * @see isSomeAnd
+     * @example
+     * ```ts
+     * const x = Some(2);
+     * console.log(x.isNoneOr(v => v > 1)); // true
+     * console.log(x.isNoneOr(v => v > 5)); // false
+     *
+     * const y = None;
+     * console.log(y.isNoneOr(v => v > 5)); // true (always true for None)
+     * ```
+     */
+    isNoneOr(predicate: (value: T) => boolean): boolean;
+
+    /**
+     * Asynchronous version of `isNoneOr`.
+     * @param predicate - An async function that takes the contained value and returns a `Promise<boolean>`.
+     * @returns A promise that resolves to `true` if the Option is `None` or the predicate resolves to `true`.
+     * @see isNoneOr
+     * @example
+     * ```ts
+     * const x = Some(2);
+     * await x.isNoneOrAsync(async v => v > 1); // true
+     *
+     * const y = None;
+     * await y.isNoneOrAsync(async v => v > 5); // true
+     * ```
+     */
+    isNoneOrAsync(predicate: (value: T) => Promise<boolean>): Promise<boolean>;
+
     // #endregion
 
     // #region Extracting the contained value

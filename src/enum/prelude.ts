@@ -28,6 +28,8 @@ export interface None extends Option<never> {
     isNone(): true;
     isSomeAnd(predicate: (value: never) => boolean): false;
     isSomeAndAsync(predicate: (value: never) => Promise<boolean>): Promise<false>;
+    isNoneOr(predicate: (value: never) => boolean): true;
+    isNoneOrAsync(predicate: (value: never) => Promise<boolean>): Promise<true>;
 
     expect(msg: string): never;
     unwrap(): never;
@@ -93,6 +95,12 @@ export function Some<T>(value: T): Option<T> {
             return predicate(value);
         },
         isSomeAndAsync(predicate: (value: T) => Promise<boolean>): Promise<boolean> {
+            return predicate(value);
+        },
+        isNoneOr(predicate: (value: T) => boolean): boolean {
+            return predicate(value);
+        },
+        isNoneOrAsync(predicate: (value: T) => Promise<boolean>): Promise<boolean> {
             return predicate(value);
         },
 
@@ -239,6 +247,12 @@ export const None = Object.freeze<None>({
     },
     isSomeAndAsync(_predicate: (value: never) => Promise<boolean>): Promise<false> {
         return Promise.resolve(false);
+    },
+    isNoneOr(_predicate: (value: never) => boolean): true {
+        return true;
+    },
+    isNoneOrAsync(_predicate: (value: never) => Promise<boolean>): Promise<true> {
+        return Promise.resolve(true);
     },
 
     expect(msg: string): never {

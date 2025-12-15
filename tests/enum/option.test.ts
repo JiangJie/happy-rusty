@@ -36,6 +36,21 @@ describe('Option', () => {
                 });
                 expect(result).toBe(true);
             });
+
+            it('isNoneOr() should return true when predicate matches', () => {
+                expect(some.isNoneOr(v => v === 10)).toBe(true);
+                expect(some.isNoneOr(v => v === 20)).toBe(false);
+            });
+
+            it('isNoneOrAsync() should work with async predicates', async () => {
+                const result = await some.isNoneOrAsync(async v => {
+                    return v === await Promise.resolve(10);
+                });
+                expect(result).toBe(true);
+
+                const result2 = await some.isNoneOrAsync(async v => v === 20);
+                expect(result2).toBe(false);
+            });
         });
 
         describe('extracting contained value', () => {
@@ -287,6 +302,19 @@ describe('Option', () => {
                     return v === await Promise.resolve(10);
                 });
                 expect(result).toBe(false);
+            });
+
+            it('isNoneOr() should return true without calling predicate', () => {
+                const fn = vi.fn(() => false);
+                expect(none.isNoneOr(fn)).toBe(true);
+                expect(fn).not.toHaveBeenCalled();
+            });
+
+            it('isNoneOrAsync() should return true without calling predicate', async () => {
+                const fn = vi.fn(async () => false);
+                const result = await none.isNoneOrAsync(fn);
+                expect(result).toBe(true);
+                expect(fn).not.toHaveBeenCalled();
             });
         });
 
