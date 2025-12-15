@@ -1,6 +1,6 @@
 /**
  * @fileoverview
- * Rust-inspired [LazyCell](https://doc.rust-lang.org/std/cell/struct.LazyCell.html) for lazy initialization.
+ * Rust-inspired [LazyLock](https://doc.rust-lang.org/std/sync/struct.LazyLock.html) for lazy initialization.
  *
  * `Lazy<T>` is a value which is initialized on the first access. Unlike `Once<T>`,
  * the initialization function is provided at construction time.
