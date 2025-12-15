@@ -341,10 +341,8 @@ export function Once<T>(): Once<T> {
             if (pendingPromise) {
                 try {
                     await pendingPromise;
-                    // After waiting, check if initialization succeeded
-                    if (initialized) {
-                        return Ok(value as T);
-                    }
+                    // pendingPromise only resolves on success, so initialized must be true
+                    return Ok(value as T);
                 } catch {
                     // Previous initialization failed via Err result, let this call try again
                 }
