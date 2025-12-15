@@ -40,6 +40,11 @@ console.log('│  Lazy: Deferred Initialization                 │');
 console.log('└────────────────────────────────────────────────┘\n');
 await import('./lazy.ts');
 
+console.log('\n┌────────────────────────────────────────────────┐');
+console.log('│  Mutex: Async Mutual Exclusion                 │');
+console.log('└────────────────────────────────────────────────┘\n');
+await import('./mutex.ts');
+
 console.log('\n╔════════════════════════════════════════════════╗');
 console.log('║              Examples Complete                 ║');
 console.log('╚════════════════════════════════════════════════╝');
