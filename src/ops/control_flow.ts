@@ -10,6 +10,7 @@
  */
 
 import { Err, None, Ok, Some, type Option, type Result } from '../enum/mod.ts';
+import { ControlFlowKindSymbol } from './symbols.ts';
 
 /**
  * Used to tell an operation whether it should exit early or go on as usual.
@@ -59,6 +60,40 @@ import { Err, None, Ok, Some, type Option, type Result } from '../enum/mod.ts';
  * ```
  */
 export interface ControlFlow<B, C = void> {
+    // #region Internal properties
+
+    /**
+     * The well-known symbol `Symbol.toStringTag` used by `Object.prototype.toString()`.
+     * Returns `'ControlFlow'` so that `Object.prototype.toString.call(flow)` produces `'[object ControlFlow]'`.
+     *
+     * This enables reliable type identification even across different execution contexts (e.g., iframes, different module instances).
+     *
+     * @example
+     * ```ts
+     * const x = Break(5);
+     * console.log(Object.prototype.toString.call(x)); // '[object ControlFlow]'
+     * ```
+     *
+     * @internal
+     */
+    readonly [Symbol.toStringTag]: 'ControlFlow';
+
+    /**
+     * A unique symbol property used to identify the variant of this `ControlFlow`.
+     * Returns `'Break'` if the ControlFlow signals early exit, or `'Continue'` if it signals to proceed as normal.
+     *
+     * This is used internally by the `isControlFlow` utility function to verify that an object is a valid `ControlFlow` instance,
+     * and to distinguish between `Break` and `Continue` variants without calling methods.
+     *
+     * Note: The symbol itself is not exported as part of the public API.
+     * Use the `isControlFlow` utility function or the `isBreak()`/`isContinue()` methods for type checking.
+     *
+     * @internal
+     */
+    readonly [ControlFlowKindSymbol]: 'Break' | 'Continue';
+
+    // #endregion
+
     /**
      * Returns `true` if this is a `Break` variant.
      *
@@ -184,10 +219,20 @@ export interface ControlFlow<B, C = void> {
  * const flow = Break('found it');
  * console.log(flow.isBreak()); // true
  * console.log(flow.breakValue().unwrap()); // 'found it'
+ *
+ * const voidFlow = Break();
+ * console.log(voidFlow.isBreak()); // true
  * ```
  */
-export function Break<B>(value: B): ControlFlow<B, never> {
-    return Object.freeze({
+export function Break(): ControlFlow<void, never>;
+export function Break<B>(value: B): ControlFlow<B, never>;
+export function Break<B>(...args: [] | [B]): ControlFlow<B, never> {
+    const value = (args.length > 0 ? args[0] : undefined) as B;
+
+    const brk: ControlFlow<B, never> = {
+        [Symbol.toStringTag]: 'ControlFlow',
+        [ControlFlowKindSymbol]: 'Break',
+
         isBreak(): true {
             return true;
         },
@@ -204,7 +249,7 @@ export function Break<B>(value: B): ControlFlow<B, never> {
             return Break(fn(value));
         },
         mapContinue<T>(_fn: (v: never) => T): ControlFlow<B, T> {
-            return this as unknown as ControlFlow<B, T>;
+            return brk satisfies ControlFlow<B, T>;
         },
         breakOk(): Result<B, never> {
             return Ok(value);
@@ -212,7 +257,9 @@ export function Break<B>(value: B): ControlFlow<B, never> {
         continueOk(): Result<never, B> {
             return Err(value);
         },
-    });
+    } as const;
+
+    return Object.freeze(brk);
 }
 
 /**
@@ -238,7 +285,10 @@ export function Continue<C>(value: C): ControlFlow<never, C>;
 export function Continue<C>(...args: [] | [C]): ControlFlow<never, C> {
     const value = (args.length > 0 ? args[0] : undefined) as C;
 
-    return Object.freeze({
+    const cont: ControlFlow<never, C> = {
+        [Symbol.toStringTag]: 'ControlFlow',
+        [ControlFlowKindSymbol]: 'Continue',
+
         isBreak(): false {
             return false;
         },
@@ -252,7 +302,7 @@ export function Continue<C>(...args: [] | [C]): ControlFlow<never, C> {
             return Some(value);
         },
         mapBreak<T>(_fn: (v: never) => T): ControlFlow<T, C> {
-            return this as unknown as ControlFlow<T, C>;
+            return cont satisfies ControlFlow<T, C>;
         },
         mapContinue<T>(fn: (v: C) => T): ControlFlow<never, T> {
             return Continue(fn(value));
@@ -263,5 +313,7 @@ export function Continue<C>(...args: [] | [C]): ControlFlow<never, C> {
         continueOk(): Result<C, never> {
             return Ok(value);
         },
-    });
+    } as const;
+
+    return Object.freeze(cont);
 }

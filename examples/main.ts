@@ -45,6 +45,11 @@ console.log('│  Mutex: Async Mutual Exclusion                 │');
 console.log('└────────────────────────────────────────────────┘\n');
 await import('./mutex.ts');
 
+console.log('\n┌────────────────────────────────────────────────┐');
+console.log('│  ControlFlow: Short-circuiting Operations      │');
+console.log('└────────────────────────────────────────────────┘\n');
+await import('./control_flow.ts');
+
 console.log('\n╔════════════════════════════════════════════════╗');
 console.log('║              Examples Complete                 ║');
 console.log('╚════════════════════════════════════════════════╝');

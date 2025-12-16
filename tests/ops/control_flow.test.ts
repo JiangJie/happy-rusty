@@ -1,8 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { Break, Continue } from '../../src/mod.ts';
+import { Break, Continue, isControlFlow } from '../../src/mod.ts';
 
 describe('ControlFlow', () => {
     describe('Break', () => {
+        it('should have correct Symbol.toStringTag', () => {
+            const flow = Break(42);
+            expect(Object.prototype.toString.call(flow)).toBe('[object ControlFlow]');
+        });
+
+        it('should support void Break()', () => {
+            const flow = Break();
+            expect(flow.isBreak()).toBe(true);
+            expect(flow.breakValue().unwrap()).toBe(undefined);
+        });
+
         it('isBreak() should return true', () => {
             const flow = Break(42);
             expect(flow.isBreak()).toBe(true);
@@ -63,6 +74,11 @@ describe('ControlFlow', () => {
     });
 
     describe('Continue', () => {
+        it('should have correct Symbol.toStringTag', () => {
+            const flow = Continue(42);
+            expect(Object.prototype.toString.call(flow)).toBe('[object ControlFlow]');
+        });
+
         it('isContinue() should return true', () => {
             const flow = Continue();
             expect(flow.isContinue()).toBe(true);
@@ -119,6 +135,26 @@ describe('ControlFlow', () => {
 
             expect(result.isErr()).toBe(true);
             expect(result.unwrapErr()).toBe('still going');
+        });
+    });
+
+    describe('isControlFlow', () => {
+        it('should return true for Break', () => {
+            expect(isControlFlow(Break(42))).toBe(true);
+        });
+
+        it('should return true for Continue', () => {
+            expect(isControlFlow(Continue())).toBe(true);
+            expect(isControlFlow(Continue(42))).toBe(true);
+        });
+
+        it('should return false for non-ControlFlow values', () => {
+            expect(isControlFlow(null)).toBe(false);
+            expect(isControlFlow(undefined)).toBe(false);
+            expect(isControlFlow(42)).toBe(false);
+            expect(isControlFlow('string')).toBe(false);
+            expect(isControlFlow({ isBreak: () => true })).toBe(false);
+            expect(isControlFlow([])).toBe(false);
         });
     });
 
