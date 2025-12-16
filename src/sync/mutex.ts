@@ -268,7 +268,7 @@ export function Mutex<T>(value: T): Mutex<T> {
                 released = true;
                 unlock();
             },
-        });
+        } as const);
     }
 
     function lock(): Promise<MutexGuard<T>> {
@@ -307,5 +307,5 @@ export function Mutex<T>(value: T): Mutex<T> {
         isLocked(): boolean {
             return locked;
         },
-    });
+    } as const);
 }

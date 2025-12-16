@@ -211,6 +211,7 @@ export interface ControlFlow<B, C = void> {
  * Use this to signal that an operation should exit early with the given value.
  *
  * @typeParam B - The type of the break value.
+ * @typeParam C - The type of the continue value (defaults to `void` when a value is provided).
  * @param value - The value to return on break.
  * @returns A `ControlFlow` in the `Break` state.
  *
@@ -224,12 +225,28 @@ export interface ControlFlow<B, C = void> {
  * console.log(voidFlow.isBreak()); // true
  * ```
  */
-export function Break(): ControlFlow<void, never>;
-export function Break<B>(value: B): ControlFlow<B, never>;
-export function Break<B>(...args: [] | [B]): ControlFlow<B, never> {
-    const value = (args.length > 0 ? args[0] : undefined) as B;
+export function Break<B, C = never>(value: B): ControlFlow<B, C>;
+/**
+ * Creates a `Break` variant of `ControlFlow` with no value.
+ * This overload is used when the operation exits early but doesn't produce a meaningful value.
+ *
+ * @typeParam C - The type of the continue value (allows type specification when chaining with Continue).
+ * @returns A `ControlFlow<void, C>` in the `Break` state.
+ *
+ * @example
+ * ```ts
+ * const voidFlow = Break();
+ * console.log(voidFlow.isBreak()); // true
+ * console.log(voidFlow.breakValue()); // Some(undefined)
+ *
+ * // With explicit type parameter
+ * const typedFlow = Break<number>();  // ControlFlow<void, number>
+ * ```
+ */
+export function Break<C = never>(): ControlFlow<void, C>;
+export function Break<B, C>(value?: B): ControlFlow<B, C> {
 
-    const brk: ControlFlow<B, never> = {
+    const brk: ControlFlow<B, C> = {
         [Symbol.toStringTag]: 'ControlFlow',
         [ControlFlowKindSymbol]: 'Break',
 
@@ -240,22 +257,22 @@ export function Break<B>(...args: [] | [B]): ControlFlow<B, never> {
             return false;
         },
         breakValue(): Option<B> {
-            return Some(value);
+            return Some(value as B);
         },
-        continueValue(): Option<never> {
+        continueValue(): Option<C> {
             return None;
         },
-        mapBreak<T>(fn: (v: B) => T): ControlFlow<T, never> {
-            return Break(fn(value));
+        mapBreak<T>(fn: (v: B) => T): ControlFlow<T, C> {
+            return Break(fn(value as B));
         },
-        mapContinue<T>(_fn: (v: never) => T): ControlFlow<B, T> {
-            return brk;
+        mapContinue<T>(_fn: (v: C) => T): ControlFlow<B, T> {
+            return brk as unknown as ControlFlow<B, T>;
         },
-        breakOk(): Result<B, never> {
-            return Ok(value);
+        breakOk(): Result<B, C> {
+            return Ok(value as B);
         },
-        continueOk(): Result<never, B> {
-            return Err(value);
+        continueOk(): Result<C, B> {
+            return Err(value as B);
         },
     } as const;
 
@@ -267,6 +284,7 @@ export function Break<B>(...args: [] | [B]): ControlFlow<B, never> {
  *
  * Use this to signal that an operation should continue as normal.
  *
+ * @typeParam B - The type of the break value (defaults to `void` when a value is provided).
  * @typeParam C - The type of the continue value.
  * @param value - The value to carry forward (optional, defaults to `undefined`).
  * @returns A `ControlFlow` in the `Continue` state.
@@ -280,12 +298,28 @@ export function Break<B>(...args: [] | [B]): ControlFlow<B, never> {
  * console.log(flowWithValue.continueValue().unwrap()); // 42
  * ```
  */
-export function Continue(): ControlFlow<never, void>;
-export function Continue<C>(value: C): ControlFlow<never, C>;
-export function Continue<C>(...args: [] | [C]): ControlFlow<never, C> {
-    const value = (args.length > 0 ? args[0] : undefined) as C;
+export function Continue<B = never, C = void>(value: C): ControlFlow<B, C>;
+/**
+ * Creates a `Continue` variant of `ControlFlow` with no value.
+ * This overload is used when the operation continues but doesn't carry a meaningful value.
+ *
+ * @typeParam B - The type of the break value (allows type specification when chaining with Break).
+ * @returns A `ControlFlow<B, void>` in the `Continue` state.
+ *
+ * @example
+ * ```ts
+ * const voidFlow = Continue();
+ * console.log(voidFlow.isContinue()); // true
+ * console.log(voidFlow.continueValue()); // Some(undefined)
+ *
+ * // With explicit type parameter
+ * const typedFlow = Continue<string>();  // ControlFlow<string, void>
+ * ```
+ */
+export function Continue<B = never>(): ControlFlow<B, void>;
+export function Continue<B, C>(value?: C): ControlFlow<B, C> {
 
-    const cont: ControlFlow<never, C> = {
+    const cont: ControlFlow<B, C> = {
         [Symbol.toStringTag]: 'ControlFlow',
         [ControlFlowKindSymbol]: 'Continue',
 
@@ -295,23 +329,23 @@ export function Continue<C>(...args: [] | [C]): ControlFlow<never, C> {
         isContinue(): true {
             return true;
         },
-        breakValue(): Option<never> {
+        breakValue(): Option<B> {
             return None;
         },
         continueValue(): Option<C> {
-            return Some(value);
+            return Some(value as C);
         },
-        mapBreak<T>(_fn: (v: never) => T): ControlFlow<T, C> {
-            return cont;
+        mapBreak<T>(_fn: (v: B) => T): ControlFlow<T, C> {
+            return cont as unknown as ControlFlow<T, C>;
         },
-        mapContinue<T>(fn: (v: C) => T): ControlFlow<never, T> {
-            return Continue(fn(value));
+        mapContinue<T>(fn: (v: C) => T): ControlFlow<B, T> {
+            return Continue(fn(value as C));
         },
-        breakOk(): Result<never, C> {
-            return Err(value);
+        breakOk(): Result<B, C> {
+            return Err(value as C);
         },
-        continueOk(): Result<C, never> {
-            return Ok(value);
+        continueOk(): Result<C, B> {
+            return Ok(value as C);
         },
     } as const;
 

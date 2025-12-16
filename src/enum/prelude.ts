@@ -232,7 +232,7 @@ export function Some<T>(value: T): Option<T> {
  * const name = None.unwrapOr('Anonymous'); // 'Anonymous'
  * ```
  */
-export const None = Object.freeze<None>({
+export const None: None = Object.freeze<None>({
     [Symbol.toStringTag]: 'Option',
     [OptionKindSymbol]: 'None',
 
@@ -344,7 +344,7 @@ export const None = Object.freeze<None>({
     toString(): string {
         return 'None';
     },
-}) as None;
+} as const);
 
 /**
  * Creates a `Result<T, E>` representing a successful outcome containing a value.
@@ -363,7 +363,7 @@ export const None = Object.freeze<None>({
  * }
  * ```
  */
-export function Ok<T, E>(value: T): Result<T, E>;
+export function Ok<T, E = never>(value: T): Result<T, E>;
 /**
  * Creates a `Result<void, E>` representing a successful outcome with no value.
  * This overload is used when the operation succeeds but doesn't produce a meaningful value.
@@ -391,7 +391,7 @@ export function Ok<T, E>(value: T): Result<T, E>;
  * }
  * ```
  */
-export function Ok<E>(): Result<void, E>;
+export function Ok<E = never>(): Result<void, E>;
 export function Ok<T, E>(value?: T): Result<T, E> {
     const ok: Result<T, E> = {
         [Symbol.toStringTag]: 'Result',
@@ -432,10 +432,10 @@ export function Ok<T, E>(value?: T): Result<T, E> {
             return Promise.resolve(value as T);
         },
 
-        expectErr(msg: string): E {
+        expectErr(msg: string): never {
             throw new TypeError(`${ msg }: ${ value }`);
         },
-        unwrapErr(): E {
+        unwrapErr(): never {
             throw new TypeError('Result::unwrapErr() called on an `Ok` value.');
         },
 
@@ -532,7 +532,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
  * }
  * ```
  */
-export function Err<T, E>(error: E): Result<T, E> {
+export function Err<T = never, E = unknown>(error: E): Result<T, E> {
     const err: Result<T, E> = {
         [Symbol.toStringTag]: 'Result',
         [ResultKindSymbol]: 'Err',
@@ -556,10 +556,10 @@ export function Err<T, E>(error: E): Result<T, E> {
             return predicate(error);
         },
 
-        expect(msg: string): T {
+        expect(msg: string): never {
             throw new TypeError(`${ msg }: ${ error }`);
         },
-        unwrap(): T {
+        unwrap(): never {
             throw new TypeError('Result::unwrap() called on an `Err` value.');
         },
         unwrapOr(defaultValue: T): T {

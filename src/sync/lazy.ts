@@ -234,7 +234,7 @@ export function Lazy<T>(fn: () => T): Lazy<T> {
         isInitialized(): boolean {
             return initialized;
         },
-    });
+    } as const);
 }
 
 /**
@@ -330,5 +330,5 @@ export function LazyAsync<T>(fn: () => Promise<T>): LazyAsync<T> {
         isInitialized(): boolean {
             return initialized;
         },
-    });
+    } as const);
 }

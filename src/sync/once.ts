@@ -383,5 +383,5 @@ export function Once<T>(): Once<T> {
         isInitialized(): boolean {
             return initialized;
         },
-    });
+    } as const);
 }
