@@ -264,7 +264,7 @@ export interface Option<T> {
 
     /**
      * Transposes an `Option` of a `Result` into a `Result` of an `Option`.
-     * @typeParam T - The type of the success value in the `Ok` variant of the `Result`.
+     * @typeParam U - The type of the success value in the `Ok` variant of the `Result`.
      * @typeParam E - The type of the error value in the `Err` variant of the `Result`.
      * @returns `Ok` containing `Some` if the Option is a `Some` containing `Ok`,
      *          `Err` containing the error if the Option is a `Some` containing `Err`,
@@ -281,7 +281,7 @@ export interface Option<T> {
      * console.log(z.transpose().unwrap().isNone()); // true
      * ```
      */
-    transpose<T, E>(this: Option<Result<T, E>>): Result<Option<T>, E>;
+    transpose<U, E>(this: Option<Result<U, E>>): Result<Option<U>, E>;
 
     /**
      * These methods transform the `Some` variant:
@@ -302,7 +302,8 @@ export interface Option<T> {
     filter(predicate: (value: T) => boolean): Option<T>;
 
     /**
-     * Converts from `Option<Option<T>>` to `Option<T>`.
+     * Converts from `Option<Option<U>>` to `Option<U>`.
+     * @typeParam U - The type of the value contained in the inner `Option`.
      * @returns `None` if the Option is `None`, otherwise returns the contained `Option`.
      * @example
      * ```ts
@@ -313,7 +314,7 @@ export interface Option<T> {
      * console.log(y.flatten().isNone()); // true
      * ```
      */
-    flatten<T>(this: Option<Option<T>>): Option<T>;
+    flatten<U>(this: Option<Option<U>>): Option<U>;
 
     /**
      * Maps an `Option<T>` to `Option<U>` by applying a function to a contained value.
@@ -410,11 +411,11 @@ export interface Option<T> {
     zipWith<U, R>(other: Option<U>, fn: (value: T, otherValue: U) => R): Option<R>;
 
     /**
-     * Converts from `Option<[T, U]>` to `[Option<T>, Option<U>]`.
+     * Converts from `Option<[U, R]>` to `[Option<U>, Option<R>]`.
      * If `this` is `Some([a, b])`, returns `[Some(a), Some(b)]`.
      * If `this` is `None`, returns `[None, None]`.
-     * @typeParam T - The type of the first value in the tuple.
-     * @typeParam U - The type of the second value in the tuple.
+     * @typeParam U - The type of the first value in the tuple.
+     * @typeParam R - The type of the second value in the tuple.
      * @returns A tuple of `Options`, one for each element in the original `Option` of a tuple.
      * @see zip
      * @example
@@ -425,7 +426,7 @@ export interface Option<T> {
      * console.log(b.unwrap()); // 'hello'
      * ```
      */
-    unzip<T, U>(this: Option<[T, U]>): [Option<T>, Option<U>];
+    unzip<U, R>(this: Option<[U, R]>): [Option<U>, Option<R>];
 
     // #endregion
 
@@ -912,7 +913,7 @@ export interface Result<T, E> {
 
     /**
      * Transposes a `Result` of an `Option` into an `Option` of a `Result`.
-     * @typeParam T - The type of the success value in the `Ok` variant of the `Option`.
+     * @typeParam U - The type of the success value in the `Ok` variant of the `Option`.
      * @returns `Some` containing `Ok` if the result is `Ok` containing `Some`,
      *          `Some` containing `Err` if the result is `Err`,
      *          `None` if the result is `Ok` containing `None`.
@@ -928,7 +929,7 @@ export interface Result<T, E> {
      * console.log(z.transpose().isNone()); // true
      * ```
      */
-    transpose<T>(this: Result<Option<T>, E>): Option<Result<T, E>>;
+    transpose<U>(this: Result<Option<U>, E>): Option<Result<U, E>>;
 
     /**
      * This method transforms the contained value of the `Ok` variant:
@@ -1009,9 +1010,10 @@ export interface Result<T, E> {
     mapOrElse<U>(defaultFn: (error: E) => U, fn: (value: T) => U): U;
 
     /**
-     * Converts from `Result<Result<T, E>, E>` to `Result<T, E>`.
-     * If the result is `Ok(Ok(T))`, returns `Ok(T)`.
+     * Converts from `Result<Result<U, E>, E>` to `Result<U, E>`.
+     * If the result is `Ok(Ok(U))`, returns `Ok(U)`.
      * If the result is `Ok(Err(E))` or `Err(E)`, returns `Err(E)`.
+     * @typeParam U - The type of the success value in the inner `Result`.
      * @example
      * ```ts
      * const x = Ok(Ok(5));
@@ -1021,7 +1023,7 @@ export interface Result<T, E> {
      * console.log(y.flatten().unwrapErr()); // 'error'
      * ```
      */
-    flatten<T>(this: Result<Result<T, E>, E>): Result<T, E>;
+    flatten<U>(this: Result<Result<U, E>, E>): Result<U, E>;
 
     // #endregion
 

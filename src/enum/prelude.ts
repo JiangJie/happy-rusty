@@ -126,16 +126,16 @@ export function Some<T>(value: T): Option<T> {
         okOrElse<E>(_err: () => E): Result<T, E> {
             return Ok(value);
         },
-        transpose<T, E>(): Result<Option<T>, E> {
-            assertResult<T, E>(value);
+        transpose<U, E>(): Result<Option<U>, E> {
+            assertResult<U, E>(value);
             return value.isOk() ? Ok(Some(value.unwrap())) : Err(value.unwrapErr());
         },
 
         filter(predicate: (value: T) => boolean): Option<T> {
             return predicate(value) ? some : None;
         },
-        flatten<T>(): Option<T> {
-            assertOption<T>(value);
+        flatten<U>(): Option<U> {
+            assertOption<U>(value);
             return value;
         },
         map<U>(fn: (value: T) => U): Option<U> {
@@ -157,8 +157,8 @@ export function Some<T>(value: T): Option<T> {
             assertOption<U>(other);
             return other.isSome() ? Some(fn(value, other.unwrap())) : None;
         },
-        unzip<T, U>(): [Option<T>, Option<U>] {
-            const tuple = value as unknown as [T, U];
+        unzip<U, R>(): [Option<U>, Option<R>] {
+            const tuple = value as [U, R];
 
             if (!Array.isArray(tuple) || tuple.length !== 2) {
                 throw new TypeError(`Option::unzip() requires a 2-element tuple, received ${ Array.isArray(tuple) ? `array with ${ tuple.length } elements` : typeof tuple }.`);
@@ -445,8 +445,8 @@ export function Ok<T, E>(value?: T): Result<T, E> {
         err(): None {
             return None;
         },
-        transpose<T>(): Option<Result<T, E>> {
-            assertOption<T>(value);
+        transpose<U>(): Option<Result<U, E>> {
+            assertOption<U>(value);
             return value.isSome() ? Some(Ok(value.unwrap())) : None;
         },
 
@@ -462,8 +462,8 @@ export function Ok<T, E>(value?: T): Result<T, E> {
         mapOrElse<U>(_defaultFn: (error: E) => U, fn: (value: T) => U): U {
             return fn(value as T);
         },
-        flatten<T>(): Result<T, E> {
-            assertResult<T, E>(value);
+        flatten<U>(): Result<U, E> {
+            assertResult<U, E>(value);
             return value;
         },
 
@@ -585,8 +585,8 @@ export function Err<T, E>(error: E): Result<T, E> {
         err(): Option<E> {
             return Some(error);
         },
-        transpose<T>(): Option<Result<T, E>> {
-            return Some(err as unknown as Result<T, E>);
+        transpose<U>(): Option<Result<U, E>> {
+            return Some(err as unknown as Result<U, E>);
         },
 
         map<U>(_fn: (value: T) => U): Result<U, E> {
@@ -601,8 +601,8 @@ export function Err<T, E>(error: E): Result<T, E> {
         mapOrElse<U>(defaultFn: (error: E) => U, _fn: (value: T) => U): U {
             return defaultFn(error);
         },
-        flatten<T>(): Result<T, E> {
-            return err as unknown as Result<T, E>;
+        flatten<U>(): Result<U, E> {
+            return err as unknown as Result<U, E>;
         },
 
         and<U>(_other: Result<U, E>): Result<U, E> {
