@@ -273,7 +273,7 @@ export function Once<T>(): Once<T> {
     let initialized = false;
     let pendingPromise: Promise<T> | undefined;
 
-    return {
+    return Object.freeze({
         get(): Option<T> {
             return initialized ? Some(value as T) : None;
         },
@@ -383,5 +383,5 @@ export function Once<T>(): Once<T> {
         isInitialized(): boolean {
             return initialized;
         },
-    };
+    });
 }

@@ -207,7 +207,7 @@ export function Some<T>(value: T): Option<T> {
         },
     } as const;
 
-    return some;
+    return Object.freeze(some);
 }
 
 /**
@@ -512,7 +512,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
         },
     } as const;
 
-    return ok;
+    return Object.freeze(ok);
 }
 
 /**
@@ -650,7 +650,7 @@ export function Err<T, E>(error: E): Result<T, E> {
         },
     } as const;
 
-    return err;
+    return Object.freeze(err);
 }
 
 /**

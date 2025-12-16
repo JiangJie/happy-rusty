@@ -248,7 +248,7 @@ export function Mutex<T>(value: T): Mutex<T> {
     function createGuard(): MutexGuard<T> {
         let released = false;
 
-        return {
+        return Object.freeze({
             get value(): T {
                 if (released) {
                     throw new Error('MutexGuard has been released.');
@@ -268,7 +268,7 @@ export function Mutex<T>(value: T): Mutex<T> {
                 released = true;
                 unlock();
             },
-        };
+        });
     }
 
     function lock(): Promise<MutexGuard<T>> {
@@ -284,7 +284,7 @@ export function Mutex<T>(value: T): Mutex<T> {
         });
     }
 
-    return {
+    return Object.freeze({
         async withLock<U>(fn: (value: T) => Promise<U> | U): Promise<U> {
             const guard = await lock();
             try {
@@ -307,5 +307,5 @@ export function Mutex<T>(value: T): Mutex<T> {
         isLocked(): boolean {
             return locked;
         },
-    };
+    });
 }

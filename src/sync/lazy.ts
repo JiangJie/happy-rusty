@@ -218,7 +218,7 @@ export function Lazy<T>(fn: () => T): Lazy<T> {
     let value: T | undefined;
     let initialized = false;
 
-    return {
+    return Object.freeze({
         force(): T {
             if (!initialized) {
                 value = fn();
@@ -234,7 +234,7 @@ export function Lazy<T>(fn: () => T): Lazy<T> {
         isInitialized(): boolean {
             return initialized;
         },
-    };
+    });
 }
 
 /**
@@ -299,7 +299,7 @@ export function LazyAsync<T>(fn: () => Promise<T>): LazyAsync<T> {
     let initialized = false;
     let pendingPromise: Promise<T> | undefined;
 
-    return {
+    return Object.freeze({
         async force(): Promise<T> {
             if (initialized) {
                 return value as T;
@@ -330,5 +330,5 @@ export function LazyAsync<T>(fn: () => Promise<T>): LazyAsync<T> {
         isInitialized(): boolean {
             return initialized;
         },
-    };
+    });
 }
