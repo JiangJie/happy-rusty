@@ -149,11 +149,12 @@ type AsyncVoidIOResult = Promise<VoidIOResult>;
 ### 工具函数
 
 ```ts
-import { isOption, isResult, promiseToAsyncResult } from 'happy-rusty';
+import { isOption, isResult, isControlFlow, promiseToAsyncResult } from 'happy-rusty';
 
 // 类型守卫
 if (isOption(value)) { /* ... */ }
 if (isResult(value)) { /* ... */ }
+if (isControlFlow(value)) { /* ... */ }
 
 // 将 Promise 转换为 Result
 const result = await promiseToAsyncResult(fetch('/api/data'));

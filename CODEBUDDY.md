@@ -79,6 +79,8 @@ The codebase is organized around implementing Rust-style enums and synchronizati
 
 - **`src/ops/`** - Rust-inspired control flow types
   - `control_flow.ts` - `ControlFlow<B, C>` enum with `Break(value)` and `Continue(value)` variants for short-circuiting operations
+  - `symbols.ts` - Internal symbols for type discrimination (`ControlFlowKindSymbol`)
+  - `utils.ts` - Type guard utilities (`isControlFlow()`)
   - `mod.ts` - Re-exports all ops types
 
 - **`src/mod.ts`** - Main entry point, re-exports everything from enum/, sync/, and ops/

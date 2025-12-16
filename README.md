@@ -149,11 +149,12 @@ type AsyncVoidIOResult = Promise<VoidIOResult>;
 ### Utility Functions
 
 ```ts
-import { isOption, isResult, promiseToAsyncResult } from 'happy-rusty';
+import { isOption, isResult, isControlFlow, promiseToAsyncResult } from 'happy-rusty';
 
 // Type guards
 if (isOption(value)) { /* ... */ }
 if (isResult(value)) { /* ... */ }
+if (isControlFlow(value)) { /* ... */ }
 
 // Convert Promise to Result
 const result = await promiseToAsyncResult(fetch('/api/data'));
