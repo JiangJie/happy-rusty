@@ -249,7 +249,7 @@ export function Break<B>(...args: [] | [B]): ControlFlow<B, never> {
             return Break(fn(value));
         },
         mapContinue<T>(_fn: (v: never) => T): ControlFlow<B, T> {
-            return brk satisfies ControlFlow<B, T>;
+            return brk;
         },
         breakOk(): Result<B, never> {
             return Ok(value);
@@ -302,7 +302,7 @@ export function Continue<C>(...args: [] | [C]): ControlFlow<never, C> {
             return Some(value);
         },
         mapBreak<T>(_fn: (v: never) => T): ControlFlow<T, C> {
-            return cont satisfies ControlFlow<T, C>;
+            return cont;
         },
         mapContinue<T>(fn: (v: C) => T): ControlFlow<never, T> {
             return Continue(fn(value));
