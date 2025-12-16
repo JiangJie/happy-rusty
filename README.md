@@ -1,6 +1,6 @@
 # happy-rusty
 
-Rust's `Option` and `Result` for JavaScript/TypeScript - Better error handling and null-safety patterns.
+Rust's `Option`, `Result`, and sync primitives for JavaScript/TypeScript - Better error handling and null-safety patterns.
 
 [![NPM version](https://img.shields.io/npm/v/happy-rusty.svg)](https://npmjs.org/package/happy-rusty)
 [![NPM downloads](https://badgen.net/npm/dm/happy-rusty)](https://npmjs.org/package/happy-rusty)

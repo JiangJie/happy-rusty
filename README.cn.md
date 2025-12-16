@@ -1,6 +1,6 @@
 # happy-rusty
 
-将 Rust 的 `Option` 和 `Result` 带入 JavaScript/TypeScript - 更好的错误处理和空值安全模式。
+将 Rust 的 `Option`、`Result` 和同步原语带入 JavaScript/TypeScript - 更好的错误处理和空值安全模式。
 
 [![NPM version](https://img.shields.io/npm/v/happy-rusty.svg)](https://npmjs.org/package/happy-rusty)
 [![NPM downloads](https://badgen.net/npm/dm/happy-rusty)](https://npmjs.org/package/happy-rusty)

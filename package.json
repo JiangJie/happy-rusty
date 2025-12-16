@@ -1,6 +1,6 @@
 {
   "name": "happy-rusty",
-  "description": "Porting some excellent design implementations from Rust to JavaScript.",
+  "description": "Rust's Option, Result, and sync primitives for JavaScript/TypeScript - Better error handling and null-safety patterns.",
   "author": "jiang115jie@gmail.com",
   "license": "GPL-3.0",
   "version": "1.5.0",
@@ -38,13 +38,20 @@
   },
   "keywords": [
     "rust",
+    "typescript",
     "enum",
     "Option",
     "Some",
     "None",
     "Result",
     "Ok",
-    "Err"
+    "Err",
+    "Once",
+    "Lazy",
+    "Mutex",
+    "ControlFlow",
+    "error-handling",
+    "null-safety"
   ],
   "devDependencies": {
     "@eslint/js": "^9.39.2",
