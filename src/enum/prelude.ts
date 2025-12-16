@@ -81,7 +81,7 @@ export interface None extends Option<never> {
  * ```
  */
 export function Some<T>(value: T): Option<T> {
-    const some: Option<T> = {
+    const some: Option<T> = Object.freeze<Option<T>>({
         [Symbol.toStringTag]: 'Option',
         [OptionKindSymbol]: 'Some',
 
@@ -205,9 +205,9 @@ export function Some<T>(value: T): Option<T> {
         toString(): string {
             return `Some(${ value })`;
         },
-    } as const;
+    } as const);
 
-    return Object.freeze(some);
+    return some;
 }
 
 /**
@@ -393,7 +393,7 @@ export function Ok<T, E = never>(value: T): Result<T, E>;
  */
 export function Ok<E = never>(): Result<void, E>;
 export function Ok<T, E>(value?: T): Result<T, E> {
-    const ok: Result<T, E> = {
+    const ok: Result<T, E> = Object.freeze<Result<T, E>>({
         [Symbol.toStringTag]: 'Result',
         [ResultKindSymbol]: 'Ok',
 
@@ -510,9 +510,9 @@ export function Ok<T, E>(value?: T): Result<T, E> {
         toString(): string {
             return `Ok(${ value })`;
         },
-    } as const;
+    } as const);
 
-    return Object.freeze(ok);
+    return ok;
 }
 
 /**
@@ -533,7 +533,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
  * ```
  */
 export function Err<T = never, E = unknown>(error: E): Result<T, E> {
-    const err: Result<T, E> = {
+    const err: Result<T, E> = Object.freeze<Result<T, E>>({
         [Symbol.toStringTag]: 'Result',
         [ResultKindSymbol]: 'Err',
 
@@ -648,9 +648,9 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
         toString(): string {
             return `Err(${ error })`;
         },
-    } as const;
+    } as const);
 
-    return Object.freeze(err);
+    return err;
 }
 
 /**

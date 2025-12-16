@@ -245,8 +245,7 @@ export function Break<B, C = never>(value: B): ControlFlow<B, C>;
  */
 export function Break<C = never>(): ControlFlow<void, C>;
 export function Break<B, C>(value?: B): ControlFlow<B, C> {
-
-    const brk: ControlFlow<B, C> = {
+    const brk: ControlFlow<B, C> = Object.freeze<ControlFlow<B, C>>({
         [Symbol.toStringTag]: 'ControlFlow',
         [ControlFlowKindSymbol]: 'Break',
 
@@ -274,9 +273,9 @@ export function Break<B, C>(value?: B): ControlFlow<B, C> {
         continueOk(): Result<C, B> {
             return Err(value as B);
         },
-    } as const;
+    } as const);
 
-    return Object.freeze(brk);
+    return brk;
 }
 
 /**
@@ -318,8 +317,7 @@ export function Continue<B = never, C = void>(value: C): ControlFlow<B, C>;
  */
 export function Continue<B = never>(): ControlFlow<B, void>;
 export function Continue<B, C>(value?: C): ControlFlow<B, C> {
-
-    const cont: ControlFlow<B, C> = {
+    const cont: ControlFlow<B, C> = Object.freeze<ControlFlow<B, C>>({
         [Symbol.toStringTag]: 'ControlFlow',
         [ControlFlowKindSymbol]: 'Continue',
 
@@ -347,7 +345,7 @@ export function Continue<B, C>(value?: C): ControlFlow<B, C> {
         continueOk(): Result<C, B> {
             return Ok(value as C);
         },
-    } as const;
+    } as const);
 
-    return Object.freeze(cont);
+    return cont;
 }
