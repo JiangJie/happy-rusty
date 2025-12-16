@@ -22,6 +22,7 @@ export interface None extends Option<never> {
      * When using `None` alone, the following overrides can make type inference more accurate.
      */
 
+    readonly [Symbol.toStringTag]: 'Option';
     readonly [OptionKindSymbol]: 'None';
 
     isSome(): false;
@@ -39,21 +40,21 @@ export interface None extends Option<never> {
 
     okOr<E>(error: E): Result<never, E>;
     okOrElse<E>(err: () => E): Result<never, E>;
-    transpose(): Result<None, never>;
+    transpose(): Result<this, never>;
 
-    filter(predicate: (value: never) => boolean): None;
-    flatten(): None;
-    map<U>(fn: (value: never) => U): None;
+    filter(predicate: (value: never) => boolean): this;
+    flatten(): this;
+    map<U>(fn: (value: never) => U): this;
     mapOr<U>(defaultValue: U, fn: (value: never) => U): U;
     mapOrElse<U>(defaultFn: () => U, fn: (value: never) => U): U;
 
-    zip<U>(other: Option<U>): None;
-    zipWith<U, R>(other: Option<U>, fn: (value: never, otherValue: U) => R): None;
-    unzip(): [None, None];
+    zip<U>(other: Option<U>): this;
+    zipWith<U, R>(other: Option<U>, fn: (value: never, otherValue: U) => R): this;
+    unzip(): [this, this];
 
-    and<U>(other: Option<U>): None;
-    andThen<U>(fn: (value: never) => Option<U>): None;
-    andThenAsync<U>(fn: (value: never) => AsyncOption<U>): Promise<None>;
+    and<U>(other: Option<U>): this;
+    andThen<U>(fn: (value: never) => Option<U>): this;
+    andThenAsync<U>(fn: (value: never) => AsyncOption<U>): Promise<this>;
     or<T>(other: Option<T>): Option<T>;
     orElse<T>(fn: () => Option<T>): Option<T>;
     orElseAsync<T>(fn: () => AsyncOption<T>): AsyncOption<T>;
