@@ -10,7 +10,6 @@
       "README.cn.md",
       "package.json",
       "jsr.json",
-      "docs",
       "src"
     ]
   }

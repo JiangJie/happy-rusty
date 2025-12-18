@@ -23,7 +23,6 @@
     "README.md",
     "README.cn.md",
     "package.json",
-    "docs",
     "src",
     "dist"
   ],
