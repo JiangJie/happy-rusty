@@ -381,4 +381,25 @@ describe('Once', () => {
             expect(value).toBe(42);
         });
     });
+
+    describe('Immutability', () => {
+        it('Once should be frozen', () => {
+            const once = Once<number>();
+            expect(Object.isFrozen(once)).toBe(true);
+        });
+
+        it('Once should prevent property modification', () => {
+            const once = Once<number>();
+            expect(() => {
+                (once as Record<string, unknown>).get = () => null;
+            }).toThrow(TypeError);
+        });
+
+        it('Once should prevent adding new properties', () => {
+            const once = Once<number>();
+            expect(() => {
+                (once as Record<string, unknown>).newProp = 'test';
+            }).toThrow(TypeError);
+        });
+    });
 });

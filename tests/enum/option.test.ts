@@ -473,4 +473,47 @@ describe('Option', () => {
             });
         });
     });
+
+    describe('Immutability', () => {
+        it('Some should be frozen', () => {
+            const some = Some(42);
+            expect(Object.isFrozen(some)).toBe(true);
+        });
+
+        it('None should be frozen', () => {
+            expect(Object.isFrozen(None)).toBe(true);
+        });
+
+        it('Some should prevent property modification', () => {
+            const some = Some(42);
+            expect(() => {
+                (some as Record<string, unknown>).isSome = () => false;
+            }).toThrow(TypeError);
+        });
+
+        it('None should prevent property modification', () => {
+            expect(() => {
+                (None as Record<string, unknown>).isNone = () => false;
+            }).toThrow(TypeError);
+        });
+
+        it('Some should prevent adding new properties', () => {
+            const some = Some(42);
+            expect(() => {
+                (some as Record<string, unknown>).newProp = 'test';
+            }).toThrow(TypeError);
+        });
+
+        it('None should prevent adding new properties', () => {
+            expect(() => {
+                (None as Record<string, unknown>).newProp = 'test';
+            }).toThrow(TypeError);
+        });
+
+        it('None should be a singleton', () => {
+            const none1 = None;
+            const none2 = None;
+            expect(none1).toBe(none2);
+        });
+    });
 });

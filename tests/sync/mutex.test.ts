@@ -353,4 +353,47 @@ describe('Mutex', () => {
             });
         });
     });
+
+    describe('Immutability', () => {
+        it('Mutex should be frozen', () => {
+            const mutex = Mutex(42);
+            expect(Object.isFrozen(mutex)).toBe(true);
+        });
+
+        it('Mutex should prevent property modification', () => {
+            const mutex = Mutex(42);
+            expect(() => {
+                (mutex as Record<string, unknown>).lock = () => Promise.resolve(null);
+            }).toThrow(TypeError);
+        });
+
+        it('Mutex should prevent adding new properties', () => {
+            const mutex = Mutex(42);
+            expect(() => {
+                (mutex as Record<string, unknown>).newProp = 'test';
+            }).toThrow(TypeError);
+        });
+
+        it('MutexGuard should be frozen', async () => {
+            const mutex = Mutex(42);
+            const guard = await mutex.lock();
+            try {
+                expect(Object.isFrozen(guard)).toBe(true);
+            } finally {
+                guard.unlock();
+            }
+        });
+
+        it('MutexGuard should prevent adding new properties', async () => {
+            const mutex = Mutex(42);
+            const guard = await mutex.lock();
+            try {
+                expect(() => {
+                    (guard as Record<string, unknown>).newProp = 'test';
+                }).toThrow(TypeError);
+            } finally {
+                guard.unlock();
+            }
+        });
+    });
 });

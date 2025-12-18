@@ -498,4 +498,44 @@ describe('promiseToAsyncResult', () => {
             expect(result.unwrapErr().message).toBe('Not found');
         });
     });
+
+    describe('Immutability', () => {
+        it('Ok should be frozen', () => {
+            const ok = Ok(42);
+            expect(Object.isFrozen(ok)).toBe(true);
+        });
+
+        it('Err should be frozen', () => {
+            const err = Err('error');
+            expect(Object.isFrozen(err)).toBe(true);
+        });
+
+        it('Ok should prevent property modification', () => {
+            const ok = Ok(42);
+            expect(() => {
+                (ok as Record<string, unknown>).isOk = () => false;
+            }).toThrow(TypeError);
+        });
+
+        it('Err should prevent property modification', () => {
+            const err = Err('error');
+            expect(() => {
+                (err as Record<string, unknown>).isErr = () => false;
+            }).toThrow(TypeError);
+        });
+
+        it('Ok should prevent adding new properties', () => {
+            const ok = Ok(42);
+            expect(() => {
+                (ok as Record<string, unknown>).newProp = 'test';
+            }).toThrow(TypeError);
+        });
+
+        it('Err should prevent adding new properties', () => {
+            const err = Err('error');
+            expect(() => {
+                (err as Record<string, unknown>).newProp = 'test';
+            }).toThrow(TypeError);
+        });
+    });
 });

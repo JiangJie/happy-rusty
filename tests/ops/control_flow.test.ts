@@ -218,4 +218,44 @@ describe('ControlFlow', () => {
             expect(success.continueValue().unwrap()).toBe('all done');
         });
     });
+
+    describe('Immutability', () => {
+        it('Break should be frozen', () => {
+            const brk = Break('stopped');
+            expect(Object.isFrozen(brk)).toBe(true);
+        });
+
+        it('Continue should be frozen', () => {
+            const cont = Continue('value');
+            expect(Object.isFrozen(cont)).toBe(true);
+        });
+
+        it('Break should prevent property modification', () => {
+            const brk = Break('stopped');
+            expect(() => {
+                (brk as Record<string, unknown>).isBreak = () => false;
+            }).toThrow(TypeError);
+        });
+
+        it('Continue should prevent property modification', () => {
+            const cont = Continue('value');
+            expect(() => {
+                (cont as Record<string, unknown>).isContinue = () => false;
+            }).toThrow(TypeError);
+        });
+
+        it('Break should prevent adding new properties', () => {
+            const brk = Break('stopped');
+            expect(() => {
+                (brk as Record<string, unknown>).newProp = 'test';
+            }).toThrow(TypeError);
+        });
+
+        it('Continue should prevent adding new properties', () => {
+            const cont = Continue('value');
+            expect(() => {
+                (cont as Record<string, unknown>).newProp = 'test';
+            }).toThrow(TypeError);
+        });
+    });
 });
