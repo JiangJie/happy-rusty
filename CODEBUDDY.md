@@ -4,7 +4,18 @@ This file provides guidance to CodeBuddy Code when working with code in this rep
 
 ## Project Overview
 
-`happy-rusty` is a TypeScript library that ports Rust's `Option` and `Result` enum types to JavaScript/TypeScript, providing better error handling and null-safety patterns.
+`happy-rusty` is a TypeScript library that brings Rust's error handling and synchronization patterns to JavaScript/TypeScript:
+
+- **Option\<T\>** - Represents optional values (`Some(T)` or `None`) for null-safe programming
+- **Result\<T, E\>** - Represents success (`Ok(T)`) or failure (`Err(E)`) for explicit error handling
+- **Sync Primitives** - `Once<T>`, `Lazy<T>`, `LazyAsync<T>`, `Mutex<T>` for initialization and concurrency control
+- **ControlFlow\<B, C\>** - `Break(value)` and `Continue(value)` for short-circuiting operations
+
+Key characteristics:
+- Zero dependencies
+- Runtime immutability via `Object.freeze()`
+- Full async support with `*Async` method variants
+- Cross-runtime: Node.js (CJS/ESM), Deno, Bun, browsers
 
 ## Development Commands
 
@@ -51,7 +62,7 @@ The build process is split into two separate steps:
 
 ### Documentation
 ```bash
-# Generate TypeDoc markdown documentation
+# Generate TypeDoc HTML documentation (deployed to GitHub Pages)
 pnpm run docs
 ```
 
@@ -130,6 +141,8 @@ Dual publishing to:
 - Test files located in `tests/` directory, mirroring `src/` structure:
   - `tests/enum/option.test.ts` - Option tests
   - `tests/enum/result.test.ts` - Result tests
+  - `tests/enum/constants.test.ts` - Pre-defined Result constants tests
+  - `tests/enum/utils.test.ts` - Type guard utilities tests
   - `tests/sync/once.test.ts` - Once tests
   - `tests/sync/lazy.test.ts` - Lazy tests
   - `tests/sync/mutex.test.ts` - Mutex tests
@@ -165,3 +178,20 @@ pnpm update --latest
 - Trailing commas required in multiline (enforced by `@stylistic/comma-dangle`)
 - Strict TypeScript settings: `noUnusedLocals`, `noUnusedParameters`, `strictNullChecks`
 - File extensions required in imports (`.ts` suffix)
+- Use `@internal` JSDoc tag for private helper functions that should not appear in public API docs (e.g., `safeStringify`, `assertOption`, `assertResult` in `prelude.ts`)
+
+## CI/CD
+
+- **test.yml** - Runs tests on push to main; reusable via `workflow_call`
+- **docs.yml** - Deploys TypeDoc HTML to GitHub Pages on push to main
+- **npm-publish.yml** - Publishes to npm on version tags (v*)
+- **npm-publish-github-packages.yml** - Publishes to GitHub Packages on version tags
+- **jsr-publish.yml** - Publishes to JSR on version tags
+
+## Releasing
+
+1. Update version in `package.json` and `jsr.json`
+2. Update `CHANGELOG.md` (follow [Keep a Changelog](https://keepachangelog.com/) format)
+3. Commit: `git commit -m "chore(release): bump version to vX.Y.Z"`
+4. Create and push tag: `git tag vX.Y.Z && git push origin main --tags`
+5. CI automatically publishes to npm, GitHub Packages, and JSR
