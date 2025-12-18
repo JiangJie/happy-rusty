@@ -38,7 +38,7 @@ export interface Option<T> {
      *
      * @internal
      */
-    readonly [Symbol.toStringTag]: 'Option',
+    readonly [Symbol.toStringTag]: 'Option';
 
     /**
      * A unique symbol property used to identify the variant of this `Option`.

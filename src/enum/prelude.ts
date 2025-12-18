@@ -22,7 +22,6 @@ export interface None extends Option<never> {
      * When using `None` alone, the following overrides can make type inference more accurate.
      */
 
-    readonly [Symbol.toStringTag]: 'Option';
     readonly [OptionKindSymbol]: 'None';
 
     isSome(): false;
