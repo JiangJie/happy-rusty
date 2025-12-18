@@ -290,4 +290,4 @@ JavaScript's `null`/`undefined` and try-catch patterns lead to:
 
 ## License
 
-[GPL-3.0](LICENSE)
+[MIT](LICENSE)

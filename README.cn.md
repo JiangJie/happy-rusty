@@ -290,4 +290,4 @@ JavaScript 的 `null`/`undefined` 和 try-catch 模式会导致：
 
 ## 许可证
 
-[GPL-3.0](LICENSE)
+[MIT](LICENSE)
