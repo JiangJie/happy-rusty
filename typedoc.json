@@ -1,17 +1,12 @@
 {
-  "$schema": "https://typedoc-plugin-markdown.org/schema.json",
+  "$schema": "https://typedoc.org/schema.json",
   "entryPoints": ["src/mod.ts"],
   "out": "docs",
-  "plugin": ["typedoc-plugin-markdown"],
   "readme": "none",
-  "entryFileName": "README",
-  "enumMembersFormat": "table",
-  "parametersFormat": "table",
-  "interfacePropertiesFormat": "table",
-  "classPropertiesFormat": "table",
-  "typeDeclarationFormat": "table",
-  "indexFormat": "table",
-  "useCodeBlocks": true,
-  "expandObjects": true,
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true
+  },
+  "categorizeByGroup": true,
   "exclude": ["**/node_modules/**"]
 }
