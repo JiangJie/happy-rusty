@@ -1,7 +1,6 @@
-# This workflow will run tests using deno and then publish a package to GitHub Packages when a release is created.
-# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
+# This workflow will run tests and then publish a package to GitHub Packages when a release is created.
 
-name: Node.js Package Github
+name: GitHub Package
 
 on:
   release:
@@ -9,23 +8,11 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@main
+    uses: ./.github/workflows/test.yml
 
-      - name: Run test cases
-        uses: actions/setup-node@v6
-        with:
-          node-version: latest
-      - run: npm install pnpm -g
-      - run: pnpm install
-      - run: pnpm test
-
-  publish-gpr:
+  publish:
     needs: test
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
       packages: write
@@ -34,11 +21,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@main
 
-      - name: Publish Github package
+      - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: latest
           registry-url: https://npm.pkg.github.com/
-      - run: npm install pnpm -g
-      - run: pnpm install
-      - run: npm publish
+
+      - name: Install pnpm
+        run: npm install pnpm -g
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Publish to GitHub Packages
+        run: npm publish

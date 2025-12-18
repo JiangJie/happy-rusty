@@ -21,13 +21,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@main
 
-      - name: Generate docs
+      - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: latest
-      - run: npm install pnpm -g
-      - run: pnpm install
-      - run: pnpm run docs
+
+      - name: Install pnpm
+        run: npm install pnpm -g
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate docs
+        run: pnpm run docs
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
