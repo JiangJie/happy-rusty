@@ -18,6 +18,14 @@ import { None, Some, type Option } from '../enum/mod.ts';
  */
 export interface MutexGuard<T> {
     /**
+     * The well-known symbol `Symbol.toStringTag` used by `Object.prototype.toString()`.
+     * Returns `'MutexGuard'` so that `Object.prototype.toString.call(guard)` produces `'[object MutexGuard]'`.
+     *
+     * @internal
+     */
+    readonly [Symbol.toStringTag]: 'MutexGuard';
+
+    /**
      * The protected value. Can be read or modified while the guard is held.
      */
     value: T;
@@ -69,6 +77,14 @@ export interface MutexGuard<T> {
  * ```
  */
 export interface Mutex<T> {
+    /**
+     * The well-known symbol `Symbol.toStringTag` used by `Object.prototype.toString()`.
+     * Returns `'Mutex'` so that `Object.prototype.toString.call(mutex)` produces `'[object Mutex]'`.
+     *
+     * @internal
+     */
+    readonly [Symbol.toStringTag]: 'Mutex';
+
     /**
      * Acquires the lock and executes the callback with the protected value.
      *
@@ -249,6 +265,8 @@ export function Mutex<T>(value: T): Mutex<T> {
         let released = false;
 
         return Object.freeze<MutexGuard<T>>({
+            [Symbol.toStringTag]: 'MutexGuard',
+
             get value(): T {
                 if (released) {
                     throw new Error('MutexGuard has been released.');
@@ -285,6 +303,8 @@ export function Mutex<T>(value: T): Mutex<T> {
     }
 
     return Object.freeze<Mutex<T>>({
+        [Symbol.toStringTag]: 'Mutex',
+
         async withLock<U>(fn: (value: T) => Promise<U> | U): Promise<U> {
             const guard = await lock();
             try {

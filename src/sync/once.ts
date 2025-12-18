@@ -45,6 +45,14 @@ import { Err, None, Ok, Some, type Option, type Result } from '../enum/mod.ts';
  */
 export interface Once<T> {
     /**
+     * The well-known symbol `Symbol.toStringTag` used by `Object.prototype.toString()`.
+     * Returns `'Once'` so that `Object.prototype.toString.call(once)` produces `'[object Once]'`.
+     *
+     * @internal
+     */
+    readonly [Symbol.toStringTag]: 'Once';
+
+    /**
      * Gets the reference to the underlying value.
      *
      * @returns `Some(value)` if initialized, `None` otherwise.
@@ -274,6 +282,8 @@ export function Once<T>(): Once<T> {
     let pendingPromise: Promise<T> | undefined;
 
     return Object.freeze<Once<T>>({
+        [Symbol.toStringTag]: 'Once',
+
         get(): Option<T> {
             return initialized ? Some(value as T) : None;
         },

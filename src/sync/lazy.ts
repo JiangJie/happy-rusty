@@ -39,6 +39,14 @@ import { None, Some, type Option } from '../enum/mod.ts';
  */
 export interface Lazy<T> {
     /**
+     * The well-known symbol `Symbol.toStringTag` used by `Object.prototype.toString()`.
+     * Returns `'Lazy'` so that `Object.prototype.toString.call(lazy)` produces `'[object Lazy]'`.
+     *
+     * @internal
+     */
+    readonly [Symbol.toStringTag]: 'Lazy';
+
+    /**
      * Forces the evaluation of this lazy value and returns the result.
      *
      * If the value has already been initialized, returns the cached value.
@@ -114,6 +122,14 @@ export interface Lazy<T> {
  * ```
  */
 export interface LazyAsync<T> {
+    /**
+     * The well-known symbol `Symbol.toStringTag` used by `Object.prototype.toString()`.
+     * Returns `'LazyAsync'` so that `Object.prototype.toString.call(lazy)` produces `'[object LazyAsync]'`.
+     *
+     * @internal
+     */
+    readonly [Symbol.toStringTag]: 'LazyAsync';
+
     /**
      * Forces the evaluation of this lazy value and returns a promise to the result.
      *
@@ -219,6 +235,8 @@ export function Lazy<T>(fn: () => T): Lazy<T> {
     let initialized = false;
 
     return Object.freeze<Lazy<T>>({
+        [Symbol.toStringTag]: 'Lazy',
+
         force(): T {
             if (!initialized) {
                 value = fn();
@@ -300,6 +318,8 @@ export function LazyAsync<T>(fn: () => Promise<T>): LazyAsync<T> {
     let pendingPromise: Promise<T> | undefined;
 
     return Object.freeze<LazyAsync<T>>({
+        [Symbol.toStringTag]: 'LazyAsync',
+
         async force(): Promise<T> {
             if (initialized) {
                 return value as T;
