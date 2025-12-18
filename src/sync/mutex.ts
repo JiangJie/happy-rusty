@@ -47,6 +47,16 @@ export interface MutexGuard<T> {
      * ```
      */
     unlock(): void;
+
+    /**
+     * Custom `toString` implementation.
+     * @example
+     * ```ts
+     * const guard = await mutex.lock();
+     * console.log(guard.toString()); // 'MutexGuard(42)'
+     * ```
+     */
+    toString(): string;
 }
 
 /**
@@ -168,6 +178,19 @@ export interface Mutex<T> {
      * ```
      */
     isLocked(): boolean;
+
+    /**
+     * Custom `toString` implementation.
+     * @example
+     * ```ts
+     * const mutex = Mutex(42);
+     * console.log(mutex.toString()); // 'Mutex(<unlocked>)'
+     *
+     * const guard = await mutex.lock();
+     * console.log(mutex.toString()); // 'Mutex(<locked>)'
+     * ```
+     */
+    toString(): string;
 }
 
 /**
@@ -286,6 +309,13 @@ export function Mutex<T>(value: T): Mutex<T> {
                 released = true;
                 unlock();
             },
+
+            toString(): string {
+                if (released) {
+                    return 'MutexGuard(<released>)';
+                }
+                return `MutexGuard(${ currentValue })`;
+            },
         } as const);
     }
 
@@ -326,6 +356,10 @@ export function Mutex<T>(value: T): Mutex<T> {
 
         isLocked(): boolean {
             return locked;
+        },
+
+        toString(): string {
+            return locked ? 'Mutex(<locked>)' : 'Mutex(<unlocked>)';
         },
     } as const);
 }

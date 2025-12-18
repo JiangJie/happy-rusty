@@ -203,6 +203,16 @@ export interface ControlFlow<B, C = void> {
      * ```
      */
     continueOk(): Result<C, B>;
+
+    /**
+     * Custom `toString` implementation that uses the `ControlFlow`'s contained value.
+     * @example
+     * ```ts
+     * console.log(Break(5).toString()); // 'Break(5)'
+     * console.log(Continue('ok').toString()); // 'Continue(ok)'
+     * ```
+     */
+    toString(): string;
 }
 
 /**
@@ -272,6 +282,10 @@ export function Break<B, C>(value?: B): ControlFlow<B, C> {
         },
         continueOk(): Result<C, B> {
             return Err(value as B);
+        },
+
+        toString(): string {
+            return `Break(${ value })`;
         },
     } as const);
 
@@ -344,6 +358,10 @@ export function Continue<B, C>(value?: C): ControlFlow<B, C> {
         },
         continueOk(): Result<C, B> {
             return Ok(value as C);
+        },
+
+        toString(): string {
+            return `Continue(${ value })`;
         },
     } as const);
 

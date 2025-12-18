@@ -95,6 +95,19 @@ export interface Lazy<T> {
      * ```
      */
     isInitialized(): boolean;
+
+    /**
+     * Custom `toString` implementation.
+     * @example
+     * ```ts
+     * const lazy = Lazy(() => 42);
+     * console.log(lazy.toString()); // 'Lazy(<uninitialized>)'
+     *
+     * lazy.force();
+     * console.log(lazy.toString()); // 'Lazy(42)'
+     * ```
+     */
+    toString(): string;
 }
 
 /**
@@ -183,6 +196,19 @@ export interface LazyAsync<T> {
      * ```
      */
     isInitialized(): boolean;
+
+    /**
+     * Custom `toString` implementation.
+     * @example
+     * ```ts
+     * const lazy = LazyAsync(async () => 42);
+     * console.log(lazy.toString()); // 'LazyAsync(<uninitialized>)'
+     *
+     * await lazy.force();
+     * console.log(lazy.toString()); // 'LazyAsync(42)'
+     * ```
+     */
+    toString(): string;
 }
 
 /**
@@ -251,6 +277,10 @@ export function Lazy<T>(fn: () => T): Lazy<T> {
 
         isInitialized(): boolean {
             return initialized;
+        },
+
+        toString(): string {
+            return initialized ? `Lazy(${ value })` : 'Lazy(<uninitialized>)';
         },
     } as const);
 }
@@ -349,6 +379,10 @@ export function LazyAsync<T>(fn: () => Promise<T>): LazyAsync<T> {
 
         isInitialized(): boolean {
             return initialized;
+        },
+
+        toString(): string {
+            return initialized ? `LazyAsync(${ value })` : 'LazyAsync(<uninitialized>)';
         },
     } as const);
 }

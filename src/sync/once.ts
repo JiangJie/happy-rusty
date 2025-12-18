@@ -213,6 +213,19 @@ export interface Once<T> {
      * ```
      */
     isInitialized(): boolean;
+
+    /**
+     * Custom `toString` implementation.
+     * @example
+     * ```ts
+     * const once = Once<number>();
+     * console.log(once.toString()); // 'Once(<uninitialized>)'
+     *
+     * once.set(42);
+     * console.log(once.toString()); // 'Once(42)'
+     * ```
+     */
+    toString(): string;
 }
 
 /**
@@ -392,6 +405,10 @@ export function Once<T>(): Once<T> {
 
         isInitialized(): boolean {
             return initialized;
+        },
+
+        toString(): string {
+            return initialized ? `Once(${ value })` : 'Once(<uninitialized>)';
         },
     } as const);
 }
