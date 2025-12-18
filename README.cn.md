@@ -249,7 +249,7 @@ function tryFold<T, Acc>(
 
 ## 文档
 
-完整的 API 文档请查看 [docs/README.md](docs/README.md)。
+完整的 API 文档请查看 [jiangjie.github.io/happy-rusty](https://jiangjie.github.io/happy-rusty/)。
 
 ## 设计说明
 

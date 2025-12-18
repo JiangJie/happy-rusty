@@ -249,7 +249,7 @@ function tryFold<T, Acc>(
 
 ## Documentation
 
-Full API documentation is available at [docs/README.md](docs/README.md).
+Full API documentation is available at [jiangjie.github.io/happy-rusty](https://jiangjie.github.io/happy-rusty/).
 
 ## Design Notes
 
