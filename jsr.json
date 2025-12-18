@@ -1,15 +1,14 @@
 {
   "$schema": "https://jsr.io/schema/config-file.v1.json",
   "name": "@happy-js/happy-rusty",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "exports": "./src/mod.ts",
   "publish": {
     "include": [
       "LICENSE",
       "README.md",
       "README.cn.md",
-      "package.json",
-      "jsr.json",
+      "CHANGELOG.md",
       "src"
     ]
   }

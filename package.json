@@ -3,7 +3,7 @@
   "description": "Rust's Option, Result, and sync primitives for JavaScript/TypeScript - Better error handling and null-safety patterns.",
   "author": "jiang115jie@gmail.com",
   "license": "GPL-3.0",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "type": "module",
   "source": "src/mod.ts",
   "main": "dist/main.cjs",
@@ -22,8 +22,7 @@
     "LICENSE",
     "README.md",
     "README.cn.md",
-    "package.json",
-    "src",
+    "CHANGELOG.md",
     "dist"
   ],
   "sideEffects": false,
