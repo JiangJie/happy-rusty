@@ -89,7 +89,10 @@ The codebase is organized around implementing Rust-style enums and synchronizati
 
 1. **Tagged Union Pattern**: Uses internal symbols (`OptionKindSymbol`, `ResultKindSymbol`) to distinguish between variants (Some/None, Ok/Err)
 
-2. **Immutable Design**: `None` is a frozen singleton object; `Some`, `Ok`, and `Err` return frozen objects
+2. **Runtime Immutability**: All instances (`Some`, `None`, `Ok`, `Err`, `Break`, `Continue`, `Lazy`, `LazyAsync`, `Once`, `Mutex`, `MutexGuard`) are frozen with `Object.freeze()`. TypeScript interfaces intentionally omit `readonly` modifiers because:
+   - `None extends Option<never>` requires method syntax (bivariant) rather than arrow function property syntax (contravariant) for type compatibility
+   - Runtime protection via `Object.freeze()` is sufficient; compile-time `readonly` provides marginal additional benefit
+   - Avoiding `Mutable* + Readonly<>` pattern keeps exported types clean
 
 3. **Method Chaining**: All transformation methods (`map`, `andThen`, etc.) return new `Option` or `Result` instances
 

@@ -364,28 +364,28 @@ describe('LazyAsync', () => {
         it('Lazy should prevent property modification', () => {
             const lazy = Lazy(() => 42);
             expect(() => {
-                (lazy as Record<string, unknown>).force = () => 0;
+                (lazy as unknown as Record<string, unknown>)['force'] = () => 0;
             }).toThrow(TypeError);
         });
 
         it('LazyAsync should prevent property modification', () => {
             const lazy = LazyAsync(async () => 42);
             expect(() => {
-                (lazy as Record<string, unknown>).force = async () => 0;
+                (lazy as unknown as Record<string, unknown>)['force'] = async () => 0;
             }).toThrow(TypeError);
         });
 
         it('Lazy should prevent adding new properties', () => {
             const lazy = Lazy(() => 42);
             expect(() => {
-                (lazy as Record<string, unknown>).newProp = 'test';
+                (lazy as unknown as Record<string, unknown>)['newProp'] = 'test';
             }).toThrow(TypeError);
         });
 
         it('LazyAsync should prevent adding new properties', () => {
             const lazy = LazyAsync(async () => 42);
             expect(() => {
-                (lazy as Record<string, unknown>).newProp = 'test';
+                (lazy as unknown as Record<string, unknown>)['newProp'] = 'test';
             }).toThrow(TypeError);
         });
     });

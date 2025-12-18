@@ -407,14 +407,14 @@ describe('Once', () => {
         it('Once should prevent property modification', () => {
             const once = Once<number>();
             expect(() => {
-                (once as Record<string, unknown>).get = () => null;
+                (once as unknown as Record<string, unknown>)['get'] = () => null;
             }).toThrow(TypeError);
         });
 
         it('Once should prevent adding new properties', () => {
             const once = Once<number>();
             expect(() => {
-                (once as Record<string, unknown>).newProp = 'test';
+                (once as unknown as Record<string, unknown>)['newProp'] = 'test';
             }).toThrow(TypeError);
         });
     });

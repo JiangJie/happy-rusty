@@ -413,14 +413,14 @@ describe('Mutex', () => {
         it('Mutex should prevent property modification', () => {
             const mutex = Mutex(42);
             expect(() => {
-                (mutex as Record<string, unknown>).lock = () => Promise.resolve(null);
+                (mutex as unknown as Record<string, unknown>)['lock'] = () => Promise.resolve(null);
             }).toThrow(TypeError);
         });
 
         it('Mutex should prevent adding new properties', () => {
             const mutex = Mutex(42);
             expect(() => {
-                (mutex as Record<string, unknown>).newProp = 'test';
+                (mutex as unknown as Record<string, unknown>)['newProp'] = 'test';
             }).toThrow(TypeError);
         });
 
@@ -439,7 +439,7 @@ describe('Mutex', () => {
             const guard = await mutex.lock();
             try {
                 expect(() => {
-                    (guard as Record<string, unknown>).newProp = 'test';
+                    (guard as unknown as Record<string, unknown>)['newProp'] = 'test';
                 }).toThrow(TypeError);
             } finally {
                 guard.unlock();

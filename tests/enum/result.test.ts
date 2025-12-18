@@ -513,28 +513,28 @@ describe('promiseToAsyncResult', () => {
         it('Ok should prevent property modification', () => {
             const ok = Ok(42);
             expect(() => {
-                (ok as Record<string, unknown>).isOk = () => false;
+                (ok as unknown as Record<string, unknown>)['isOk'] = () => false;
             }).toThrow(TypeError);
         });
 
         it('Err should prevent property modification', () => {
             const err = Err('error');
             expect(() => {
-                (err as Record<string, unknown>).isErr = () => false;
+                (err as unknown as Record<string, unknown>)['isErr'] = () => false;
             }).toThrow(TypeError);
         });
 
         it('Ok should prevent adding new properties', () => {
             const ok = Ok(42);
             expect(() => {
-                (ok as Record<string, unknown>).newProp = 'test';
+                (ok as unknown as Record<string, unknown>)['newProp'] = 'test';
             }).toThrow(TypeError);
         });
 
         it('Err should prevent adding new properties', () => {
             const err = Err('error');
             expect(() => {
-                (err as Record<string, unknown>).newProp = 'test';
+                (err as unknown as Record<string, unknown>)['newProp'] = 'test';
             }).toThrow(TypeError);
         });
     });

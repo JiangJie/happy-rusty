@@ -245,28 +245,28 @@ describe('ControlFlow', () => {
         it('Break should prevent property modification', () => {
             const brk = Break('stopped');
             expect(() => {
-                (brk as Record<string, unknown>).isBreak = () => false;
+                (brk as unknown as Record<string, unknown>)['isBreak'] = () => false;
             }).toThrow(TypeError);
         });
 
         it('Continue should prevent property modification', () => {
             const cont = Continue('value');
             expect(() => {
-                (cont as Record<string, unknown>).isContinue = () => false;
+                (cont as unknown as Record<string, unknown>)['isContinue'] = () => false;
             }).toThrow(TypeError);
         });
 
         it('Break should prevent adding new properties', () => {
             const brk = Break('stopped');
             expect(() => {
-                (brk as Record<string, unknown>).newProp = 'test';
+                (brk as unknown as Record<string, unknown>)['newProp'] = 'test';
             }).toThrow(TypeError);
         });
 
         it('Continue should prevent adding new properties', () => {
             const cont = Continue('value');
             expect(() => {
-                (cont as Record<string, unknown>).newProp = 'test';
+                (cont as unknown as Record<string, unknown>)['newProp'] = 'test';
             }).toThrow(TypeError);
         });
     });

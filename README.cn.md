@@ -24,7 +24,7 @@
 - **完整的 TypeScript 支持**，具有严格的类型推断
 - **异步支持** - 所有转换方法都有异步版本
 - **零依赖**
-- **不可变** - 所有实例都是冻结对象
+- **运行时不可变** - 所有实例都通过 `Object.freeze()` 冻结
 - **跨运行时** - 支持 Node.js、Deno、Bun 和浏览器
 
 ## 安装
@@ -250,6 +250,29 @@ function tryFold<T, Acc>(
 ## 文档
 
 完整的 API 文档请查看 [docs/README.md](docs/README.md)。
+
+## 设计说明
+
+### 不可变性
+
+所有类型（`Option`、`Result`、`ControlFlow`、`Lazy`、`LazyAsync`、`Once`、`Mutex`、`MutexGuard`）都通过 `Object.freeze()` 实现**运行时不可变**。这可以防止意外修改方法或属性：
+
+```ts
+const some = Some(42);
+some.unwrap = () => 0;  // TypeError: Cannot assign to read only property
+```
+
+**为什么 TypeScript 接口没有使用 `readonly`？**
+
+我们有意在接口的方法签名中省略了 `readonly` 修饰符。虽然这看起来可能会降低类型安全性，但有以下几个原因：
+
+1. **继承兼容性** - `None` 类型继承自 `Option<never>`。TypeScript 的箭头函数属性语法（`readonly prop: () => T`）使用逆变参数检查，这会导致 `None`（参数为 `never`）与 `Option<T>` 不兼容。方法语法（`method(): T`）使用双变参数检查，使继承能够正常工作。
+
+2. **运行时保护已足够** - `Object.freeze()` 已经在运行时阻止了重新赋值。添加 `readonly` 只提供编译时检查，在已有运行时保护的情况下收益有限。
+
+3. **更简洁的 API** - 避免使用 `Mutable*` + `Readonly<>` 模式可以保持导出类型的简洁和文档的可读性。
+
+4. **测试验证不可变性** - 我们的测试套件明确验证了所有实例都被冻结并且会拒绝属性修改。
 
 ## 为什么选择 happy-rusty？
 

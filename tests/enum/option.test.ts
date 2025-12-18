@@ -487,26 +487,26 @@ describe('Option', () => {
         it('Some should prevent property modification', () => {
             const some = Some(42);
             expect(() => {
-                (some as Record<string, unknown>).isSome = () => false;
+                (some as unknown as Record<string, unknown>)['isSome'] = () => false;
             }).toThrow(TypeError);
         });
 
         it('None should prevent property modification', () => {
             expect(() => {
-                (None as Record<string, unknown>).isNone = () => false;
+                (None as unknown as Record<string, unknown>)['isNone'] = () => false;
             }).toThrow(TypeError);
         });
 
         it('Some should prevent adding new properties', () => {
             const some = Some(42);
             expect(() => {
-                (some as Record<string, unknown>).newProp = 'test';
+                (some as unknown as Record<string, unknown>)['newProp'] = 'test';
             }).toThrow(TypeError);
         });
 
         it('None should prevent adding new properties', () => {
             expect(() => {
-                (None as Record<string, unknown>).newProp = 'test';
+                (None as unknown as Record<string, unknown>)['newProp'] = 'test';
             }).toThrow(TypeError);
         });
 

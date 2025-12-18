@@ -24,7 +24,7 @@ Rust's `Option`, `Result`, and sync primitives for JavaScript/TypeScript - Bette
 - **Full TypeScript support** with strict type inference
 - **Async support** - Async versions of all transformation methods
 - **Zero dependencies**
-- **Immutable** - All instances are frozen objects
+- **Runtime immutability** - All instances are frozen with `Object.freeze()`
 - **Cross-runtime** - Works in Node.js, Deno, Bun, and browsers
 
 ## Installation
@@ -250,6 +250,29 @@ function tryFold<T, Acc>(
 ## Documentation
 
 Full API documentation is available at [docs/README.md](docs/README.md).
+
+## Design Notes
+
+### Immutability
+
+All types (`Option`, `Result`, `ControlFlow`, `Lazy`, `LazyAsync`, `Once`, `Mutex`, `MutexGuard`) are **immutable at runtime** via `Object.freeze()`. This prevents accidental modification of methods or properties:
+
+```ts
+const some = Some(42);
+some.unwrap = () => 0;  // TypeError: Cannot assign to read only property
+```
+
+**Why no `readonly` in TypeScript interfaces?**
+
+We intentionally omit `readonly` modifiers from method signatures in interfaces. While this might seem to reduce type safety, there are compelling reasons:
+
+1. **Inheritance compatibility** - The `None` type extends `Option<never>`. TypeScript's arrow function property syntax (`readonly prop: () => T`) uses contravariant parameter checking, which causes `None` (with `never` parameters) to be incompatible with `Option<T>`. Method syntax (`method(): T`) uses bivariant checking, allowing the inheritance to work correctly.
+
+2. **Runtime protection is sufficient** - `Object.freeze()` already prevents reassignment at runtime. Adding `readonly` only provides compile-time checking, which offers marginal benefit when runtime protection exists.
+
+3. **Cleaner API** - Avoiding the `Mutable*` + `Readonly<>` pattern keeps the exported types clean and documentation readable.
+
+4. **Testing validates immutability** - Our test suite explicitly verifies that all instances are frozen and reject property modifications.
 
 ## Why happy-rusty?
 
