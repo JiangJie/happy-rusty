@@ -18,6 +18,22 @@ describe('Lazy', () => {
             Lazy(fn);
             expect(fn).not.toHaveBeenCalled();
         });
+
+        it('should have correct Symbol.toStringTag', () => {
+            const lazy = Lazy(() => 42);
+            expect(Object.prototype.toString.call(lazy)).toBe('[object Lazy]');
+        });
+
+        it('toString() should show uninitialized state', () => {
+            const lazy = Lazy(() => 42);
+            expect(lazy.toString()).toBe('Lazy(<uninitialized>)');
+        });
+
+        it('toString() should show value after initialization', () => {
+            const lazy = Lazy(() => 42);
+            lazy.force();
+            expect(lazy.toString()).toBe('Lazy(42)');
+        });
     });
 
     describe('force', () => {
@@ -148,6 +164,22 @@ describe('LazyAsync', () => {
             const fn = vi.fn(async () => 42);
             LazyAsync(fn);
             expect(fn).not.toHaveBeenCalled();
+        });
+
+        it('should have correct Symbol.toStringTag', () => {
+            const lazy = LazyAsync(async () => 42);
+            expect(Object.prototype.toString.call(lazy)).toBe('[object LazyAsync]');
+        });
+
+        it('toString() should show uninitialized state', () => {
+            const lazy = LazyAsync(async () => 42);
+            expect(lazy.toString()).toBe('LazyAsync(<uninitialized>)');
+        });
+
+        it('toString() should show value after initialization', async () => {
+            const lazy = LazyAsync(async () => 42);
+            await lazy.force();
+            expect(lazy.toString()).toBe('LazyAsync(42)');
         });
     });
 

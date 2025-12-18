@@ -8,6 +8,12 @@ describe('ControlFlow', () => {
             expect(Object.prototype.toString.call(flow)).toBe('[object ControlFlow]');
         });
 
+        it('toString() should return Break(value)', () => {
+            expect(Break(42).toString()).toBe('Break(42)');
+            expect(Break('error').toString()).toBe('Break(error)');
+            expect(`${ Break('test') }`).toBe('Break(test)');
+        });
+
         it('should support void Break()', () => {
             const flow = Break();
             expect(flow.isBreak()).toBe(true);
@@ -77,6 +83,12 @@ describe('ControlFlow', () => {
         it('should have correct Symbol.toStringTag', () => {
             const flow = Continue(42);
             expect(Object.prototype.toString.call(flow)).toBe('[object ControlFlow]');
+        });
+
+        it('toString() should return Continue(value)', () => {
+            expect(Continue(42).toString()).toBe('Continue(42)');
+            expect(Continue('ok').toString()).toBe('Continue(ok)');
+            expect(`${ Continue('test') }`).toBe('Continue(test)');
         });
 
         it('isContinue() should return true', () => {

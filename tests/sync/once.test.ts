@@ -12,6 +12,22 @@ describe('Once', () => {
             const once = Once<number>();
             expect(once.get().isNone()).toBe(true);
         });
+
+        it('should have correct Symbol.toStringTag', () => {
+            const once = Once<number>();
+            expect(Object.prototype.toString.call(once)).toBe('[object Once]');
+        });
+
+        it('toString() should show uninitialized state', () => {
+            const once = Once<number>();
+            expect(once.toString()).toBe('Once(<uninitialized>)');
+        });
+
+        it('toString() should show value after initialization', () => {
+            const once = Once<number>();
+            once.set(42);
+            expect(once.toString()).toBe('Once(42)');
+        });
     });
 
     describe('set', () => {

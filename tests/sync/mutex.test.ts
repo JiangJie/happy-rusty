@@ -7,6 +7,56 @@ describe('Mutex', () => {
             const mutex = Mutex(42);
             expect(mutex.isLocked()).toBe(false);
         });
+
+        it('should have correct Symbol.toStringTag', () => {
+            const mutex = Mutex(42);
+            expect(Object.prototype.toString.call(mutex)).toBe('[object Mutex]');
+        });
+
+        it('toString() should show unlocked state initially', () => {
+            const mutex = Mutex(42);
+            expect(mutex.toString()).toBe('Mutex(<unlocked>)');
+        });
+
+        it('toString() should show locked state when locked', async () => {
+            const mutex = Mutex(42);
+            const guard = await mutex.lock();
+            try {
+                expect(mutex.toString()).toBe('Mutex(<locked>)');
+            } finally {
+                guard.unlock();
+            }
+            expect(mutex.toString()).toBe('Mutex(<unlocked>)');
+        });
+    });
+
+    describe('MutexGuard', () => {
+        it('should have correct Symbol.toStringTag', async () => {
+            const mutex = Mutex(42);
+            const guard = await mutex.lock();
+            try {
+                expect(Object.prototype.toString.call(guard)).toBe('[object MutexGuard]');
+            } finally {
+                guard.unlock();
+            }
+        });
+
+        it('toString() should show value while held', async () => {
+            const mutex = Mutex(42);
+            const guard = await mutex.lock();
+            try {
+                expect(guard.toString()).toBe('MutexGuard(42)');
+            } finally {
+                guard.unlock();
+            }
+        });
+
+        it('toString() should show released state after unlock', async () => {
+            const mutex = Mutex(42);
+            const guard = await mutex.lock();
+            guard.unlock();
+            expect(guard.toString()).toBe('MutexGuard(<released>)');
+        });
     });
 
     describe('withLock', () => {
