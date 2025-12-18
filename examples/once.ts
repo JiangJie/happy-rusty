@@ -45,7 +45,7 @@ console.log(getConfig());
 // ============================================================================
 console.log('\n=== Example 2: Fallible initialization ===\n');
 
-const dbOnce = Once<{ connected: boolean; host: string }>();
+const dbOnce = Once<{ connected: boolean; host: string; }>();
 
 function connectToDatabase(host: string, shouldFail: boolean) {
     console.log(`Attempting to connect to ${host}...`);

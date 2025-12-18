@@ -649,7 +649,7 @@ export interface Result<T, E> {
      *
      * @internal
      */
-    readonly [Symbol.toStringTag]: 'Result',
+    readonly [Symbol.toStringTag]: 'Result';
 
     /**
      * A unique symbol property used to identify the variant of this `Result`.

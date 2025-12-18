@@ -21,6 +21,16 @@ export default defineConfig([
         rules: {
             '@stylistic/semi': ['error', 'always'],
             '@stylistic/comma-dangle': ['error', 'always-multiline'],
+            '@stylistic/member-delimiter-style': ['error', {
+                multiline: {
+                    delimiter: 'semi',
+                    requireLast: true,
+                },
+                singleline: {
+                    delimiter: 'semi',
+                    requireLast: true,
+                },
+            }],
             '@typescript-eslint/no-unused-vars': ['error', {
                 argsIgnorePattern: '^_',
                 varsIgnorePattern: '^_',

@@ -78,7 +78,7 @@ describe('Once', () => {
         });
 
         it('should work with complex types', () => {
-            const once = Once<{ name: string }>();
+            const once = Once<{ name: string; }>();
 
             const value = once.getOrInit(() => ({ name: 'Alice' }));
 

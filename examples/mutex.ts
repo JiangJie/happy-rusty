@@ -47,7 +47,7 @@ const authState = Mutex<AuthState>({
 
 let refreshCount = 0;
 
-async function refreshToken(): Promise<{ token: string; expiresIn: number }> {
+async function refreshToken(): Promise<{ token: string; expiresIn: number; }> {
     refreshCount++;
     console.log(`  [Auth] Refreshing token (call #${refreshCount})...`);
     await new Promise(r => setTimeout(r, 50));
