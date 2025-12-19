@@ -8,5 +8,10 @@
     "includeGroups": true
   },
   "categorizeByGroup": true,
-  "exclude": ["**/node_modules/**"]
+  "exclude": ["**/node_modules/**"],
+  "navigationLinks": {
+    "GitHub": "https://github.com/JiangJie/happy-rusty",
+    "npm": "https://www.npmjs.com/package/happy-rusty",
+    "JSR": "https://jsr.io/@happy-js/happy-rusty"
+  }
 }
