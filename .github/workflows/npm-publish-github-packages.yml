@@ -35,6 +35,8 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Publish to GitHub Packages
-        run: npm publish
+        run: |
+          npm pkg set name="@jiangjie/happy-rusty"
+          npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
