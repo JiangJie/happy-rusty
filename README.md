@@ -1,6 +1,6 @@
 # happy-rusty
 
-[![License](https://img.shields.io/npm/l/happy-rusty.svg)](https://opensource.org/licenses/MIT)
+[![License](https://img.shields.io/npm/l/happy-rusty.svg)](LICENSE)
 [![Build Status](https://github.com/JiangJie/happy-rusty/actions/workflows/test.yml/badge.svg)](https://github.com/JiangJie/happy-rusty/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/JiangJie/happy-rusty/graph/badge.svg)](https://codecov.io/gh/JiangJie/happy-rusty)
 [![NPM version](https://img.shields.io/npm/v/happy-rusty.svg)](https://npmjs.org/package/happy-rusty)
