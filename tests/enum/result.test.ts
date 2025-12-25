@@ -515,6 +515,38 @@ describe('promiseToAsyncResult', () => {
         });
     });
 
+    describe('function parameter form', () => {
+        it('should handle function returning resolved Promise', async () => {
+            const result = await promiseToAsyncResult(() => Promise.resolve(42));
+            expect(result.isOk()).toBe(true);
+            expect(result.unwrap()).toBe(42);
+        });
+
+        it('should handle function returning rejected Promise', async () => {
+            const error = new Error('async error');
+            const result = await promiseToAsyncResult(() => Promise.reject(error));
+            expect(result.isErr()).toBe(true);
+            expect(result.unwrapErr()).toBe(error);
+        });
+
+        it('should capture synchronous exceptions thrown before Promise creation', async () => {
+            const result = await promiseToAsyncResult<number, Error>(() => {
+                throw new Error('sync error');
+            });
+            expect(result.isErr()).toBe(true);
+            expect(result.unwrapErr().message).toBe('sync error');
+        });
+
+        it('should capture synchronous exceptions in async function', async () => {
+            const result = await promiseToAsyncResult<number, Error>(async () => {
+                JSON.parse('invalid json');  // Throws synchronously
+                return 42;
+            });
+            expect(result.isErr()).toBe(true);
+            expect(result.unwrapErr()).toBeInstanceOf(SyntaxError);
+        });
+    });
+
     describe('Immutability', () => {
         it('Ok should be frozen', () => {
             const ok = Ok(42);

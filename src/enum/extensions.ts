@@ -8,38 +8,54 @@ import type { AsyncResult } from './core.ts';
 import { Err, Ok } from './prelude.ts';
 
 /**
- * Converts a Promise to a Result type, capturing the resolved value in an `Ok`, or the error in an `Err`.
- * This allows for promise-based asynchronous operations to be handled in a way that is more in line with the Result pattern.
+ * Converts a Promise or a function returning a Promise to a Result type,
+ * capturing the resolved value in an `Ok`, or the error in an `Err`.
+ *
+ * **Promise form**: Captures async rejections.
+ *
+ * **Function form**: Captures both sync exceptions and async rejections.
+ * Use this when the Promise-returning function may throw synchronously before creating the Promise.
+ * Similar to the `Promise.try()`.
  *
  * Note: JavaScript promises can reject with any value, not just `Error` objects.
  * The error is cast to type `E`, so ensure your error handling accounts for this.
  *
  * @typeParam T - The type of the value that the promise resolves to.
  * @typeParam E - The type of the error that the promise may reject with, defaults to `Error`.
- * @param p - The promise or promise-like object to convert into a `Result` type.
- * @returns A promise that resolves to a `Result<T, E>`. If the input promise `p` resolves, the resulting promise will resolve with `Ok<T>`. If the input promise `p` rejects, the resulting promise will resolve with `Err<E>`.
+ * @param task - A promise, promise-like object, or a function that returns a promise-like object.
+ * @returns A promise that resolves to `Ok<T>` if successful, or `Err<E>` if the promise rejects or the function throws.
  *
  * @example
  * ```ts
- * async function example() {
- *     const result = await promiseToAsyncResult(fetchData());
- *     result.inspect(x => {
- *         console.log('Data:', x);
- *     }).inspectErr(err => {
- *         console.error('Error:', err);
- *     });
- * }
+ * // Promise form
+ * const result = await promiseToAsyncResult(fetchData());
+ * result.inspect(x => console.log('Data:', x))
+ *       .inspectErr(err => console.error('Error:', err));
  * ```
  *
  * @example
  * ```ts
- * // With custom error type
- * const result = await promiseToAsyncResult<User, ApiError>(fetchUser(id));
+ * // Function form - captures sync exceptions
+ * function riskyOperation(): Promise<Data> {
+ *     const id = JSON.parse(invalidJson);  // May throw synchronously
+ *     return fetch(`/api/${id}`);
+ * }
+ * const result = await promiseToAsyncResult(() => riskyOperation());
+ * ```
+ *
+ * @example
+ * ```ts
+ * // Inline async function
+ * const result = await promiseToAsyncResult(async () => {
+ *     const response = await fetch('/api');
+ *     return response.json();
+ * });
  * ```
  */
-export async function promiseToAsyncResult<T, E = Error>(p: PromiseLike<T>): AsyncResult<T, E> {
+export async function promiseToAsyncResult<T, E = Error>(task: PromiseLike<T> | (() => PromiseLike<T>)): AsyncResult<T, E> {
     try {
-        return Ok(await p);
+        const promise = typeof task === 'function' ? task() : task;
+        return Ok(await promise);
     } catch (err) {
         return Err(err as E);
     }
