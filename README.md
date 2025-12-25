@@ -12,7 +12,7 @@ Rust's `Option`, `Result`, and sync primitives for JavaScript/TypeScript - Bette
 
 ---
 
-[中文](README.cn.md)
+[中文](README.cn.md) | [API Documentation](https://jiangjie.github.io/happy-rusty/)
 
 ---
 
@@ -247,10 +247,6 @@ function tryFold<T, Acc>(
 - [Lazy](examples/lazy.ts)
 - [Mutex](examples/mutex.ts)
 - [ControlFlow](examples/control_flow.ts)
-
-## Documentation
-
-Full API documentation is available at [jiangjie.github.io/happy-rusty](https://jiangjie.github.io/happy-rusty/).
 
 ## Design Notes
 

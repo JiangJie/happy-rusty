@@ -12,7 +12,7 @@
 
 ---
 
-[English](README.md)
+[English](README.md) | [API 文档](https://jiangjie.github.io/happy-rusty/)
 
 ---
 
@@ -247,10 +247,6 @@ function tryFold<T, Acc>(
 - [Lazy](examples/lazy.ts)
 - [Mutex](examples/mutex.ts)
 - [ControlFlow](examples/control_flow.ts)
-
-## 文档
-
-完整的 API 文档请查看 [jiangjie.github.io/happy-rusty](https://jiangjie.github.io/happy-rusty/)。
 
 ## 设计说明
 
