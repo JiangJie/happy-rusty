@@ -4,7 +4,7 @@
  *
  * This module provides utilities for integrating async/await patterns with Result-based error handling.
  */
-import type { Result } from './core.ts';
+import type { AsyncResult } from './core.ts';
 import { Err, Ok } from './prelude.ts';
 
 /**
@@ -37,7 +37,7 @@ import { Err, Ok } from './prelude.ts';
  * const result = await promiseToAsyncResult<User, ApiError>(fetchUser(id));
  * ```
  */
-export async function promiseToAsyncResult<T, E = Error>(p: PromiseLike<T>): Promise<Result<T, E>> {
+export async function promiseToAsyncResult<T, E = Error>(p: PromiseLike<T>): AsyncResult<T, E> {
     try {
         return Ok(await p);
     } catch (err) {

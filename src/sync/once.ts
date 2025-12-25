@@ -6,7 +6,7 @@
  * to lazily initialized data, supporting both sync and async initialization.
  */
 
-import { Err, None, Ok, Some, type Option, type Result } from '../enum/mod.ts';
+import { Err, None, Ok, Some, type AsyncResult, type Option, type Result } from '../enum/mod.ts';
 
 /**
  * A container which can be written to only once.
@@ -181,7 +181,7 @@ export interface Once<T> {
      * });
      * ```
      */
-    getOrTryInitAsync<E>(fn: () => Promise<Result<T, E>>): Promise<Result<T, E>>;
+    getOrTryInitAsync<E>(fn: () => AsyncResult<T, E>): AsyncResult<T, E>;
 
     /**
      * Takes the value out, leaving it uninitialized.
@@ -355,7 +355,7 @@ export function Once<T>(): Once<T> {
             return result;
         },
 
-        async getOrTryInitAsync<E>(fn: () => Promise<Result<T, E>>): Promise<Result<T, E>> {
+        async getOrTryInitAsync<E>(fn: () => AsyncResult<T, E>): AsyncResult<T, E> {
             if (initialized) {
                 return Ok(value as T);
             }
