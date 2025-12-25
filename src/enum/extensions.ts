@@ -16,7 +16,7 @@ import { Err, Ok } from './prelude.ts';
  *
  * @typeParam T - The type of the value that the promise resolves to.
  * @typeParam E - The type of the error that the promise may reject with, defaults to `Error`.
- * @param p - The promise to convert into a `Result` type.
+ * @param p - The promise or promise-like object to convert into a `Result` type.
  * @returns A promise that resolves to a `Result<T, E>`. If the input promise `p` resolves, the resulting promise will resolve with `Ok<T>`. If the input promise `p` rejects, the resulting promise will resolve with `Err<E>`.
  *
  * @example
@@ -37,7 +37,7 @@ import { Err, Ok } from './prelude.ts';
  * const result = await promiseToAsyncResult<User, ApiError>(fetchUser(id));
  * ```
  */
-export async function promiseToAsyncResult<T, E = Error>(p: Promise<T>): Promise<Result<T, E>> {
+export async function promiseToAsyncResult<T, E = Error>(p: PromiseLike<T>): Promise<Result<T, E>> {
     try {
         return Ok(await p);
     } catch (err) {

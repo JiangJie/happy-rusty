@@ -467,6 +467,18 @@ describe('promiseToAsyncResult', () => {
             const result = await promiseToAsyncResult(promise);
             expect(result.unwrap()).toBe(value);
         });
+
+        it('should handle PromiseLike (thenable) objects', async () => {
+            const thenable: PromiseLike<number> = {
+                then(resolve) {
+                    resolve!(100);
+                    return this;
+                },
+            };
+            const result = await promiseToAsyncResult(thenable);
+            expect(result.isOk()).toBe(true);
+            expect(result.unwrap()).toBe(100);
+        });
     });
 
     describe('converting rejected Promise', () => {
