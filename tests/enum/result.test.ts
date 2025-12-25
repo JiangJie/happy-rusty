@@ -5,6 +5,10 @@ import {
     Ok,
     Some,
     promiseToAsyncResult,
+    tryAsyncOption,
+    tryAsyncResult,
+    tryOption,
+    tryResult,
     type Option,
     type Result,
 } from '../../src/mod.ts';
@@ -585,5 +589,259 @@ describe('promiseToAsyncResult', () => {
                 (err as unknown as Record<string, unknown>)['newProp'] = 'test';
             }).toThrow(TypeError);
         });
+    });
+});
+
+describe('tryResult', () => {
+    it('should return Ok when function succeeds', () => {
+        const result = tryResult(() => 42);
+        expect(result.isOk()).toBe(true);
+        expect(result.unwrap()).toBe(42);
+    });
+
+    it('should return Err when function throws', () => {
+        const result = tryResult(() => {
+            throw new Error('test error');
+        });
+        expect(result.isErr()).toBe(true);
+        expect(result.unwrapErr()).toBeInstanceOf(Error);
+        expect((result.unwrapErr() as Error).message).toBe('test error');
+    });
+
+    it('should capture JSON.parse errors', () => {
+        const result = tryResult(() => JSON.parse('invalid json'));
+        expect(result.isErr()).toBe(true);
+        expect(result.unwrapErr()).toBeInstanceOf(SyntaxError);
+    });
+
+    it('should capture URL constructor errors', () => {
+        const result = tryResult(() => new URL('not a valid url'));
+        expect(result.isErr()).toBe(true);
+        expect(result.unwrapErr()).toBeInstanceOf(TypeError);
+    });
+
+    it('should work with custom error type', () => {
+        interface CustomError {
+            code: number;
+            message: string;
+        }
+        const result = tryResult<number, CustomError>(() => {
+            throw { code: 500, message: 'Internal error' };
+        });
+        expect(result.isErr()).toBe(true);
+        expect(result.unwrapErr().code).toBe(500);
+    });
+
+    it('should return Ok with complex objects', () => {
+        const result = tryResult(() => ({ name: 'test', value: 123 }));
+        expect(result.isOk()).toBe(true);
+        expect(result.unwrap()).toEqual({ name: 'test', value: 123 });
+    });
+});
+
+describe('tryOption', () => {
+    it('should return Some when function succeeds', () => {
+        const option = tryOption(() => 42);
+        expect(option.isSome()).toBe(true);
+        expect(option.unwrap()).toBe(42);
+    });
+
+    it('should return None when function throws', () => {
+        const option = tryOption(() => {
+            throw new Error('test error');
+        });
+        expect(option.isNone()).toBe(true);
+    });
+
+    it('should capture JSON.parse errors', () => {
+        const option = tryOption(() => JSON.parse('invalid json'));
+        expect(option.isNone()).toBe(true);
+    });
+
+    it('should capture URL constructor errors', () => {
+        const option = tryOption(() => new URL('not a valid url'));
+        expect(option.isNone()).toBe(true);
+    });
+
+    it('should return Some with null value (not treat as failure)', () => {
+        const option = tryOption(() => null);
+        expect(option.isSome()).toBe(true);
+        expect(option.unwrap()).toBe(null);
+    });
+
+    it('should return Some with undefined value (not treat as failure)', () => {
+        const option = tryOption(() => undefined);
+        expect(option.isSome()).toBe(true);
+        expect(option.unwrap()).toBe(undefined);
+    });
+
+    it('should return Some for falsy values', () => {
+        expect(tryOption(() => 0).unwrap()).toBe(0);
+        expect(tryOption(() => '').unwrap()).toBe('');
+        expect(tryOption(() => false).unwrap()).toBe(false);
+    });
+
+    it('should return Some with complex objects', () => {
+        const option = tryOption(() => ({ name: 'test', value: 123 }));
+        expect(option.isSome()).toBe(true);
+        expect(option.unwrap()).toEqual({ name: 'test', value: 123 });
+    });
+});
+
+describe('tryAsyncResult', () => {
+    it('should return Ok when promise resolves', async () => {
+        const result = await tryAsyncResult(Promise.resolve(42));
+        expect(result.isOk()).toBe(true);
+        expect(result.unwrap()).toBe(42);
+    });
+
+    it('should return Err when promise rejects', async () => {
+        const error = new Error('async error');
+        const result = await tryAsyncResult(Promise.reject(error));
+        expect(result.isErr()).toBe(true);
+        expect(result.unwrapErr()).toBe(error);
+    });
+
+    it('should handle function returning resolved Promise', async () => {
+        const result = await tryAsyncResult(() => Promise.resolve('success'));
+        expect(result.isOk()).toBe(true);
+        expect(result.unwrap()).toBe('success');
+    });
+
+    it('should handle function returning rejected Promise', async () => {
+        const result = await tryAsyncResult(() => Promise.reject(new Error('rejected')));
+        expect(result.isErr()).toBe(true);
+        expect((result.unwrapErr() as Error).message).toBe('rejected');
+    });
+
+    it('should capture synchronous exceptions in function', async () => {
+        const result = await tryAsyncResult<number, Error>(() => {
+            throw new Error('sync throw');
+        });
+        expect(result.isErr()).toBe(true);
+        expect(result.unwrapErr().message).toBe('sync throw');
+    });
+
+    it('should capture sync exceptions before promise creation', async () => {
+        const result = await tryAsyncResult<number, Error>(() => {
+            JSON.parse('invalid');  // Throws before returning promise
+            return Promise.resolve(42);
+        });
+        expect(result.isErr()).toBe(true);
+        expect(result.unwrapErr()).toBeInstanceOf(SyntaxError);
+    });
+
+    it('should work with async functions', async () => {
+        const result = await tryAsyncResult(async () => {
+            return 'async result';
+        });
+        expect(result.isOk()).toBe(true);
+        expect(result.unwrap()).toBe('async result');
+    });
+
+    it('should capture errors in async functions', async () => {
+        const result = await tryAsyncResult<number, Error>(async () => {
+            throw new Error('async throw');
+        });
+        expect(result.isErr()).toBe(true);
+        expect(result.unwrapErr().message).toBe('async throw');
+    });
+
+    it('should work with PromiseLike objects', async () => {
+        const thenable: PromiseLike<number> = {
+            then<TResult1 = number, TResult2 = never>(
+                onfulfilled?: ((value: number) => TResult1 | PromiseLike<TResult1>) | null,
+            ): PromiseLike<TResult1 | TResult2> {
+                return Promise.resolve(onfulfilled?.(42) as TResult1);
+            },
+        };
+        const result = await tryAsyncResult(thenable);
+        expect(result.isOk()).toBe(true);
+        expect(result.unwrap()).toBe(42);
+    });
+});
+
+describe('tryAsyncOption', () => {
+    it('should return Some when promise resolves', async () => {
+        const option = await tryAsyncOption(Promise.resolve(42));
+        expect(option.isSome()).toBe(true);
+        expect(option.unwrap()).toBe(42);
+    });
+
+    it('should return None when promise rejects', async () => {
+        const option = await tryAsyncOption(Promise.reject(new Error('rejected')));
+        expect(option.isNone()).toBe(true);
+    });
+
+    it('should return Some with null value (not treat as failure)', async () => {
+        const option = await tryAsyncOption(Promise.resolve(null));
+        expect(option.isSome()).toBe(true);
+        expect(option.unwrap()).toBe(null);
+    });
+
+    it('should return Some with undefined value (not treat as failure)', async () => {
+        const option = await tryAsyncOption(Promise.resolve(undefined));
+        expect(option.isSome()).toBe(true);
+        expect(option.unwrap()).toBe(undefined);
+    });
+
+    it('should return Some for falsy values', async () => {
+        expect((await tryAsyncOption(Promise.resolve(0))).unwrap()).toBe(0);
+        expect((await tryAsyncOption(Promise.resolve(''))).unwrap()).toBe('');
+        expect((await tryAsyncOption(Promise.resolve(false))).unwrap()).toBe(false);
+    });
+
+    it('should handle function returning resolved promise', async () => {
+        const option = await tryAsyncOption(() => Promise.resolve('result'));
+        expect(option.isSome()).toBe(true);
+        expect(option.unwrap()).toBe('result');
+    });
+
+    it('should handle function returning rejected promise', async () => {
+        const option = await tryAsyncOption(() => Promise.reject(new Error('rejected')));
+        expect(option.isNone()).toBe(true);
+    });
+
+    it('should capture synchronous exceptions in function', async () => {
+        const option = await tryAsyncOption(() => {
+            throw new Error('sync error');
+        });
+        expect(option.isNone()).toBe(true);
+    });
+
+    it('should capture sync exceptions before promise creation', async () => {
+        const option = await tryAsyncOption(() => {
+            JSON.parse('invalid');  // Throws before returning promise
+            return Promise.resolve(42);
+        });
+        expect(option.isNone()).toBe(true);
+    });
+
+    it('should work with async functions', async () => {
+        const option = await tryAsyncOption(async () => {
+            return { id: 1, name: 'test' };
+        });
+        expect(option.isSome()).toBe(true);
+        expect(option.unwrap()).toEqual({ id: 1, name: 'test' });
+    });
+
+    it('should return None when async function throws', async () => {
+        const option = await tryAsyncOption(async () => {
+            throw new Error('async error');
+        });
+        expect(option.isNone()).toBe(true);
+    });
+
+    it('should work with PromiseLike objects', async () => {
+        const thenable: PromiseLike<string> = {
+            then<TResult1 = string, TResult2 = never>(
+                onfulfilled?: ((value: string) => TResult1 | PromiseLike<TResult1>) | null,
+            ): PromiseLike<TResult1 | TResult2> {
+                return Promise.resolve(onfulfilled?.('thenable result') as TResult1);
+            },
+        };
+        const option = await tryAsyncOption(thenable);
+        expect(option.isSome()).toBe(true);
+        expect(option.unwrap()).toBe('thenable result');
     });
 });
