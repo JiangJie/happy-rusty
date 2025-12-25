@@ -150,17 +150,22 @@ type AsyncVoidIOResult = Promise<VoidIOResult>;
 ### 工具函数
 
 ```ts
-import { isOption, isResult, isControlFlow, promiseToAsyncResult } from 'happy-rusty';
+import { isOption, isResult, isControlFlow, tryOption, tryResult, tryAsyncOption, tryAsyncResult } from 'happy-rusty';
 
 // 类型守卫
 if (isOption(value)) { /* ... */ }
 if (isResult(value)) { /* ... */ }
 if (isControlFlow(value)) { /* ... */ }
 
-// 将 Promise 转换为 Result
-const result = await promiseToAsyncResult(fetch('/api/data'));
-result.inspect(data => console.log(data))
-      .inspectErr(err => console.error(err));
+// 捕获异常为 Option（成功 → Some，异常 → None）
+const parsed = tryOption(() => JSON.parse(jsonString));
+const asyncData = await tryAsyncOption(fetch('/api').then(r => r.json()));
+
+// 捕获异常为 Result（成功 → Ok，异常 → Err）
+const result = tryResult(() => JSON.parse(jsonString));
+const asyncResult = await tryAsyncResult(fetch('/api/data'));
+asyncResult.inspect(data => console.log(data))
+           .inspectErr(err => console.error(err));
 ```
 
 ### 常量

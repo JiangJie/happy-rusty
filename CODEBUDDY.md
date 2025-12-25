@@ -78,7 +78,7 @@ The codebase is organized around implementing Rust-style enums and synchronizati
   - `defines.ts` - Type aliases like `VoidResult<E>`, `IOResult<T>`, `AsyncIOResult<T>`
   - `symbols.ts` - Internal symbols for type discrimination (`OptionKindSymbol`, `ResultKindSymbol`)
   - `utils.ts` - Type guard utilities (`isOption()`, `isResult()`)
-  - `extensions.ts` - Bridge utilities like `promiseToAsyncResult()` for converting Promise-based APIs to Result pattern
+  - `extensions.ts` - Bridge utilities like `tryResult()`, `tryAsyncResult()` for converting try-catch patterns to Option/Result
   - `constants.ts` - Pre-defined immutable Result constants (`RESULT_TRUE`, `RESULT_FALSE`, `RESULT_ZERO`, `RESULT_VOID`)
   - `mod.ts` - Re-exports all public APIs
 

@@ -150,17 +150,22 @@ type AsyncVoidIOResult = Promise<VoidIOResult>;
 ### Utility Functions
 
 ```ts
-import { isOption, isResult, isControlFlow, promiseToAsyncResult } from 'happy-rusty';
+import { isOption, isResult, isControlFlow, tryOption, tryResult, tryAsyncOption, tryAsyncResult } from 'happy-rusty';
 
 // Type guards
 if (isOption(value)) { /* ... */ }
 if (isResult(value)) { /* ... */ }
 if (isControlFlow(value)) { /* ... */ }
 
-// Convert Promise to Result
-const result = await promiseToAsyncResult(fetch('/api/data'));
-result.inspect(data => console.log(data))
-      .inspectErr(err => console.error(err));
+// Capture exceptions as Option (success → Some, exception → None)
+const parsed = tryOption(() => JSON.parse(jsonString));
+const asyncData = await tryAsyncOption(fetch('/api').then(r => r.json()));
+
+// Capture exceptions as Result (success → Ok, exception → Err)
+const result = tryResult(() => JSON.parse(jsonString));
+const asyncResult = await tryAsyncResult(fetch('/api/data'));
+asyncResult.inspect(data => console.log(data))
+           .inspectErr(err => console.error(err));
 ```
 
 ### Constants
