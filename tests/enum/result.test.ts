@@ -476,7 +476,7 @@ describe('promiseToAsyncResult', () => {
                     if (onfulfilled) {
                         onfulfilled(100);
                     }
-                    return this as unknown as PromiseLike<TResult1>;
+                    return this as PromiseLike<TResult1>;
                 },
             };
             const result = await promiseToAsyncResult(thenable);
