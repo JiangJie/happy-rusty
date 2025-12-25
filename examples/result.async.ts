@@ -4,7 +4,7 @@
  * Demonstrates using async Result methods for handling
  * asynchronous operations that may fail.
  */
-import { Err, Ok, type Result, promiseToAsyncResult } from '../src/mod.ts';
+import { Err, Ok, type Result, tryAsyncResult } from '../src/mod.ts';
 
 // Types
 interface User {
@@ -120,7 +120,7 @@ const isValidUser = await (await fetchUser(1)).isOkAndAsync(async user => {
 
 console.log(`User 1 is valid (has posts): ${isValidUser}`);
 
-// Example 4: Using promiseToAsyncResult
+// Example 4: Using tryAsyncResult
 console.log('\n=== Example 4: Convert Promise to Result ===');
 
 async function riskyOperation(): Promise<string> {
@@ -132,7 +132,7 @@ async function riskyOperation(): Promise<string> {
 
 // Run multiple times to see both outcomes
 for (let i = 0; i < 3; i++) {
-    const result = await promiseToAsyncResult(riskyOperation());
+    const result = await tryAsyncResult(riskyOperation());
     console.log(
         result
             .map(msg => `Success: ${msg}`)

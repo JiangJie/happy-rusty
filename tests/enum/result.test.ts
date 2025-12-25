@@ -456,139 +456,55 @@ describe('Result', () => {
     });
 });
 
-describe('promiseToAsyncResult', () => {
-    describe('converting resolved Promise', () => {
-        it('should convert to Ok with the resolved value', async () => {
-            const promise = Promise.resolve(42);
-            const result = await promiseToAsyncResult(promise);
-            expect(result.isOk()).toBe(true);
-            expect(result.unwrap()).toBe(42);
-        });
+describe('promiseToAsyncResult (deprecated)', () => {
+    it('should be an alias for tryAsyncResult', async () => {
+        // Verify it works as expected - detailed tests are in tryAsyncResult
+        const okResult = await promiseToAsyncResult(Promise.resolve(42));
+        expect(okResult.isOk()).toBe(true);
+        expect(okResult.unwrap()).toBe(42);
 
-        it('should handle resolved Promise with complex value', async () => {
-            const value = { name: 'test', count: 5 };
-            const promise = Promise.resolve(value);
-            const result = await promiseToAsyncResult(promise);
-            expect(result.unwrap()).toBe(value);
-        });
+        const errResult = await promiseToAsyncResult(Promise.reject(new Error('test')));
+        expect(errResult.isErr()).toBe(true);
+    });
+});
 
-        it('should handle PromiseLike (thenable) objects', async () => {
-            const thenable: PromiseLike<number> = {
-                then<TResult1 = number>(
-                    onfulfilled?: ((value: number) => TResult1 | PromiseLike<TResult1>) | null,
-                ): PromiseLike<TResult1> {
-                    if (onfulfilled) {
-                        onfulfilled(100);
-                    }
-                    return this as PromiseLike<TResult1>;
-                },
-            };
-            const result = await promiseToAsyncResult(thenable);
-            expect(result.isOk()).toBe(true);
-            expect(result.unwrap()).toBe(100);
-        });
+describe('Immutability', () => {
+    it('Ok should be frozen', () => {
+        const ok = Ok(42);
+        expect(Object.isFrozen(ok)).toBe(true);
     });
 
-    describe('converting rejected Promise', () => {
-        it('should convert Error rejection to Err', async () => {
-            const error = new Error('lose');
-            const promise = Promise.reject(error);
-            const result = await promiseToAsyncResult(promise);
-            expect(result.isErr()).toBe(true);
-            expect(result.unwrapErr().message).toBe('lose');
-        });
-
-        it('should preserve non-Error rejection value as-is', async () => {
-            const promise = Promise.reject('string error');
-            const result = await promiseToAsyncResult<number, string>(promise);
-            expect(result.isErr()).toBe(true);
-            expect(result.unwrapErr()).toBe('string error');
-        });
-
-        it('should handle rejection with custom error type', async () => {
-            interface ApiError {
-                code: number;
-                message: string;
-            }
-            const apiError: ApiError = { code: 404, message: 'Not found' };
-            const promise = Promise.reject(apiError);
-            const result = await promiseToAsyncResult<number, ApiError>(promise);
-            expect(result.isErr()).toBe(true);
-            expect(result.unwrapErr().code).toBe(404);
-            expect(result.unwrapErr().message).toBe('Not found');
-        });
+    it('Err should be frozen', () => {
+        const err = Err('error');
+        expect(Object.isFrozen(err)).toBe(true);
     });
 
-    describe('function parameter form', () => {
-        it('should handle function returning resolved Promise', async () => {
-            const result = await promiseToAsyncResult(() => Promise.resolve(42));
-            expect(result.isOk()).toBe(true);
-            expect(result.unwrap()).toBe(42);
-        });
-
-        it('should handle function returning rejected Promise', async () => {
-            const error = new Error('async error');
-            const result = await promiseToAsyncResult(() => Promise.reject(error));
-            expect(result.isErr()).toBe(true);
-            expect(result.unwrapErr()).toBe(error);
-        });
-
-        it('should capture synchronous exceptions thrown before Promise creation', async () => {
-            const result = await promiseToAsyncResult<number, Error>(() => {
-                throw new Error('sync error');
-            });
-            expect(result.isErr()).toBe(true);
-            expect(result.unwrapErr().message).toBe('sync error');
-        });
-
-        it('should capture synchronous exceptions in async function', async () => {
-            const result = await promiseToAsyncResult<number, Error>(async () => {
-                JSON.parse('invalid json');  // Throws synchronously
-                return 42;
-            });
-            expect(result.isErr()).toBe(true);
-            expect(result.unwrapErr()).toBeInstanceOf(SyntaxError);
-        });
+    it('Ok should prevent property modification', () => {
+        const ok = Ok(42);
+        expect(() => {
+            (ok as unknown as Record<string, unknown>)['isOk'] = () => false;
+        }).toThrow(TypeError);
     });
 
-    describe('Immutability', () => {
-        it('Ok should be frozen', () => {
-            const ok = Ok(42);
-            expect(Object.isFrozen(ok)).toBe(true);
-        });
+    it('Err should prevent property modification', () => {
+        const err = Err('error');
+        expect(() => {
+            (err as unknown as Record<string, unknown>)['isErr'] = () => false;
+        }).toThrow(TypeError);
+    });
 
-        it('Err should be frozen', () => {
-            const err = Err('error');
-            expect(Object.isFrozen(err)).toBe(true);
-        });
+    it('Ok should prevent adding new properties', () => {
+        const ok = Ok(42);
+        expect(() => {
+            (ok as unknown as Record<string, unknown>)['newProp'] = 'test';
+        }).toThrow(TypeError);
+    });
 
-        it('Ok should prevent property modification', () => {
-            const ok = Ok(42);
-            expect(() => {
-                (ok as unknown as Record<string, unknown>)['isOk'] = () => false;
-            }).toThrow(TypeError);
-        });
-
-        it('Err should prevent property modification', () => {
-            const err = Err('error');
-            expect(() => {
-                (err as unknown as Record<string, unknown>)['isErr'] = () => false;
-            }).toThrow(TypeError);
-        });
-
-        it('Ok should prevent adding new properties', () => {
-            const ok = Ok(42);
-            expect(() => {
-                (ok as unknown as Record<string, unknown>)['newProp'] = 'test';
-            }).toThrow(TypeError);
-        });
-
-        it('Err should prevent adding new properties', () => {
-            const err = Err('error');
-            expect(() => {
-                (err as unknown as Record<string, unknown>)['newProp'] = 'test';
-            }).toThrow(TypeError);
-        });
+    it('Err should prevent adding new properties', () => {
+        const err = Err('error');
+        expect(() => {
+            (err as unknown as Record<string, unknown>)['newProp'] = 'test';
+        }).toThrow(TypeError);
     });
 });
 
