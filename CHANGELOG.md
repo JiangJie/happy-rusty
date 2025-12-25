@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.2] - 2025-12-25
+
+### Changed
+- `promiseToAsyncResult` now accepts `PromiseLike<T>` instead of `Promise<T>` for broader compatibility with thenable objects
+- Use `AsyncResult` type alias in function signatures for consistency
+
+### Removed
+- Removed unused `source` field from package.json (Parcel legacy)
+- Removed redundant `@internal` tags from private (non-exported) functions
+
 ## [1.6.1] - 2025-12-19
 
 ### Changed
@@ -192,6 +202,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full TypeScript support
 - Comprehensive API matching Rust's Option and Result
 
+[1.6.2]: https://github.com/JiangJie/happy-rusty/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/JiangJie/happy-rusty/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/JiangJie/happy-rusty/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/JiangJie/happy-rusty/compare/v1.4.0...v1.5.0
