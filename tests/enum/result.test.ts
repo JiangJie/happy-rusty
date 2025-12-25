@@ -470,9 +470,13 @@ describe('promiseToAsyncResult', () => {
 
         it('should handle PromiseLike (thenable) objects', async () => {
             const thenable: PromiseLike<number> = {
-                then(resolve) {
-                    resolve!(100);
-                    return this;
+                then<TResult1 = number>(
+                    onfulfilled?: ((value: number) => TResult1 | PromiseLike<TResult1>) | null,
+                ): PromiseLike<TResult1> {
+                    if (onfulfilled) {
+                        onfulfilled(100);
+                    }
+                    return this as unknown as PromiseLike<TResult1>;
                 },
             };
             const result = await promiseToAsyncResult(thenable);
