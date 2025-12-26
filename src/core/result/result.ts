@@ -1,7 +1,6 @@
 /**
  * @module
  * A Rust-inspired [Result](https://doc.rust-lang.org/core/result/index.html) enum type, used for better error handling.
- *
  */
 
 import type { Option } from '../option/option.ts';

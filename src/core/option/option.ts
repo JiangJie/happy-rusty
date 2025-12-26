@@ -1,7 +1,6 @@
 /**
  * @module
  * A Rust-inspired [Option](https://doc.rust-lang.org/core/option/index.html) enum type, used as an alternative to the use of null and undefined.
- *
  */
 
 import type { Result } from '../result/result.ts';
