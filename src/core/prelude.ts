@@ -463,6 +463,13 @@ export function Ok<T, E>(value?: T): Result<T, E> {
             throw new TypeError('Result::unwrapErr() called on an `Ok` value');
         },
 
+        intoOk(): T {
+            return value as T;
+        },
+        intoErr(): never {
+            throw new TypeError('Result::intoErr() called on an `Ok` value');
+        },
+
         ok(): Option<T> {
             return Some(value as T);
         },
@@ -603,6 +610,13 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
             return error;
         },
         unwrapErr(): E {
+            return error;
+        },
+
+        intoOk(): never {
+            throw new TypeError('Result::intoOk() called on an `Err` value');
+        },
+        intoErr(): E {
             return error;
         },
 

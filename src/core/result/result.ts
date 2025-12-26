@@ -300,6 +300,52 @@ export interface Result<T, E> {
      */
     unwrapErr(): E;
 
+    /**
+     * Returns the contained `Ok` value.
+     *
+     * Unlike `unwrap`, this method is known to never throw because
+     * the error type is `never`, meaning the `Err` variant can never occur.
+     *
+     * This provides a **compile-time guarantee** that the extraction is safe.
+     * If someone later changes the error type to one that can occur,
+     * the code will fail to compile rather than potentially throwing at runtime.
+     *
+     * @returns The contained `Ok` value.
+     * @example
+     * ```ts
+     * function alwaysSucceeds(): Result<string, never> {
+     *     return Ok('success');
+     * }
+     *
+     * // Safe extraction - compiler knows this can never be Err
+     * const value: string = alwaysSucceeds().intoOk();
+     * ```
+     */
+    intoOk(this: Result<T, never>): T;
+
+    /**
+     * Returns the contained `Err` value.
+     *
+     * Unlike `unwrapErr`, this method is known to never throw because
+     * the success type is `never`, meaning the `Ok` variant can never occur.
+     *
+     * This provides a **compile-time guarantee** that the extraction is safe.
+     * If someone later changes the ok type to one that can occur,
+     * the code will fail to compile rather than potentially throwing at runtime.
+     *
+     * @returns The contained `Err` value.
+     * @example
+     * ```ts
+     * function alwaysFails(): Result<never, string> {
+     *     return Err('error');
+     * }
+     *
+     * // Safe extraction - compiler knows this can never be Ok
+     * const error: string = alwaysFails().intoErr();
+     * ```
+     */
+    intoErr(this: Result<never, E>): E;
+
     // #endregion
 
     // #region Transforming contained values

@@ -242,6 +242,18 @@ describe('Result', () => {
             });
         });
 
+        describe('infallible extraction', () => {
+            it('intoOk() should return the contained value for Result<T, never>', () => {
+                const infallible = Ok('success');
+                const value = infallible.intoOk();
+                expect(value).toBe('success');
+            });
+
+            it('intoErr() should throw TypeError on Ok', () => {
+                expect(() => (ok as unknown as Result<never, string>).intoErr()).toThrow(TypeError);
+            });
+        });
+
         describe('iterator', () => {
             it('should yield the contained value once', () => {
                 const values: number[] = [];
@@ -479,6 +491,18 @@ describe('Result', () => {
 
             it('asErr() should return self', () => {
                 expect(err.asErr()).toBe(err);
+            });
+        });
+
+        describe('infallible extraction', () => {
+            it('intoErr() should return the contained error for Result<never, E>', () => {
+                const infallible = Err('error');
+                const error = infallible.intoErr();
+                expect(error).toBe('error');
+            });
+
+            it('intoOk() should throw TypeError on Err', () => {
+                expect(() => (err as unknown as Result<number, never>).intoOk()).toThrow(TypeError);
             });
         });
 
