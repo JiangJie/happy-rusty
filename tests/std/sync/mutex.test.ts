@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Mutex } from '../../src/mod.ts';
+import { Mutex } from '../../../src/mod.ts';
 
 describe('Mutex', () => {
     describe('initial state', () => {

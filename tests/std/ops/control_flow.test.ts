@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Break, Continue, isControlFlow } from '../../src/mod.ts';
+import { Break, Continue, isControlFlow } from '../../../src/mod.ts';
 
 describe('ControlFlow', () => {
     describe('Break', () => {

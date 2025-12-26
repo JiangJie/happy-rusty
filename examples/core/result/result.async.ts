@@ -4,7 +4,7 @@
  * Demonstrates using async Result methods for handling
  * asynchronous operations that may fail.
  */
-import { Err, Ok, type Result, tryAsyncResult } from '../src/mod.ts';
+import { Err, Ok, type Result, tryAsyncResult } from '../../../src/mod.ts';
 
 // Types
 interface User {

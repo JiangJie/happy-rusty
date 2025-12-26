@@ -5,7 +5,7 @@ import {
     RESULT_VOID,
     RESULT_ZERO,
     isResult,
-} from '../../src/mod.ts';
+} from '../../../src/mod.ts';
 
 describe('Result Constants', () => {
     describe('RESULT_TRUE', () => {

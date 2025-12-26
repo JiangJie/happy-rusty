@@ -4,7 +4,7 @@
  * Demonstrates using Once for lazy initialization of expensive resources,
  * configuration loading, and singleton patterns. Supports both sync and async.
  */
-import { Err, Ok, Once } from '../src/mod.ts';
+import { Err, Ok, Once } from '../../../src/mod.ts';
 
 // ============================================================================
 // Example 1: Basic sync lazy initialization

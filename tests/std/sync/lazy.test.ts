@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Lazy, LazyAsync } from '../../src/mod.ts';
+import { Lazy, LazyAsync } from '../../../src/mod.ts';
 
 describe('Lazy', () => {
     describe('initial state', () => {

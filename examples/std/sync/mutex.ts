@@ -4,7 +4,7 @@
  * Demonstrates using Mutex to prevent race conditions in async code,
  * protecting shared resources from concurrent access.
  */
-import { Mutex } from '../src/mod.ts';
+import { Mutex } from '../../../src/mod.ts';
 
 // ============================================================================
 // Example 1: Basic counter protection

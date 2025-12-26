@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Err, Ok, Once } from '../../src/mod.ts';
+import { Err, Ok, Once } from '../../../src/mod.ts';
 
 describe('Once', () => {
     describe('initial state', () => {

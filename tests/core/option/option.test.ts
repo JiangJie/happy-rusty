@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Err, None, Ok, Some, type Option } from '../../src/mod.ts';
+import { Err, None, Ok, Some, type Option } from '../../../src/mod.ts';
 
 describe('Option', () => {
     describe('Some variant', () => {

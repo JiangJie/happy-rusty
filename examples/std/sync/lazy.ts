@@ -4,7 +4,7 @@
  * Demonstrates using Lazy and LazyAsync for deferred initialization.
  * Unlike Once, the initialization function is bound at creation time.
  */
-import { Lazy, LazyAsync } from '../src/mod.ts';
+import { Lazy, LazyAsync } from '../../../src/mod.ts';
 
 // ============================================================================
 // Example 1: Basic Lazy usage
@@ -240,7 +240,7 @@ try {
 // ============================================================================
 console.log('\n=== Example 7: Lazy vs Once ===\n');
 
-import { Once } from '../src/mod.ts';
+import { Once } from '../../../src/mod.ts';
 
 // Lazy: initialization function bound at creation
 const lazyValue = Lazy(() => {

@@ -4,7 +4,7 @@
  * Demonstrates using Result for error handling in a type-safe way,
  * replacing try-catch with chainable operations.
  */
-import { Err, Ok, type Result } from '../src/mod.ts';
+import { Err, Ok, type Result } from '../../../src/mod.ts';
 
 // Error types
 interface ValidationError {

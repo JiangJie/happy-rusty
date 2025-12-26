@@ -4,7 +4,7 @@
  * Demonstrates using async Option methods for handling
  * asynchronous operations that may or may not return values.
  */
-import { None, type Option, Some } from '../src/mod.ts';
+import { None, type Option, Some } from '../../../src/mod.ts';
 
 // Simulated cache and remote data
 interface Product {

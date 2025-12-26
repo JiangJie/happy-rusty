@@ -5,7 +5,7 @@
  * ControlFlow is useful for short-circuiting operations and custom iterators.
  */
 
-import { Break, Continue, type ControlFlow } from '../src/mod.ts';
+import { Break, Continue, type ControlFlow } from '../../../src/mod.ts';
 
 // ============================================================================
 // Example 1: Short-circuiting Search

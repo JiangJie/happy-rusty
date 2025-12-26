@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Err, isOption, isResult, None, Ok, Some } from '../../src/mod.ts';
+import { Err, isOption, isResult, None, Ok, Some } from '../../../src/mod.ts';
 
 describe('isOption', () => {
     describe('returns true for valid Option values', () => {

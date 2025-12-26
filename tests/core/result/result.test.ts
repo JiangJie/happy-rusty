@@ -11,7 +11,7 @@ import {
     tryResult,
     type Option,
     type Result,
-} from '../../src/mod.ts';
+} from '../../../src/mod.ts';
 
 describe('Result', () => {
     describe('Ok variant', () => {

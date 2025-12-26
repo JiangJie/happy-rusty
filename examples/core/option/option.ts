@@ -4,7 +4,7 @@
  * Demonstrates using Option for handling nullable/optional values
  * in a type-safe way without null checks scattered throughout code.
  */
-import { None, type Option, Some } from '../src/mod.ts';
+import { None, type Option, Some } from '../../../src/mod.ts';
 
 // Simulated user data with optional fields
 interface User {
