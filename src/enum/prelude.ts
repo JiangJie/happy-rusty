@@ -85,6 +85,13 @@ export function Some<T>(value: T): Option<T> {
         [Symbol.toStringTag]: 'Option',
         [OptionKindSymbol]: 'Some',
 
+        *[Symbol.iterator](): Iterator<T> {
+            yield value;
+        },
+        toString(): string {
+            return `Some(${ value })`;
+        },
+
         isSome(): true {
             return true;
         },
@@ -201,10 +208,6 @@ export function Some<T>(value: T): Option<T> {
             assertOption<T>(other);
             return other.isSome() && other.unwrap() === value;
         },
-
-        toString(): string {
-            return `Some(${ value })`;
-        },
     } as const);
 
     return some;
@@ -235,6 +238,13 @@ export function Some<T>(value: T): Option<T> {
 export const None: None = Object.freeze<None>({
     [Symbol.toStringTag]: 'Option',
     [OptionKindSymbol]: 'None',
+
+    *[Symbol.iterator](): Iterator<never> {
+        // Empty iterator - yields nothing
+    },
+    toString(): string {
+        return 'None';
+    },
 
     isSome(): false {
         return false;
@@ -340,10 +350,6 @@ export const None: None = Object.freeze<None>({
         assertOption<T>(other);
         return other === None;
     },
-
-    toString(): string {
-        return 'None';
-    },
 } as const);
 
 /**
@@ -396,6 +402,13 @@ export function Ok<T, E>(value?: T): Result<T, E> {
     const ok: Result<T, E> = Object.freeze<Result<T, E>>({
         [Symbol.toStringTag]: 'Result',
         [ResultKindSymbol]: 'Ok',
+
+        *[Symbol.iterator](): Iterator<T> {
+            yield value as T;
+        },
+        toString(): string {
+            return `Ok(${ value })`;
+        },
 
         isOk(): true {
             return true;
@@ -506,10 +519,6 @@ export function Ok<T, E>(value?: T): Result<T, E> {
         asErr(): never {
             throw new TypeError('Result::asErr() called on an `Ok` value.');
         },
-
-        toString(): string {
-            return `Ok(${ value })`;
-        },
     } as const);
 
     return ok;
@@ -536,6 +545,13 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
     const err: Result<T, E> = Object.freeze<Result<T, E>>({
         [Symbol.toStringTag]: 'Result',
         [ResultKindSymbol]: 'Err',
+
+        *[Symbol.iterator](): Iterator<T> {
+            // Empty iterator - yields nothing for Err
+        },
+        toString(): string {
+            return `Err(${ error })`;
+        },
 
         isOk(): false {
             return false;
@@ -643,10 +659,6 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
         },
         asErr<U>(): Result<U, E> {
             return err as unknown as Result<U, E>;
-        },
-
-        toString(): string {
-            return `Err(${ error })`;
         },
     } as const);
 

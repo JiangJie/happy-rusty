@@ -241,6 +241,34 @@ describe('Result', () => {
                 expect(() => ok.asErr()).toThrow(TypeError);
             });
         });
+
+        describe('iterator', () => {
+            it('should yield the contained value once', () => {
+                const values: number[] = [];
+                for (const v of ok) {
+                    values.push(v);
+                }
+                expect(values).toEqual([1]);
+            });
+
+            it('should work with spread operator', () => {
+                expect([...ok]).toEqual([1]);
+                expect([...Ok('hello')]).toEqual(['hello']);
+            });
+
+            it('should work with Array.from', () => {
+                expect(Array.from(ok)).toEqual([1]);
+            });
+
+            it('should be usable with destructuring', () => {
+                const [first] = ok;
+                expect(first).toBe(1);
+            });
+
+            it('should work with Ok()', () => {
+                expect([...Ok()]).toEqual([undefined]);
+            });
+        });
     });
 
     describe('Err variant', () => {
@@ -451,6 +479,24 @@ describe('Result', () => {
 
             it('asErr() should return self', () => {
                 expect(err.asErr()).toBe(err);
+            });
+        });
+
+        describe('iterator', () => {
+            it('should yield nothing', () => {
+                const values: number[] = [];
+                for (const v of err) {
+                    values.push(v);
+                }
+                expect(values).toEqual([]);
+            });
+
+            it('should work with spread operator', () => {
+                expect([...err]).toEqual([]);
+            });
+
+            it('should work with Array.from', () => {
+                expect(Array.from(err)).toEqual([]);
             });
         });
     });

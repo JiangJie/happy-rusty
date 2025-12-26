@@ -56,6 +56,50 @@ export interface Option<T> {
 
     // #endregion
 
+    // #region JavaScript protocols
+
+    /**
+     * Implements the Iterator protocol, allowing `Option` to be used with `for...of` loops and spread syntax.
+     * - For `Some(value)`, yields the contained value once.
+     * - For `None`, yields nothing (empty iterator).
+     *
+     * This is similar to Rust's `Option::iter()` method.
+     *
+     * @returns An iterator that yields zero or one value.
+     * @example
+     * ```ts
+     * // Using with for...of
+     * for (const value of Some(5)) {
+     *     console.log(value); // 5
+     * }
+     *
+     * for (const value of None) {
+     *     console.log(value); // never executed
+     * }
+     *
+     * // Using with spread operator
+     * const arr1 = [...Some(5)]; // [5]
+     * const arr2 = [...None];    // []
+     *
+     * // Using with Array.from
+     * Array.from(Some('hello')); // ['hello']
+     * Array.from(None);          // []
+     * ```
+     */
+    [Symbol.iterator](): Iterator<T>;
+
+    /**
+     * Custom `toString` implementation that uses the `Option`'s contained value.
+     * @example
+     * ```ts
+     * console.log(Some(5).toString()); // 'Some(5)'
+     * console.log(None.toString()); // 'None'
+     * ```
+     */
+    toString(): string;
+
+    // #endregion
+
     // #region Querying the variant
 
     /**
@@ -605,16 +649,6 @@ export interface Option<T> {
     eq(other: Option<T>): boolean;
 
     // #endregion
-
-    /**
-     * Custom `toString` implementation that uses the `Option`'s contained value.
-     * @example
-     * ```ts
-     * console.log(Some(5).toString()); // 'Some(5)'
-     * console.log(None.toString()); // 'None'
-     * ```
-     */
-    toString(): string;
 }
 
 /**
@@ -664,6 +698,50 @@ export interface Result<T, E> {
      * @internal
      */
     readonly [ResultKindSymbol]: 'Ok' | 'Err';
+
+    // #endregion
+
+    // #region JavaScript protocols
+
+    /**
+     * Implements the Iterator protocol, allowing `Result` to be used with `for...of` loops and spread syntax.
+     * - For `Ok(value)`, yields the contained value once.
+     * - For `Err(error)`, yields nothing (empty iterator).
+     *
+     * This is similar to Rust's `Result::iter()` method.
+     *
+     * @returns An iterator that yields zero or one value.
+     * @example
+     * ```ts
+     * // Using with for...of
+     * for (const value of Ok(5)) {
+     *     console.log(value); // 5
+     * }
+     *
+     * for (const value of Err('error')) {
+     *     console.log(value); // never executed
+     * }
+     *
+     * // Using with spread operator
+     * const arr1 = [...Ok(5)];        // [5]
+     * const arr2 = [...Err('error')]; // []
+     *
+     * // Using with Array.from
+     * Array.from(Ok('hello'));   // ['hello']
+     * Array.from(Err('error'));  // []
+     * ```
+     */
+    [Symbol.iterator](): Iterator<T>;
+
+    /**
+     * Custom `toString` implementation that uses the `Result`'s contained value.
+     * @example
+     * ```ts
+     * console.log(Ok(5).toString()); // 'Ok(5)'
+     * console.log(Err('error').toString()); // 'Err(error)'
+     * ```
+     */
+    toString(): string;
 
     // #endregion
 
@@ -1194,6 +1272,8 @@ export interface Result<T, E> {
 
     // #endregion
 
+    // #region Type casting
+
     /**
      * Transforms the current Result into a new Result where the type of the error is replaced with a new type `F`.
      * The type of the success value remains unchanged.
@@ -1229,15 +1309,7 @@ export interface Result<T, E> {
      */
     asErr<U>(): Result<U, E>;
 
-    /**
-     * Custom `toString` implementation that uses the `Result`'s contained value.
-     * @example
-     * ```ts
-     * console.log(Ok(5).toString()); // 'Ok(5)'
-     * console.log(Err('error').toString()); // 'Err(error)'
-     * ```
-     */
-    toString(): string;
+    // #endregion
 }
 
 /**

@@ -241,6 +241,30 @@ describe('Option', () => {
             });
         });
 
+        describe('iterator', () => {
+            it('should yield the contained value once', () => {
+                const values: number[] = [];
+                for (const v of some) {
+                    values.push(v);
+                }
+                expect(values).toEqual([10]);
+            });
+
+            it('should work with spread operator', () => {
+                expect([...some]).toEqual([10]);
+                expect([...Some('hello')]).toEqual(['hello']);
+            });
+
+            it('should work with Array.from', () => {
+                expect(Array.from(some)).toEqual([10]);
+            });
+
+            it('should be usable with destructuring', () => {
+                const [first] = some;
+                expect(first).toBe(10);
+            });
+        });
+
         describe('type assertions', () => {
             it('should throw TypeError for invalid Option in zip', () => {
                 expect(() => some.zip(null as unknown as Option<string>)).toThrow(TypeError);
@@ -470,6 +494,24 @@ describe('Option', () => {
 
             it('should not equal Some', () => {
                 expect(none.eq(Some(10))).toBe(false);
+            });
+        });
+
+        describe('iterator', () => {
+            it('should yield nothing', () => {
+                const values: never[] = [];
+                for (const v of none) {
+                    values.push(v);
+                }
+                expect(values).toEqual([]);
+            });
+
+            it('should work with spread operator', () => {
+                expect([...none]).toEqual([]);
+            });
+
+            it('should work with Array.from', () => {
+                expect(Array.from(none)).toEqual([]);
             });
         });
     });
