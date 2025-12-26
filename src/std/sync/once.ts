@@ -97,6 +97,30 @@ export interface Once<T> {
     set(value: T): VoidResult<T>;
 
     /**
+     * Sets the contents to `value` if empty, returning a reference to the value.
+     *
+     * Unlike `set()`, this method returns the stored value on success,
+     * and returns both the current and passed values on failure.
+     *
+     * @param value - The value to store.
+     * @returns `Ok(value)` if empty, `Err([currentValue, passedValue])` if already initialized.
+     *
+     * @example
+     * ```ts
+     * const once = Once<number>();
+     *
+     * // First insert succeeds, returns the stored value
+     * const result1 = once.tryInsert(42);
+     * console.log(result1.unwrap()); // 42
+     *
+     * // Second insert fails, returns [current, passed]
+     * const result2 = once.tryInsert(100);
+     * console.log(result2.unwrapErr()); // [42, 100]
+     * ```
+     */
+    tryInsert(value: T): Result<T, [T, T]>;
+
+    /**
      * Gets the contents, initializing it with `fn` if empty.
      *
      * @param fn - The synchronous initialization function, called only if empty.
@@ -362,6 +386,14 @@ export function Once<T>(): Once<T> {
             }
             setValue(newValue);
             return RESULT_VOID;
+        },
+
+        tryInsert(newValue: T): Result<T, [T, T]> {
+            if (initialized) {
+                return Err([value as T, newValue]);
+            }
+            setValue(newValue);
+            return Ok(newValue);
         },
 
         getOrInit(fn: () => T): T {

@@ -52,6 +52,50 @@ describe('Once', () => {
         });
     });
 
+    describe('tryInsert', () => {
+        it('should set value and return Ok with value on first call', () => {
+            const once = Once<number>();
+            const result = once.tryInsert(42);
+
+            expect(result.isOk()).toBe(true);
+            expect(result.unwrap()).toBe(42);
+            expect(once.isInitialized()).toBe(true);
+            expect(once.get().unwrap()).toBe(42);
+        });
+
+        it('should return Err with [current, passed] on second call', () => {
+            const once = Once<number>();
+            once.tryInsert(42);
+
+            const result = once.tryInsert(100);
+
+            expect(result.isErr()).toBe(true);
+            const [current, passed] = result.unwrapErr();
+            expect(current).toBe(42);
+            expect(passed).toBe(100);
+            expect(once.get().unwrap()).toBe(42); // Original value unchanged
+        });
+
+        it('should work with complex types', () => {
+            const once = Once<{ id: number; }>();
+
+            const result = once.tryInsert({ id: 1 });
+
+            expect(result.isOk()).toBe(true);
+            expect(result.unwrap()).toEqual({ id: 1 });
+        });
+
+        it('should return current value in error tuple', () => {
+            const once = Once<string>();
+            once.set('first');
+
+            const result = once.tryInsert('second');
+
+            expect(result.isErr()).toBe(true);
+            expect(result.unwrapErr()).toEqual(['first', 'second']);
+        });
+    });
+
     describe('get', () => {
         it('should return None when not initialized', () => {
             const once = Once<string>();
