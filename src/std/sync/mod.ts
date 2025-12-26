@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Synchronization primitives inspired by Rust's std::sync module.
  *
  * This module provides:

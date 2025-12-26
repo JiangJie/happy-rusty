@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Main entry point for the happy-rusty library.
  */
 export * from './core/mod.ts';

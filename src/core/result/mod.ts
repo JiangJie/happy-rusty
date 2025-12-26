@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Main entry point for the Result module.
  * Re-exports all public APIs from the Result submodules.
  */

@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Extension functions for bridging standard JavaScript patterns with Option types.
  *
  * This module provides utilities for:

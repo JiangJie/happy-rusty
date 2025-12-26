@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Rust-inspired [Mutex](https://doc.rust-lang.org/std/sync/struct.Mutex.html) for async mutual exclusion.
  *
  * In JavaScript's single-threaded environment, `Mutex<T>` is used to serialize

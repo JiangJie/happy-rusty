@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Type aliases for commonly used `Result` type combinations.
  *
  * These types provide convenient shortcuts for common patterns like:

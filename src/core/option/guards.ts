@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Type guard utility for checking if a value is an `Option` type.
  *
  * This function provides runtime type checking capability for the Option type.

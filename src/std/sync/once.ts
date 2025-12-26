@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Rust-inspired [OnceLock](https://doc.rust-lang.org/std/sync/struct.OnceLock.html) for one-time initialization.
  *
  * `Once<T>` is a container which can be written to only once. It provides safe access

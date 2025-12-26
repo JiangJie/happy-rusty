@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Internal symbols used to identify `ControlFlow` type variants.
  *
  * These symbols are used as property keys to distinguish between `Break` and `Continue` variants.

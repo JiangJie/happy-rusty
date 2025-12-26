@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Rust-inspired [ControlFlow](https://doc.rust-lang.org/std/ops/enum.ControlFlow.html) for control flow handling.
  *
  * `ControlFlow` is used to tell an operation whether it should exit early or go on as usual.

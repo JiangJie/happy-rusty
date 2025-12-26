@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * A Rust-inspired [Result](https://doc.rust-lang.org/core/result/index.html) enum type, used for better error handling.
  *
  */

@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Operators and control flow types inspired by Rust's std::ops module.
  *
  * This module provides:

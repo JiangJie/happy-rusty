@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Main entry point for the Option module.
  * Re-exports all public APIs from the Option submodules.
  */

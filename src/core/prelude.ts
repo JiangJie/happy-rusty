@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Constructors and factory functions for creating `Option` and `Result` types.
  *
  * This module exports:

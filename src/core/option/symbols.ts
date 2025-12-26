@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Internal symbol used to identify `Option` type variants.
  *
  * This symbol is used as a property key to distinguish between `Some` and `None` variants.

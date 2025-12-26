@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Type guard utilities for checking if values are `ControlFlow` types.
  *
  * These functions provide runtime type checking capabilities for the ControlFlow type.

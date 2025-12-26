@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Rust-inspired [LazyLock](https://doc.rust-lang.org/std/sync/struct.LazyLock.html) for lazy initialization.
  *
  * `Lazy<T>` is a value which is initialized on the first access. Unlike `Once<T>`,

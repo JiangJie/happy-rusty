@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @module
  * Pre-defined Result constants for common return values.
  *
  * These immutable constants can be reused throughout the application to avoid
