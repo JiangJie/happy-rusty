@@ -171,7 +171,7 @@ export function Some<T>(value: T): Option<T> {
             const tuple = value as [U, R];
 
             if (!Array.isArray(tuple) || tuple.length !== 2) {
-                throw new TypeError(`Option::unzip() requires a 2-element tuple, received ${ Array.isArray(tuple) ? `array with ${ tuple.length } elements` : typeof tuple }.`);
+                throw new TypeError(`Option::unzip() requires a 2-element tuple, received ${ Array.isArray(tuple) ? `array with ${ tuple.length } elements` : typeof tuple }`);
             }
 
             const [a, b] = tuple;
@@ -272,7 +272,7 @@ export const None: None = Object.freeze<None>({
         throw new TypeError(msg);
     },
     unwrap(): never {
-        throw new TypeError('Option::unwrap() called on a `None` value.');
+        throw new TypeError('Option::unwrap() called on a `None` value');
     },
     unwrapOr<T>(defaultValue: T): T {
         return defaultValue;
@@ -452,7 +452,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
             throw new TypeError(`${ msg }: ${ value }`);
         },
         unwrapErr(): never {
-            throw new TypeError('Result::unwrapErr() called on an `Ok` value.');
+            throw new TypeError('Result::unwrapErr() called on an `Ok` value');
         },
 
         ok(): Option<T> {
@@ -520,7 +520,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
             return ok as unknown as Result<T, F>;
         },
         asErr(): never {
-            throw new TypeError('Result::asErr() called on an `Ok` value.');
+            throw new TypeError('Result::asErr() called on an `Ok` value');
         },
     } as const);
 
@@ -579,7 +579,7 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
             throw new TypeError(`${ msg }: ${ error }`);
         },
         unwrap(): never {
-            throw new TypeError('Result::unwrap() called on an `Err` value.');
+            throw new TypeError('Result::unwrap() called on an `Err` value');
         },
         unwrapOr(defaultValue: T): T {
             return defaultValue;
@@ -658,7 +658,7 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
         },
 
         asOk(): never {
-            throw new TypeError('Result::asOk() called on an `Err` value.');
+            throw new TypeError('Result::asOk() called on an `Err` value');
         },
         asErr<U>(): Result<U, E> {
             return err as unknown as Result<U, E>;
@@ -702,7 +702,7 @@ function safeStringify(value: unknown): string {
  */
 function assertOption<T>(o: unknown): asserts o is Option<T> {
     if (!isOption(o)) {
-        throw new TypeError(`Expected an Option, but received: ${ safeStringify(o) }.`);
+        throw new TypeError(`Expected an Option, but received: ${ safeStringify(o) }`);
     }
 }
 
@@ -717,6 +717,6 @@ function assertOption<T>(o: unknown): asserts o is Option<T> {
  */
 function assertResult<T, E>(r: unknown): asserts r is Result<T, E> {
     if (!isResult(r)) {
-        throw new TypeError(`Expected a Result, but received: ${ safeStringify(r) }.`);
+        throw new TypeError(`Expected a Result, but received: ${ safeStringify(r) }`);
     }
 }

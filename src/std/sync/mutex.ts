@@ -288,13 +288,13 @@ export function Mutex<T>(value: T): Mutex<T> {
 
             get value(): T {
                 if (released) {
-                    throw new Error('MutexGuard has been released.');
+                    throw new Error('MutexGuard has been released');
                 }
                 return currentValue;
             },
             set value(newValue: T) {
                 if (released) {
-                    throw new Error('MutexGuard has been released.');
+                    throw new Error('MutexGuard has been released');
                 }
                 currentValue = newValue;
             },
