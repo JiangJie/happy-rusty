@@ -224,6 +224,46 @@ export interface Once<T> {
      * ```
      */
     isInitialized(): boolean;
+
+    /**
+     * Waits for the cell to be initialized, then returns the value.
+     *
+     * If the cell is already initialized, returns immediately.
+     * If initialization is in progress, waits for it to complete.
+     * If the cell is uninitialized and no initialization is in progress,
+     * the returned promise will resolve when another caller initializes the cell.
+     *
+     * @returns A promise that resolves to the stored value once initialized.
+     *
+     * @example
+     * ```ts
+     * const once = Once<number>();
+     *
+     * // Start waiting in background
+     * const waitPromise = once.waitAsync();
+     *
+     * // Later, initialize the value
+     * once.set(42);
+     *
+     * // waitPromise resolves with 42
+     * console.log(await waitPromise); // 42
+     * ```
+     *
+     * @example
+     * ```ts
+     * const config = Once<Config>();
+     *
+     * // Multiple consumers can wait for initialization
+     * const [cfg1, cfg2] = await Promise.all([
+     *     config.waitAsync(),
+     *     config.waitAsync(),
+     * ]);
+     *
+     * // Meanwhile, one producer initializes
+     * config.set(loadConfig());
+     * ```
+     */
+    waitAsync(): Promise<T>;
 }
 
 /**
@@ -291,6 +331,19 @@ export function Once<T>(): Once<T> {
     let value: T | undefined;
     let initialized = false;
     let pendingPromise: Promise<T> | undefined;
+    let waiters: ((value: T) => void)[] = [];
+
+    /**
+     * Sets the value, marks as initialized, and notifies all waiters.
+     */
+    function setValue(val: T): void {
+        value = val;
+        initialized = true;
+        for (const waiter of waiters) {
+            waiter(val);
+        }
+        waiters = [];
+    }
 
     return Object.freeze<Once<T>>({
         [Symbol.toStringTag]: 'Once',
@@ -307,15 +360,13 @@ export function Once<T>(): Once<T> {
             if (initialized) {
                 return Err(newValue);
             }
-            value = newValue;
-            initialized = true;
+            setValue(newValue);
             return Ok(undefined);
         },
 
         getOrInit(fn: () => T): T {
             if (!initialized) {
-                value = fn();
-                initialized = true;
+                setValue(fn());
             }
             return value as T;
         },
@@ -333,8 +384,7 @@ export function Once<T>(): Once<T> {
             pendingPromise = (async () => {
                 try {
                     const result = await fn();
-                    value = result;
-                    initialized = true;
+                    setValue(result);
                     return result;
                 } finally {
                     pendingPromise = undefined;
@@ -351,8 +401,7 @@ export function Once<T>(): Once<T> {
 
             const result = fn();
             if (result.isOk()) {
-                value = result.unwrap();
-                initialized = true;
+                setValue(result.unwrap());
             }
             return result;
         },
@@ -377,9 +426,9 @@ export function Once<T>(): Once<T> {
             pendingPromise = (async () => {
                 const result = await fn();
                 if (result.isOk()) {
-                    value = result.unwrap();
-                    initialized = true;
-                    return value;
+                    const val = result.unwrap();
+                    setValue(val);
+                    return val;
                 }
                 // If Err, throw to signal failure (we'll catch and return the result)
                 throw result;
@@ -407,6 +456,23 @@ export function Once<T>(): Once<T> {
 
         isInitialized(): boolean {
             return initialized;
+        },
+
+        waitAsync(): Promise<T> {
+            // If already initialized, return immediately
+            if (initialized) {
+                return Promise.resolve(value as T);
+            }
+
+            // If initialization is in progress, wait for it
+            if (pendingPromise) {
+                return pendingPromise;
+            }
+
+            // Otherwise, add to waiters and wait for someone to initialize
+            return new Promise<T>((resolve) => {
+                waiters.push(resolve);
+            });
         },
     } as const);
 }

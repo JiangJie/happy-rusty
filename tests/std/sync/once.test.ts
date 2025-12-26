@@ -398,6 +398,140 @@ describe('Once', () => {
         });
     });
 
+    describe('waitAsync', () => {
+        it('should return immediately when already initialized', async () => {
+            const once = Once<number>();
+            once.set(42);
+
+            const value = await once.waitAsync();
+            expect(value).toBe(42);
+        });
+
+        it('should wait for set() to be called', async () => {
+            const once = Once<number>();
+
+            // Start waiting
+            const waitPromise = once.waitAsync();
+
+            // Set value after a delay
+            setTimeout(() => once.set(42), 10);
+
+            const value = await waitPromise;
+            expect(value).toBe(42);
+        });
+
+        it('should wait for getOrInit() to be called', async () => {
+            const once = Once<number>();
+
+            const waitPromise = once.waitAsync();
+
+            setTimeout(() => once.getOrInit(() => 100), 10);
+
+            const value = await waitPromise;
+            expect(value).toBe(100);
+        });
+
+        it('should wait for getOrInitAsync() to complete', async () => {
+            const once = Once<number>();
+
+            const waitPromise = once.waitAsync();
+
+            setTimeout(async () => {
+                await once.getOrInitAsync(async () => {
+                    await new Promise(r => setTimeout(r, 10));
+                    return 200;
+                });
+            }, 5);
+
+            const value = await waitPromise;
+            expect(value).toBe(200);
+        });
+
+        it('should return pending promise if initialization is in progress', async () => {
+            const once = Once<number>();
+
+            // Start async initialization
+            const initPromise = once.getOrInitAsync(async () => {
+                await new Promise(r => setTimeout(r, 30));
+                return 42;
+            });
+
+            // waitAsync should wait for the pending initialization
+            const waitPromise = once.waitAsync();
+
+            const [initValue, waitValue] = await Promise.all([initPromise, waitPromise]);
+
+            expect(initValue).toBe(42);
+            expect(waitValue).toBe(42);
+        });
+
+        it('should support multiple waiters', async () => {
+            const once = Once<number>();
+
+            // Multiple waiters
+            const wait1 = once.waitAsync();
+            const wait2 = once.waitAsync();
+            const wait3 = once.waitAsync();
+
+            // Set value after a delay
+            setTimeout(() => once.set(42), 10);
+
+            const [v1, v2, v3] = await Promise.all([wait1, wait2, wait3]);
+
+            expect(v1).toBe(42);
+            expect(v2).toBe(42);
+            expect(v3).toBe(42);
+        });
+
+        it('should work with getOrTryInit() when successful', async () => {
+            const once = Once<number>();
+
+            const waitPromise = once.waitAsync();
+
+            setTimeout(() => once.getOrTryInit(() => Ok(42)), 10);
+
+            const value = await waitPromise;
+            expect(value).toBe(42);
+        });
+
+        it('should not resolve when getOrTryInit() fails', async () => {
+            const once = Once<number>();
+
+            let resolved = false;
+            const waitPromise = once.waitAsync().then(v => {
+                resolved = true;
+                return v;
+            });
+
+            // This fails, so waiter should not be notified
+            once.getOrTryInit(() => Err<number, string>('error'));
+
+            // Give some time
+            await new Promise(r => setTimeout(r, 20));
+            expect(resolved).toBe(false);
+
+            // Now succeed
+            once.getOrTryInit(() => Ok(42));
+
+            const value = await waitPromise;
+            expect(value).toBe(42);
+            expect(resolved).toBe(true);
+        });
+
+        it('should work with getOrTryInitAsync() when successful', async () => {
+            const once = Once<number>();
+
+            const waitPromise = once.waitAsync();
+
+            setTimeout(async () => {
+                await once.getOrTryInitAsync(async () => Ok(42));
+            }, 10);
+
+            const value = await waitPromise;
+            expect(value).toBe(42);
+        });
+    });
+
     describe('Immutability', () => {
         it('Once should be frozen', () => {
             const once = Once<number>();

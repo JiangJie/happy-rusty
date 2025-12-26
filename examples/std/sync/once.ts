@@ -199,3 +199,81 @@ const asyncAgain = await mixedOnce.getOrInitAsync(async () => {
 });
 console.log(`Async again result: ${asyncAgain}`);
 console.log(`Still same value: ${asyncValue === asyncAgain}`);
+
+// ============================================================================
+// Example 7: waitAsync - Producer-Consumer pattern
+// ============================================================================
+console.log('\n=== Example 7: waitAsync - Producer-Consumer pattern ===\n');
+
+// Scenario: Multiple consumers wait for a configuration to be loaded by a producer
+
+const appConfig = Once<{ port: number; host: string; }>();
+
+// Consumer function - waits for config to be available
+async function startServer(name: string): Promise<void> {
+    console.log(`[${name}] Waiting for config...`);
+    const config = await appConfig.waitAsync();
+    console.log(`[${name}] Started on ${config.host}:${config.port}`);
+}
+
+// Producer function - loads config after some delay
+async function loadConfig(): Promise<void> {
+    console.log('[Producer] Loading config...');
+    await new Promise(r => setTimeout(r, 100));
+    appConfig.set({ port: 8080, host: 'localhost' });
+    console.log('[Producer] Config loaded');
+}
+
+// Start consumers first (they will wait)
+const server1 = startServer('Server1');
+const server2 = startServer('Server2');
+const server3 = startServer('Server3');
+
+// Start producer after a small delay
+await new Promise(r => setTimeout(r, 50));
+await loadConfig();
+
+// Wait for all servers to start
+await Promise.all([server1, server2, server3]);
+
+// ============================================================================
+// Example 8: waitAsync - Service dependency
+// ============================================================================
+console.log('\n=== Example 8: waitAsync - Service dependency ===\n');
+
+// Scenario: Services depend on a database connection being established
+
+const dbConnection = Once<{ query: (sql: string) => string; }>();
+
+class UserService {
+    async getUsers(): Promise<string> {
+        const db = await dbConnection.waitAsync();
+        return db.query('SELECT * FROM users');
+    }
+}
+
+class OrderService {
+    async getOrders(): Promise<string> {
+        const db = await dbConnection.waitAsync();
+        return db.query('SELECT * FROM orders');
+    }
+}
+
+const userService = new UserService();
+const orderService = new OrderService();
+
+// Services start querying before DB is ready
+const usersPromise = userService.getUsers();
+const ordersPromise = orderService.getOrders();
+
+// Database connects after services start
+await new Promise(r => setTimeout(r, 50));
+console.log('Establishing database connection...');
+dbConnection.set({
+    query: (sql: string) => `Result of: ${sql}`,
+});
+console.log('Database connected');
+
+// Now the queries complete
+console.log(await usersPromise);
+console.log(await ordersPromise);
