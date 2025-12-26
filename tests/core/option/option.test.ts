@@ -170,6 +170,44 @@ describe('Option', () => {
             });
         });
 
+        describe('reduce', () => {
+            it('should apply fn when both are Some', () => {
+                const a = Some(10);
+                const b = Some(20);
+                expect(a.reduce(b, (x, y) => x + y).eq(Some(30))).toBe(true);
+            });
+
+            it('should return self when only self is Some', () => {
+                const a = Some(10);
+                const b: Option<number> = None;
+                expect(a.reduce(b, (x, y) => x + y).eq(Some(10))).toBe(true);
+            });
+
+            it('should return other when only other is Some', () => {
+                const a: Option<number> = None;
+                const b = Some(20);
+                expect(a.reduce(b, (x, y) => x + y).eq(Some(20))).toBe(true);
+            });
+
+            it('should return None when both are None', () => {
+                const a: Option<number> = None;
+                const b: Option<number> = None;
+                expect(a.reduce(b, (x, y) => x + y).isNone()).toBe(true);
+            });
+
+            it('should allow fn to return a different type R', () => {
+                const a = Some(42);
+                const b = Some({ value: 42 });
+                const result = a.reduce(b, (s, n) => `${ s }-${ n.value }`);
+                expect(result.eq(Some('42-42'))).toBe(true);
+            });
+
+            it('should throw for invalid other argument', () => {
+                expect(() => some.reduce('not an option' as unknown as Option<number>, (x, y) => x + y))
+                    .toThrow('Expected an Option');
+            });
+        });
+
         describe('boolean operators', () => {
             it('and() should return other when self is Some', () => {
                 expect(some.and(Some(20)).eq(Some(20))).toBe(true);

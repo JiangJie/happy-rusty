@@ -177,6 +177,10 @@ export function Some<T>(value: T): Option<T> {
             const [a, b] = tuple;
             return [Some(a), Some(b)];
         },
+        reduce<U, R = T | U>(other: Option<U>, fn: (value: T, otherValue: U) => R): Option<T | U | R> {
+            assertOption<U>(other);
+            return other.isSome() ? Some(fn(value, other.unwrap())) : some as Option<T | U | R>;
+        },
 
         and<U>(other: Option<U>): Option<U> {
             assertOption<U>(other);
@@ -319,6 +323,10 @@ export const None: None = Object.freeze<None>({
     },
     unzip(): [None, None] {
         return [None, None];
+    },
+    reduce<U, R = U>(other: Option<U>, _fn: (value: never, otherValue: U) => R): Option<U | R> {
+        assertOption<U>(other);
+        return other as Option<U | R>;
     },
 
     and<U>(_other: Option<U>): None {

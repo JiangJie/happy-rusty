@@ -466,6 +466,45 @@ export interface Option<T> {
      */
     unzip<U, R>(this: Option<[U, R]>): [Option<U>, Option<R>];
 
+    /**
+     * Reduces two `Option` values into one using the provided function.
+     *
+     * - If both `this` and `other` are `Some`, applies `fn` to both values and returns `Some(result)`.
+     * - If only `this` is `Some`, returns `Some(this_value)`.
+     * - If only `other` is `Some`, returns `Some(other_value)`.
+     * - If both are `None`, returns `None`.
+     *
+     * This is similar to Rust's `Option::reduce` with `Into<R>` constraints.
+     * In TypeScript, when only one Option is Some, that value is returned as-is
+     * (relying on TypeScript's structural typing for compatibility with R).
+     *
+     * @typeParam U - The type of the value in the other `Option`.
+     * @typeParam R - The result type (defaults to `T | U`).
+     * @param other - The other `Option` to reduce with.
+     * @param fn - A function that combines both values when both are `Some`.
+     * @returns The reduced `Option`.
+     * @see zip
+     * @see zipWith
+     * @see or
+     * @example
+     * ```ts
+     * const a = Some(10);
+     * const b = Some(20);
+     * console.log(a.reduce(b, (x, y) => x + y).unwrap()); // 30
+     *
+     * const c = None as Option<number>;
+     * console.log(a.reduce(c, (x, y) => x + y).unwrap()); // 10
+     * console.log(c.reduce(b, (x, y) => x + y).unwrap()); // 20
+     * console.log(c.reduce(c, (x, y) => x + y).isNone()); // true
+     *
+     * // With different types that share a common supertype
+     * const str = Some('hello');
+     * const num = Some(42);
+     * const result: Option<string> = str.reduce(num, (s, n) => `${s}-${n}`);
+     * ```
+     */
+    reduce<U, R = T | U>(other: Option<U>, fn: (value: T, otherValue: U) => R): Option<T | U | R>;
+
     // #endregion
 
     // #region Boolean operators
