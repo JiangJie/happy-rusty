@@ -140,6 +140,43 @@ for (let i = 0; i < 3; i++) {
     );
 }
 
+// Example 4b: tryAsyncResult with argument passing (like Promise.try)
+console.log('\n=== Example 4b: tryAsyncResult with arguments ===');
+
+async function fetchData(url: string, options: { method: string; }): Promise<string> {
+    // Simulate fetch
+    await new Promise(resolve => setTimeout(resolve, 50));
+    return `Fetched from ${url} with method ${options.method}`;
+}
+
+// Pass arguments directly - no closure needed!
+const fetchResult = await tryAsyncResult(fetchData, 'https://api.example.com', { method: 'GET' });
+console.log(fetchResult.unwrapOr('Fetch failed'));
+
+// Example 4c: tryAsyncResult with sync/async unified return
+console.log('\n=== Example 4c: Sync/Async unified return ===');
+
+// Cache example: returns sync if cached, async if not
+const cache = new Map<string, string>([['user:1', 'Alice']]);
+
+function getCachedOrFetch(key: string): string | Promise<string> {
+    const cached = cache.get(key);
+    if (cached !== undefined) {
+        return cached; // Sync return
+    }
+    // Simulate async fetch
+    return new Promise(resolve => {
+        setTimeout(() => resolve(`Fetched: ${key}`), 50);
+    });
+}
+
+// tryAsyncResult handles both sync and async returns uniformly
+const cachedResult = await tryAsyncResult(getCachedOrFetch, 'user:1');
+console.log(`Cached: ${cachedResult.unwrapOr('miss')}`); // Sync path
+
+const fetchedResult = await tryAsyncResult(getCachedOrFetch, 'user:2');
+console.log(`Fetched: ${fetchedResult.unwrapOr('miss')}`); // Async path
+
 // Example 5: Complex async workflow
 console.log('\n=== Example 5: Complete workflow ===');
 

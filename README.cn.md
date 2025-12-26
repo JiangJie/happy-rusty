@@ -158,14 +158,20 @@ if (isResult(value)) { /* ... */ }
 if (isControlFlow(value)) { /* ... */ }
 
 // 捕获异常为 Option（成功 → Some，异常 → None）
-const parsed = tryOption(() => JSON.parse(jsonString));
-const asyncData = await tryAsyncOption(fetch('/api').then(r => r.json()));
+const parsed = tryOption(JSON.parse, jsonString);  // 直接传参（类似 Promise.try）
+const url = tryOption(() => new URL(input));       // 或使用闭包
 
 // 捕获异常为 Result（成功 → Ok，异常 → Err）
-const result = tryResult(() => JSON.parse(jsonString));
-const asyncResult = await tryAsyncResult(fetch('/api/data'));
+const result = tryResult(JSON.parse, jsonString);
+const asyncResult = await tryAsyncResult(fetch, '/api/data');
 asyncResult.inspect(data => console.log(data))
            .inspectErr(err => console.error(err));
+
+// 异步函数可以返回同步或异步值
+const data = await tryAsyncResult((id) => {
+    if (cache.has(id)) return cache.get(id);  // 同步返回
+    return fetchFromServer(id);                // 异步返回
+}, 'user-123');
 ```
 
 ### 常量

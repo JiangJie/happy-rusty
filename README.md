@@ -158,14 +158,20 @@ if (isResult(value)) { /* ... */ }
 if (isControlFlow(value)) { /* ... */ }
 
 // Capture exceptions as Option (success → Some, exception → None)
-const parsed = tryOption(() => JSON.parse(jsonString));
-const asyncData = await tryAsyncOption(fetch('/api').then(r => r.json()));
+const parsed = tryOption(JSON.parse, jsonString);  // with arguments (like Promise.try)
+const url = tryOption(() => new URL(input));       // or with closure
 
 // Capture exceptions as Result (success → Ok, exception → Err)
-const result = tryResult(() => JSON.parse(jsonString));
-const asyncResult = await tryAsyncResult(fetch('/api/data'));
+const result = tryResult(JSON.parse, jsonString);
+const asyncResult = await tryAsyncResult(fetch, '/api/data');
 asyncResult.inspect(data => console.log(data))
            .inspectErr(err => console.error(err));
+
+// Async functions can return sync or async values
+const data = await tryAsyncResult((id) => {
+    if (cache.has(id)) return cache.get(id);  // sync return
+    return fetchFromServer(id);                // async return
+}, 'user-123');
 ```
 
 ### Constants
