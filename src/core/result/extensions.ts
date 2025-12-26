@@ -6,8 +6,8 @@
  * - Converting try-catch patterns to Result-based error handling
  * - Integrating async/await patterns with Result types
  */
-import type { AsyncResult, Result } from './result.ts';
 import { Err, Ok } from '../prelude.ts';
+import type { AsyncResult, Result } from './result.ts';
 
 /**
  * Executes a function and captures any thrown exception as an `Err`.

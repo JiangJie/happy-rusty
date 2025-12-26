@@ -29,6 +29,16 @@ export interface MutexGuard<T> {
     value: T;
 
     /**
+     * Custom `toString` implementation.
+     * @example
+     * ```ts
+     * const guard = await mutex.lock();
+     * console.log(guard.toString()); // 'MutexGuard(42)'
+     * ```
+     */
+    toString(): string;
+
+    /**
      * Releases the lock, allowing other waiters to acquire it.
      *
      * Must be called when done with the protected value.
@@ -45,16 +55,6 @@ export interface MutexGuard<T> {
      * ```
      */
     unlock(): void;
-
-    /**
-     * Custom `toString` implementation.
-     * @example
-     * ```ts
-     * const guard = await mutex.lock();
-     * console.log(guard.toString()); // 'MutexGuard(42)'
-     * ```
-     */
-    toString(): string;
 }
 
 /**
@@ -90,6 +90,19 @@ export interface Mutex<T> {
      * Returns `'Mutex'` so that `Object.prototype.toString.call(mutex)` produces `'[object Mutex]'`.
      */
     readonly [Symbol.toStringTag]: 'Mutex';
+
+    /**
+     * Custom `toString` implementation.
+     * @example
+     * ```ts
+     * const mutex = Mutex(42);
+     * console.log(mutex.toString()); // 'Mutex(<unlocked>)'
+     *
+     * const guard = await mutex.lock();
+     * console.log(mutex.toString()); // 'Mutex(<locked>)'
+     * ```
+     */
+    toString(): string;
 
     /**
      * Acquires the lock and executes the callback with the protected value.
@@ -174,19 +187,6 @@ export interface Mutex<T> {
      * ```
      */
     isLocked(): boolean;
-
-    /**
-     * Custom `toString` implementation.
-     * @example
-     * ```ts
-     * const mutex = Mutex(42);
-     * console.log(mutex.toString()); // 'Mutex(<unlocked>)'
-     *
-     * const guard = await mutex.lock();
-     * console.log(mutex.toString()); // 'Mutex(<locked>)'
-     * ```
-     */
-    toString(): string;
 }
 
 /**
@@ -286,6 +286,13 @@ export function Mutex<T>(value: T): Mutex<T> {
         return Object.freeze<MutexGuard<T>>({
             [Symbol.toStringTag]: 'MutexGuard',
 
+            toString(): string {
+                if (released) {
+                    return 'MutexGuard(<released>)';
+                }
+                return `MutexGuard(${ currentValue })`;
+            },
+
             get value(): T {
                 if (released) {
                     throw new Error('MutexGuard has been released');
@@ -305,13 +312,6 @@ export function Mutex<T>(value: T): Mutex<T> {
                 released = true;
                 unlock();
             },
-
-            toString(): string {
-                if (released) {
-                    return 'MutexGuard(<released>)';
-                }
-                return `MutexGuard(${ currentValue })`;
-            },
         } as const);
     }
 
@@ -330,6 +330,10 @@ export function Mutex<T>(value: T): Mutex<T> {
 
     return Object.freeze<Mutex<T>>({
         [Symbol.toStringTag]: 'Mutex',
+
+        toString(): string {
+            return locked ? 'Mutex(<locked>)' : 'Mutex(<unlocked>)';
+        },
 
         async withLock<U>(fn: (value: T) => Promise<U> | U): Promise<U> {
             const guard = await lock();
@@ -352,10 +356,6 @@ export function Mutex<T>(value: T): Mutex<T> {
 
         isLocked(): boolean {
             return locked;
-        },
-
-        toString(): string {
-            return locked ? 'Mutex(<locked>)' : 'Mutex(<unlocked>)';
         },
     } as const);
 }

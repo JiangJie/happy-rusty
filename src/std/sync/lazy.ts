@@ -45,6 +45,19 @@ export interface Lazy<T> {
     readonly [Symbol.toStringTag]: 'Lazy';
 
     /**
+     * Custom `toString` implementation.
+     * @example
+     * ```ts
+     * const lazy = Lazy(() => 42);
+     * console.log(lazy.toString()); // 'Lazy(<uninitialized>)'
+     *
+     * lazy.force();
+     * console.log(lazy.toString()); // 'Lazy(42)'
+     * ```
+     */
+    toString(): string;
+
+    /**
      * Forces the evaluation of this lazy value and returns the result.
      *
      * If the value has already been initialized, returns the cached value.
@@ -93,19 +106,6 @@ export interface Lazy<T> {
      * ```
      */
     isInitialized(): boolean;
-
-    /**
-     * Custom `toString` implementation.
-     * @example
-     * ```ts
-     * const lazy = Lazy(() => 42);
-     * console.log(lazy.toString()); // 'Lazy(<uninitialized>)'
-     *
-     * lazy.force();
-     * console.log(lazy.toString()); // 'Lazy(42)'
-     * ```
-     */
-    toString(): string;
 }
 
 /**
@@ -138,6 +138,19 @@ export interface LazyAsync<T> {
      * Returns `'LazyAsync'` so that `Object.prototype.toString.call(lazy)` produces `'[object LazyAsync]'`.
      */
     readonly [Symbol.toStringTag]: 'LazyAsync';
+
+    /**
+     * Custom `toString` implementation.
+     * @example
+     * ```ts
+     * const lazy = LazyAsync(async () => 42);
+     * console.log(lazy.toString()); // 'LazyAsync(<uninitialized>)'
+     *
+     * await lazy.force();
+     * console.log(lazy.toString()); // 'LazyAsync(42)'
+     * ```
+     */
+    toString(): string;
 
     /**
      * Forces the evaluation of this lazy value and returns a promise to the result.
@@ -192,19 +205,6 @@ export interface LazyAsync<T> {
      * ```
      */
     isInitialized(): boolean;
-
-    /**
-     * Custom `toString` implementation.
-     * @example
-     * ```ts
-     * const lazy = LazyAsync(async () => 42);
-     * console.log(lazy.toString()); // 'LazyAsync(<uninitialized>)'
-     *
-     * await lazy.force();
-     * console.log(lazy.toString()); // 'LazyAsync(42)'
-     * ```
-     */
-    toString(): string;
 }
 
 /**
@@ -259,6 +259,10 @@ export function Lazy<T>(fn: () => T): Lazy<T> {
     return Object.freeze<Lazy<T>>({
         [Symbol.toStringTag]: 'Lazy',
 
+        toString(): string {
+            return initialized ? `Lazy(${ value })` : 'Lazy(<uninitialized>)';
+        },
+
         force(): T {
             if (!initialized) {
                 value = fn();
@@ -273,10 +277,6 @@ export function Lazy<T>(fn: () => T): Lazy<T> {
 
         isInitialized(): boolean {
             return initialized;
-        },
-
-        toString(): string {
-            return initialized ? `Lazy(${ value })` : 'Lazy(<uninitialized>)';
         },
     } as const);
 }
@@ -346,6 +346,10 @@ export function LazyAsync<T>(fn: () => Promise<T>): LazyAsync<T> {
     return Object.freeze<LazyAsync<T>>({
         [Symbol.toStringTag]: 'LazyAsync',
 
+        toString(): string {
+            return initialized ? `LazyAsync(${ value })` : 'LazyAsync(<uninitialized>)';
+        },
+
         async force(): Promise<T> {
             if (initialized) {
                 return value as T;
@@ -375,10 +379,6 @@ export function LazyAsync<T>(fn: () => Promise<T>): LazyAsync<T> {
 
         isInitialized(): boolean {
             return initialized;
-        },
-
-        toString(): string {
-            return initialized ? `LazyAsync(${ value })` : 'LazyAsync(<uninitialized>)';
         },
     } as const);
 }

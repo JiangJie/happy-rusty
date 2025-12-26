@@ -9,12 +9,12 @@
  * - `Err<T, E>(error)` - Creates a failed Result
  * - `None` interface - Type overrides for better type inference
  */
-import type { AsyncOption, Option } from './option/option.ts';
-import type { AsyncResult, Result } from './result/result.ts';
-import { OptionKindSymbol } from './option/symbols.ts';
-import { ResultKindSymbol } from './result/symbols.ts';
 import { isOption } from './option/guards.ts';
+import type { AsyncOption, Option } from './option/option.ts';
+import { OptionKindSymbol } from './option/symbols.ts';
 import { isResult } from './result/guards.ts';
+import type { AsyncResult, Result } from './result/result.ts';
+import { ResultKindSymbol } from './result/symbols.ts';
 
 /**
  * Represents the absence of a value, as a specialized `Option` type.

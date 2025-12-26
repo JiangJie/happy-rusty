@@ -51,6 +51,19 @@ export interface Once<T> {
     readonly [Symbol.toStringTag]: 'Once';
 
     /**
+     * Custom `toString` implementation.
+     * @example
+     * ```ts
+     * const once = Once<number>();
+     * console.log(once.toString()); // 'Once(<uninitialized>)'
+     *
+     * once.set(42);
+     * console.log(once.toString()); // 'Once(42)'
+     * ```
+     */
+    toString(): string;
+
+    /**
      * Gets the reference to the underlying value.
      *
      * @returns `Some(value)` if initialized, `None` otherwise.
@@ -211,19 +224,6 @@ export interface Once<T> {
      * ```
      */
     isInitialized(): boolean;
-
-    /**
-     * Custom `toString` implementation.
-     * @example
-     * ```ts
-     * const once = Once<number>();
-     * console.log(once.toString()); // 'Once(<uninitialized>)'
-     *
-     * once.set(42);
-     * console.log(once.toString()); // 'Once(42)'
-     * ```
-     */
-    toString(): string;
 }
 
 /**
@@ -294,6 +294,10 @@ export function Once<T>(): Once<T> {
 
     return Object.freeze<Once<T>>({
         [Symbol.toStringTag]: 'Once',
+
+        toString(): string {
+            return initialized ? `Once(${ value })` : 'Once(<uninitialized>)';
+        },
 
         get(): Option<T> {
             return initialized ? Some(value as T) : None;
@@ -403,10 +407,6 @@ export function Once<T>(): Once<T> {
 
         isInitialized(): boolean {
             return initialized;
-        },
-
-        toString(): string {
-            return initialized ? `Once(${ value })` : 'Once(<uninitialized>)';
         },
     } as const);
 }
