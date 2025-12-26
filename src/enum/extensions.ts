@@ -53,21 +53,14 @@ export function tryOption<T, Args extends unknown[]>(fn: (...args: Args) => T, .
 }
 
 /**
- * Executes an async function and returns `Some` with the resolved value if successful, or `None` if it rejects.
+ * Executes an async operation and returns `Some` with the resolved value if successful, or `None` if it rejects.
  *
- * This is the async version of `tryOption`. It captures both synchronous exceptions
- * (thrown before the Promise is created) and asynchronous rejections.
- *
- * Use this when you only care about success/failure, not the error details.
- *
- * Similar to `Promise.try`, when passing a function, you can provide optional arguments.
- * The function can return either a value or a Promise (both are handled uniformly).
+ * This overload accepts a Promise or PromiseLike object directly.
+ * Use this when you already have a Promise and only care about success/failure, not the error details.
  *
  * @typeParam T - The type of the value that the promise resolves to.
- * @typeParam Args - The types of the arguments to pass to the function.
- * @param task - A promise, promise-like object, or a function that returns a value or promise-like object.
- * @param args - Arguments to pass to the function (only used when task is a function).
- * @returns A promise that resolves to `Some<T>` if successful, or `None` if rejected or thrown.
+ * @param task - A promise or promise-like object to await.
+ * @returns A promise that resolves to `Some<T>` if successful, or `None` if rejected.
  *
  * @example
  * ```ts
@@ -78,7 +71,28 @@ export function tryOption<T, Args extends unknown[]>(fn: (...args: Args) => T, .
  *
  * @example
  * ```ts
- * // Function form with arguments
+ * // With existing promise
+ * const fileContent = await tryAsyncOption(fs.promises.readFile('config.json', 'utf-8'));
+ * ```
+ */
+export async function tryAsyncOption<T>(task: PromiseLike<T>): AsyncOption<T>;
+/**
+ * Executes a function and returns `Some` with the result if successful, or `None` if it throws or rejects.
+ *
+ * This overload accepts a function that may return a sync value or a Promise.
+ * It captures both synchronous exceptions (thrown before the Promise is created) and asynchronous rejections.
+ *
+ * Similar to `Promise.try`, you can pass arguments to the function.
+ *
+ * @typeParam T - The type of the value returned or resolved by the function.
+ * @typeParam Args - The types of the arguments to pass to the function.
+ * @param task - A function that returns a value or promise-like object.
+ * @param args - Arguments to pass to the function.
+ * @returns A promise that resolves to `Some<T>` if successful, or `None` if thrown or rejected.
+ *
+ * @example
+ * ```ts
+ * // Function with arguments
  * const result = await tryAsyncOption(fetch, '/api/data');
  * ```
  *
@@ -90,8 +104,16 @@ export function tryOption<T, Args extends unknown[]>(fn: (...args: Args) => T, .
  *     return fetchFromServer(id);                // async return
  * }, 'user-123');
  * ```
+ *
+ * @example
+ * ```ts
+ * // Inline async function
+ * const data = await tryAsyncOption(async () => {
+ *     const response = await fetch('/api');
+ *     return response.json();
+ * });
+ * ```
  */
-export async function tryAsyncOption<T>(task: PromiseLike<T>): AsyncOption<T>;
 export async function tryAsyncOption<T, Args extends unknown[]>(task: (...args: Args) => T | PromiseLike<T>, ...args: Args): AsyncOption<T>;
 export async function tryAsyncOption<T, Args extends unknown[]>(task: PromiseLike<T> | ((...args: Args) => T | PromiseLike<T>), ...args: Args): AsyncOption<T> {
     try {
@@ -149,28 +171,52 @@ export function tryResult<T, E = Error, Args extends unknown[] = []>(fn: (...arg
 }
 
 /**
- * Executes an async function and captures any rejection as an `Err`.
- * If the function executes successfully, returns `Ok` with the resolved value.
+ * Executes an async operation and captures any rejection as an `Err`.
+ * If the operation succeeds, returns `Ok` with the resolved value.
  *
- * This is the async version of `tryResult`. It captures both synchronous exceptions
- * (thrown before the Promise is created) and asynchronous rejections.
- *
- * Similar to `Promise.try`, when passing a function, you can provide optional arguments.
- * The function can return either a value or a Promise (both are handled uniformly).
+ * This overload accepts a Promise or PromiseLike object directly.
+ * Use this to convert Promise-based error handling to Result-based handling.
  *
  * @typeParam T - The type of the value that the promise resolves to.
- * @typeParam E - The type of the error that may be thrown or rejected, defaults to `Error`.
- * @typeParam Args - The types of the arguments to pass to the function.
- * @param task - A promise, promise-like object, or a function that returns a value or promise-like object.
- * @param args - Arguments to pass to the function (only used when task is a function).
- * @returns A promise that resolves to `Ok<T>` if successful, or `Err<E>` if rejected or thrown.
+ * @typeParam E - The type of the error that may be rejected, defaults to `Error`.
+ * @param task - A promise or promise-like object to await.
+ * @returns A promise that resolves to `Ok<T>` if successful, or `Err<E>` if rejected.
  *
  * @example
  * ```ts
- * // Fetch data safely with arguments
- * const result = await tryAsyncResult(fetch, '/api/data');
+ * // Fetch data safely
+ * const result = await tryAsyncResult(fetch('/api/data'));
  * result.inspect(response => console.log('Status:', response.status))
  *       .inspectErr(err => console.error('Fetch failed:', err));
+ * ```
+ *
+ * @example
+ * ```ts
+ * // With typed error
+ * const result = await tryAsyncResult<User, ApiError>(api.getUser(id));
+ * ```
+ */
+export async function tryAsyncResult<T, E = Error>(task: PromiseLike<T>): AsyncResult<T, E>;
+/**
+ * Executes a function and captures any thrown exception or rejection as an `Err`.
+ * If the function succeeds, returns `Ok` with the result.
+ *
+ * This overload accepts a function that may return a sync value or a Promise.
+ * It captures both synchronous exceptions (thrown before the Promise is created) and asynchronous rejections.
+ *
+ * Similar to `Promise.try`, you can pass arguments to the function.
+ *
+ * @typeParam T - The type of the value returned or resolved by the function.
+ * @typeParam E - The type of the error that may be thrown or rejected, defaults to `Error`.
+ * @typeParam Args - The types of the arguments to pass to the function.
+ * @param task - A function that returns a value or promise-like object.
+ * @param args - Arguments to pass to the function.
+ * @returns A promise that resolves to `Ok<T>` if successful, or `Err<E>` if thrown or rejected.
+ *
+ * @example
+ * ```ts
+ * // Function with arguments
+ * const result = await tryAsyncResult(fetch, '/api/data');
  * ```
  *
  * @example
@@ -190,8 +236,13 @@ export function tryResult<T, E = Error, Args extends unknown[] = []>(fn: (...arg
  *     return response.json();
  * });
  * ```
+ *
+ * @example
+ * ```ts
+ * // With custom error type
+ * const result = await tryAsyncResult<Config, ConfigError, [string]>(loadConfig, 'app.json');
+ * ```
  */
-export async function tryAsyncResult<T, E = Error>(task: PromiseLike<T>): AsyncResult<T, E>;
 export async function tryAsyncResult<T, E = Error, Args extends unknown[] = []>(task: (...args: Args) => T | PromiseLike<T>, ...args: Args): AsyncResult<T, E>;
 export async function tryAsyncResult<T, E = Error, Args extends unknown[] = []>(task: PromiseLike<T> | ((...args: Args) => T | PromiseLike<T>), ...args: Args): AsyncResult<T, E> {
     try {
