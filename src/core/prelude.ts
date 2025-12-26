@@ -9,9 +9,12 @@
  * - `Err<T, E>(error)` - Creates a failed Result
  * - `None` interface - Type overrides for better type inference
  */
-import type { AsyncOption, AsyncResult, Option, Result } from './core.ts';
-import { OptionKindSymbol, ResultKindSymbol } from './symbols.ts';
-import { isOption, isResult } from './utils.ts';
+import type { AsyncOption, Option } from './option/option.ts';
+import type { AsyncResult, Result } from './result/result.ts';
+import { OptionKindSymbol } from './option/symbols.ts';
+import { ResultKindSymbol } from './result/symbols.ts';
+import { isOption } from './option/guards.ts';
+import { isResult } from './result/guards.ts';
 
 /**
  * Represents the absence of a value, as a specialized `Option` type.
@@ -671,6 +674,7 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
  *
  * @param value - The value to stringify.
  * @returns A safe string representation of the value.
+ * @internal
  */
 function safeStringify(value: unknown): string {
     try {
@@ -696,6 +700,7 @@ function safeStringify(value: unknown): string {
  * @param o - The value to be checked as an `Option`.
  * @throws {TypeError} If the value is not an `Option`.
  * @see isOption
+ * @internal
  */
 function assertOption<T>(o: unknown): asserts o is Option<T> {
     if (!isOption(o)) {
@@ -711,6 +716,7 @@ function assertOption<T>(o: unknown): asserts o is Option<T> {
  * @param r - The value to be checked as a `Result`.
  * @throws {TypeError} If the value is not a `Result`.
  * @see isResult
+ * @internal
  */
 function assertResult<T, E>(r: unknown): asserts r is Result<T, E> {
     if (!isResult(r)) {

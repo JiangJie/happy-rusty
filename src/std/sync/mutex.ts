@@ -6,7 +6,7 @@
  * async operations, ensuring only one async task accesses the protected resource at a time.
  */
 
-import { None, Some, type Option } from '../enum/mod.ts';
+import { None, Some, type Option } from '../../core/mod.ts';
 
 /**
  * A guard that provides access to the mutex-protected value.

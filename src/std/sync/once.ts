@@ -6,7 +6,7 @@
  * to lazily initialized data, supporting both sync and async initialization.
  */
 
-import { Err, None, Ok, Some, type AsyncResult, type Option, type Result } from '../enum/mod.ts';
+import { Err, None, Ok, Some, type AsyncResult, type Option, type Result } from '../../core/mod.ts';
 
 /**
  * A container which can be written to only once.

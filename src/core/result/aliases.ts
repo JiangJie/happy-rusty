@@ -8,7 +8,7 @@
  * - Async versions of the above
  */
 
-import type { AsyncResult, Result } from './core.ts';
+import type { AsyncResult, Result } from './result.ts';
 
 /**
  * Similar to Rust's `Result<(), E>`.

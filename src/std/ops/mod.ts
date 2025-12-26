@@ -7,4 +7,4 @@
  * - `isControlFlow` - Type guard for checking ControlFlow instances
  */
 export * from './control_flow.ts';
-export * from './utils.ts';
+export * from './guards.ts';

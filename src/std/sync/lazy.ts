@@ -6,7 +6,7 @@
  * the initialization function is provided at construction time.
  */
 
-import { None, Some, type Option } from '../enum/mod.ts';
+import { None, Some, type Option } from '../../core/mod.ts';
 
 /**
  * A value which is initialized on the first access.

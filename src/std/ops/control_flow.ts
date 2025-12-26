@@ -9,7 +9,7 @@
  * - Implementing custom control flow patterns
  */
 
-import { Err, None, Ok, Some, type Option, type Result } from '../enum/mod.ts';
+import { Err, None, Ok, Some, type Option, type Result } from '../../core/mod.ts';
 import { ControlFlowKindSymbol } from './symbols.ts';
 
 /**

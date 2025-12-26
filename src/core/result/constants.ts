@@ -6,8 +6,8 @@
  * creating new Result instances for common values like `true`, `false`, `0`, and `void`.
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { Result } from './core.ts';
-import { Ok } from './prelude.ts';
+import type { Result } from './result.ts';
+import { Ok } from '../prelude.ts';
 
 /**
  * Result constant for `true`.
