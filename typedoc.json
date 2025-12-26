@@ -3,6 +3,7 @@
   "entryPoints": ["src/mod.ts"],
   "out": "docs",
   "readme": "none",
+  "highlightLanguages": ["ts", "rust"],
   "navigation": {
     "includeCategories": true,
     "includeGroups": true
