@@ -73,8 +73,6 @@ export interface ControlFlow<B, C = void> {
      * const x = Break(5);
      * console.log(Object.prototype.toString.call(x)); // '[object ControlFlow]'
      * ```
-     *
-     * @internal
      */
     readonly [Symbol.toStringTag]: 'ControlFlow';
 
@@ -87,8 +85,6 @@ export interface ControlFlow<B, C = void> {
      *
      * Note: The symbol itself is not exported as part of the public API.
      * Use the `isControlFlow` utility function or the `isBreak()`/`isContinue()` methods for type checking.
-     *
-     * @internal
      */
     readonly [ControlFlowKindSymbol]: 'Break' | 'Continue';
 

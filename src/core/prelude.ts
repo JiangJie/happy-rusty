@@ -674,7 +674,6 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
  *
  * @param value - The value to stringify.
  * @returns A safe string representation of the value.
- * @internal
  */
 function safeStringify(value: unknown): string {
     try {
@@ -700,7 +699,6 @@ function safeStringify(value: unknown): string {
  * @param o - The value to be checked as an `Option`.
  * @throws {TypeError} If the value is not an `Option`.
  * @see isOption
- * @internal
  */
 function assertOption<T>(o: unknown): asserts o is Option<T> {
     if (!isOption(o)) {
@@ -716,7 +714,6 @@ function assertOption<T>(o: unknown): asserts o is Option<T> {
  * @param r - The value to be checked as a `Result`.
  * @throws {TypeError} If the value is not a `Result`.
  * @see isResult
- * @internal
  */
 function assertResult<T, E>(r: unknown): asserts r is Result<T, E> {
     if (!isResult(r)) {

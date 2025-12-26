@@ -34,8 +34,6 @@ export interface Option<T> {
      * const x = Some(5);
      * console.log(Object.prototype.toString.call(x)); // '[object Option]'
      * ```
-     *
-     * @internal
      */
     readonly [Symbol.toStringTag]: 'Option';
 
@@ -48,8 +46,6 @@ export interface Option<T> {
      *
      * Note: The symbol itself is not exported as part of the public API.
      * Use the `isOption` utility function or the `isSome()`/`isNone()` methods for type checking.
-     *
-     * @internal
      */
     readonly [OptionKindSymbol]: 'Some' | 'None';
 

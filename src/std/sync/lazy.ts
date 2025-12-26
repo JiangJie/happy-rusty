@@ -41,8 +41,6 @@ export interface Lazy<T> {
     /**
      * The well-known symbol `Symbol.toStringTag` used by `Object.prototype.toString()`.
      * Returns `'Lazy'` so that `Object.prototype.toString.call(lazy)` produces `'[object Lazy]'`.
-     *
-     * @internal
      */
     readonly [Symbol.toStringTag]: 'Lazy';
 
@@ -138,8 +136,6 @@ export interface LazyAsync<T> {
     /**
      * The well-known symbol `Symbol.toStringTag` used by `Object.prototype.toString()`.
      * Returns `'LazyAsync'` so that `Object.prototype.toString.call(lazy)` produces `'[object LazyAsync]'`.
-     *
-     * @internal
      */
     readonly [Symbol.toStringTag]: 'LazyAsync';
 

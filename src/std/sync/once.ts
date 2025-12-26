@@ -47,8 +47,6 @@ export interface Once<T> {
     /**
      * The well-known symbol `Symbol.toStringTag` used by `Object.prototype.toString()`.
      * Returns `'Once'` so that `Object.prototype.toString.call(once)` produces `'[object Once]'`.
-     *
-     * @internal
      */
     readonly [Symbol.toStringTag]: 'Once';
 

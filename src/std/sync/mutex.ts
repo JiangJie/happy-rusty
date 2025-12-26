@@ -20,8 +20,6 @@ export interface MutexGuard<T> {
     /**
      * The well-known symbol `Symbol.toStringTag` used by `Object.prototype.toString()`.
      * Returns `'MutexGuard'` so that `Object.prototype.toString.call(guard)` produces `'[object MutexGuard]'`.
-     *
-     * @internal
      */
     readonly [Symbol.toStringTag]: 'MutexGuard';
 
@@ -90,8 +88,6 @@ export interface Mutex<T> {
     /**
      * The well-known symbol `Symbol.toStringTag` used by `Object.prototype.toString()`.
      * Returns `'Mutex'` so that `Object.prototype.toString.call(mutex)` produces `'[object Mutex]'`.
-     *
-     * @internal
      */
     readonly [Symbol.toStringTag]: 'Mutex';
 

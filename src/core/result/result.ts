@@ -36,8 +36,6 @@ export interface Result<T, E> {
      * const x = Ok(5);
      * console.log(Object.prototype.toString.call(x)); // '[object Result]'
      * ```
-     *
-     * @internal
      */
     readonly [Symbol.toStringTag]: 'Result';
 
@@ -50,8 +48,6 @@ export interface Result<T, E> {
      *
      * Note: The symbol itself is not exported as part of the public API.
      * Use the `isResult` utility function or the `isOk()`/`isErr()` methods for type checking.
-     *
-     * @internal
      */
     readonly [ResultKindSymbol]: 'Ok' | 'Err';
 
