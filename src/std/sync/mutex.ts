@@ -187,6 +187,60 @@ export interface Mutex<T> {
      * ```
      */
     isLocked(): boolean;
+
+    /**
+     * Acquires the lock and returns a copy of the protected value.
+     *
+     * This is a convenience method equivalent to `withLock(v => v)`.
+     *
+     * @returns A promise that resolves to a copy of the value.
+     *
+     * @example
+     * ```ts
+     * const mutex = Mutex(42);
+     * const value = await mutex.get();
+     * console.log(value); // 42
+     * ```
+     */
+    get(): Promise<T>;
+
+    /**
+     * Acquires the lock and sets a new value.
+     *
+     * This is a convenience method equivalent to `withLock(() => { value = newValue; })`.
+     *
+     * @param value - The new value to set.
+     * @returns A promise that resolves when the value has been set.
+     *
+     * @example
+     * ```ts
+     * const mutex = Mutex(42);
+     * await mutex.set(100);
+     * console.log(await mutex.get()); // 100
+     * ```
+     */
+    set(value: T): Promise<void>;
+
+    /**
+     * Acquires the lock, sets a new value, and returns the old value.
+     *
+     * This is a convenience method equivalent to:
+     * ```ts
+     * withLock(old => { value = newValue; return old; })
+     * ```
+     *
+     * @param value - The new value to set.
+     * @returns A promise that resolves to the old value.
+     *
+     * @example
+     * ```ts
+     * const mutex = Mutex(42);
+     * const old = await mutex.replace(100);
+     * console.log(old); // 42
+     * console.log(await mutex.get()); // 100
+     * ```
+     */
+    replace(value: T): Promise<T>;
 }
 
 /**
@@ -356,6 +410,35 @@ export function Mutex<T>(value: T): Mutex<T> {
 
         isLocked(): boolean {
             return locked;
+        },
+
+        async get(): Promise<T> {
+            const guard = await lock();
+            try {
+                return guard.value;
+            } finally {
+                guard.unlock();
+            }
+        },
+
+        async set(value: T): Promise<void> {
+            const guard = await lock();
+            try {
+                guard.value = value;
+            } finally {
+                guard.unlock();
+            }
+        },
+
+        async replace(value: T): Promise<T> {
+            const guard = await lock();
+            try {
+                const old = guard.value;
+                guard.value = value;
+                return old;
+            } finally {
+                guard.unlock();
+            }
         },
     } as const);
 }

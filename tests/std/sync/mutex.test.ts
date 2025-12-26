@@ -325,6 +325,142 @@ describe('Mutex', () => {
         });
     });
 
+    describe('get', () => {
+        it('should return the current value', async () => {
+            const mutex = Mutex(42);
+            expect(await mutex.get()).toBe(42);
+        });
+
+        it('should return updated value after modification', async () => {
+            const mutex = Mutex({ count: 0 });
+
+            await mutex.withLock((v) => { v.count = 100; });
+
+            const value = await mutex.get();
+            expect(value.count).toBe(100);
+        });
+
+        it('should wait for lock when mutex is locked', async () => {
+            const mutex = Mutex(42);
+            const events: string[] = [];
+
+            const guard = await mutex.lock();
+            events.push('locked');
+
+            const getPromise = mutex.get().then((v) => {
+                events.push('got');
+                return v;
+            });
+
+            await new Promise(r => setTimeout(r, 10));
+            expect(events).toEqual(['locked']);
+
+            guard.unlock();
+            events.push('unlocked');
+
+            await getPromise;
+            expect(events).toEqual(['locked', 'unlocked', 'got']);
+        });
+    });
+
+    describe('set', () => {
+        it('should set a new value', async () => {
+            const mutex = Mutex(42);
+
+            await mutex.set(100);
+
+            expect(await mutex.get()).toBe(100);
+        });
+
+        it('should replace object value', async () => {
+            const mutex = Mutex({ name: 'old' });
+
+            await mutex.set({ name: 'new' });
+
+            expect(await mutex.get()).toEqual({ name: 'new' });
+        });
+
+        it('should wait for lock when mutex is locked', async () => {
+            const mutex = Mutex(42);
+            const events: string[] = [];
+
+            const guard = await mutex.lock();
+            events.push('locked');
+
+            const setPromise = mutex.set(100).then(() => {
+                events.push('set');
+            });
+
+            await new Promise(r => setTimeout(r, 10));
+            expect(events).toEqual(['locked']);
+            expect(guard.value).toBe(42); // Still old value
+
+            guard.unlock();
+            events.push('unlocked');
+
+            await setPromise;
+            expect(events).toEqual(['locked', 'unlocked', 'set']);
+            expect(await mutex.get()).toBe(100);
+        });
+    });
+
+    describe('replace', () => {
+        it('should return old value and set new value', async () => {
+            const mutex = Mutex(42);
+
+            const old = await mutex.replace(100);
+
+            expect(old).toBe(42);
+            expect(await mutex.get()).toBe(100);
+        });
+
+        it('should work with objects', async () => {
+            const mutex = Mutex({ name: 'old' });
+
+            const old = await mutex.replace({ name: 'new' });
+
+            expect(old).toEqual({ name: 'old' });
+            expect(await mutex.get()).toEqual({ name: 'new' });
+        });
+
+        it('should wait for lock when mutex is locked', async () => {
+            const mutex = Mutex(42);
+            const events: string[] = [];
+
+            const guard = await mutex.lock();
+            events.push('locked');
+
+            const replacePromise = mutex.replace(100).then((old) => {
+                events.push('replaced');
+                return old;
+            });
+
+            await new Promise(r => setTimeout(r, 10));
+            expect(events).toEqual(['locked']);
+
+            guard.unlock();
+            events.push('unlocked');
+
+            const old = await replacePromise;
+            expect(events).toEqual(['locked', 'unlocked', 'replaced']);
+            expect(old).toBe(42);
+            expect(await mutex.get()).toBe(100);
+        });
+
+        it('should work in sequence', async () => {
+            const mutex = Mutex(1);
+
+            const old1 = await mutex.replace(2);
+            const old2 = await mutex.replace(3);
+            const old3 = await mutex.replace(4);
+
+            expect(old1).toBe(1);
+            expect(old2).toBe(2);
+            expect(old3).toBe(3);
+            expect(await mutex.get()).toBe(4);
+        });
+    });
+
     describe('fairness', () => {
         it('should process waiters in FIFO order', async () => {
             const mutex = Mutex<string[]>([]);
