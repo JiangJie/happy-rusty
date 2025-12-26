@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.1] - 2025-12-26
+
+### Added
+- **Argument passing** - All `try*` functions now support passing arguments like `Promise.try`:
+  - `tryOption(JSON.parse, jsonString)` instead of `tryOption(() => JSON.parse(jsonString))`
+  - `tryResult(decodeURIComponent, str)` instead of `tryResult(() => decodeURIComponent(str))`
+- **Unified sync/async returns** - `tryAsyncOption` and `tryAsyncResult` now accept functions that return `T | PromiseLike<T>`, allowing mixed sync/async logic
+
 ## [1.7.0] - 2025-12-26
 
 ### Added
@@ -213,6 +221,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full TypeScript support
 - Comprehensive API matching Rust's Option and Result
 
+[1.7.1]: https://github.com/JiangJie/happy-rusty/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/JiangJie/happy-rusty/compare/v1.6.2...v1.7.0
 [1.6.2]: https://github.com/JiangJie/happy-rusty/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/JiangJie/happy-rusty/compare/v1.6.0...v1.6.1
