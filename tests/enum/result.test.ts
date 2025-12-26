@@ -553,6 +553,38 @@ describe('tryResult', () => {
         expect(result.isOk()).toBe(true);
         expect(result.unwrap()).toEqual({ name: 'test', value: 123 });
     });
+
+    // Tests for argument passing (like Promise.try)
+    it('should pass arguments to the function', () => {
+        const result = tryResult(JSON.parse, '{"a":1}');
+        expect(result.isOk()).toBe(true);
+        expect(result.unwrap()).toEqual({ a: 1 });
+    });
+
+    it('should pass multiple arguments to the function', () => {
+        const add = (a: number, b: number, c: number) => a + b + c;
+        const result = tryResult(add, 1, 2, 3);
+        expect(result.isOk()).toBe(true);
+        expect(result.unwrap()).toBe(6);
+    });
+
+    it('should capture errors when passing arguments', () => {
+        const result = tryResult(JSON.parse, 'invalid json');
+        expect(result.isErr()).toBe(true);
+        expect(result.unwrapErr()).toBeInstanceOf(SyntaxError);
+    });
+
+    it('should work with decodeURIComponent and arguments', () => {
+        const result = tryResult(decodeURIComponent, '%E4%B8%AD%E6%96%87');
+        expect(result.isOk()).toBe(true);
+        expect(result.unwrap()).toBe('中文');
+    });
+
+    it('should capture decodeURIComponent errors with arguments', () => {
+        const result: Result<string, URIError> = tryResult(decodeURIComponent, '%');
+        expect(result.isErr()).toBe(true);
+        expect(result.unwrapErr()).toBeInstanceOf(URIError);
+    });
 });
 
 describe('tryOption', () => {
@@ -601,6 +633,36 @@ describe('tryOption', () => {
         const option = tryOption(() => ({ name: 'test', value: 123 }));
         expect(option.isSome()).toBe(true);
         expect(option.unwrap()).toEqual({ name: 'test', value: 123 });
+    });
+
+    // Tests for argument passing (like Promise.try)
+    it('should pass arguments to the function', () => {
+        const option = tryOption(JSON.parse, '{"a":1}');
+        expect(option.isSome()).toBe(true);
+        expect(option.unwrap()).toEqual({ a: 1 });
+    });
+
+    it('should pass multiple arguments to the function', () => {
+        const add = (a: number, b: number) => a + b;
+        const option = tryOption(add, 10, 20);
+        expect(option.isSome()).toBe(true);
+        expect(option.unwrap()).toBe(30);
+    });
+
+    it('should return None when function with arguments throws', () => {
+        const option = tryOption(JSON.parse, 'invalid');
+        expect(option.isNone()).toBe(true);
+    });
+
+    it('should work with decodeURIComponent and arguments', () => {
+        const option = tryOption(decodeURIComponent, '%E4%B8%AD%E6%96%87');
+        expect(option.isSome()).toBe(true);
+        expect(option.unwrap()).toBe('中文');
+    });
+
+    it('should return None for decodeURIComponent errors with arguments', () => {
+        const option = tryOption(decodeURIComponent, '%');
+        expect(option.isNone()).toBe(true);
     });
 });
 
@@ -674,6 +736,55 @@ describe('tryAsyncResult', () => {
         const result = await tryAsyncResult(thenable);
         expect(result.isOk()).toBe(true);
         expect(result.unwrap()).toBe(42);
+    });
+
+    // Tests for argument passing (like Promise.try)
+    it('should pass arguments to the function', async () => {
+        const asyncAdd = async (a: number, b: number) => a + b;
+        const result = await tryAsyncResult(asyncAdd, 10, 20);
+        expect(result.isOk()).toBe(true);
+        expect(result.unwrap()).toBe(30);
+    });
+
+    it('should capture errors when passing arguments', async () => {
+        const asyncFail = async (msg: string) => {
+            throw new Error(msg);
+        };
+        const result = await tryAsyncResult(asyncFail, 'test error');
+        expect(result.isErr()).toBe(true);
+        expect((result.unwrapErr() as Error).message).toBe('test error');
+    });
+
+    it('should work with fetch-like function and arguments', async () => {
+        const mockFetch = async (url: string, options: { method: string; }) => {
+            return { url, method: options.method };
+        };
+        const result = await tryAsyncResult(mockFetch, '/api/data', { method: 'POST' });
+        expect(result.isOk()).toBe(true);
+        expect(result.unwrap()).toEqual({ url: '/api/data', method: 'POST' });
+    });
+
+    // Tests for sync return value support (like Promise.try)
+    it('should handle function returning sync value', async () => {
+        const syncFn = (x: number) => x * 2;
+        const result = await tryAsyncResult(syncFn, 21);
+        expect(result.isOk()).toBe(true);
+        expect(result.unwrap()).toBe(42);
+    });
+
+    it('should handle function that conditionally returns sync or async', async () => {
+        const cache = new Map<string, number>([['cached', 100]]);
+        const getData = (key: string): number | Promise<number> => {
+            const cached = cache.get(key);
+            if (cached !== undefined) return cached;  // sync
+            return Promise.resolve(200);              // async
+        };
+
+        const cachedResult = await tryAsyncResult(getData, 'cached');
+        expect(cachedResult.unwrap()).toBe(100);
+
+        const asyncResult = await tryAsyncResult(getData, 'not-cached');
+        expect(asyncResult.unwrap()).toBe(200);
     });
 });
 
@@ -759,5 +870,53 @@ describe('tryAsyncOption', () => {
         const option = await tryAsyncOption(thenable);
         expect(option.isSome()).toBe(true);
         expect(option.unwrap()).toBe('thenable result');
+    });
+
+    // Tests for argument passing (like Promise.try)
+    it('should pass arguments to the function', async () => {
+        const asyncConcat = async (a: string, b: string) => a + b;
+        const option = await tryAsyncOption(asyncConcat, 'hello', 'world');
+        expect(option.isSome()).toBe(true);
+        expect(option.unwrap()).toBe('helloworld');
+    });
+
+    it('should return None when function with arguments throws', async () => {
+        const asyncFail = async (msg: string) => {
+            throw new Error(msg);
+        };
+        const option = await tryAsyncOption(asyncFail, 'test error');
+        expect(option.isNone()).toBe(true);
+    });
+
+    it('should work with fetch-like function and arguments', async () => {
+        const mockFetch = async (url: string) => {
+            return { url, status: 200 };
+        };
+        const option = await tryAsyncOption(mockFetch, '/api/data');
+        expect(option.isSome()).toBe(true);
+        expect(option.unwrap()).toEqual({ url: '/api/data', status: 200 });
+    });
+
+    // Tests for sync return value support (like Promise.try)
+    it('should handle function returning sync value', async () => {
+        const syncFn = (x: number) => x * 2;
+        const option = await tryAsyncOption(syncFn, 21);
+        expect(option.isSome()).toBe(true);
+        expect(option.unwrap()).toBe(42);
+    });
+
+    it('should handle function that conditionally returns sync or async', async () => {
+        const cache = new Map<string, string>([['cached', 'hit']]);
+        const getData = (key: string): string | Promise<string> => {
+            const cached = cache.get(key);
+            if (cached !== undefined) return cached;  // sync
+            return Promise.resolve('miss');           // async
+        };
+
+        const cachedOption = await tryAsyncOption(getData, 'cached');
+        expect(cachedOption.unwrap()).toBe('hit');
+
+        const asyncOption = await tryAsyncOption(getData, 'not-cached');
+        expect(asyncOption.unwrap()).toBe('miss');
     });
 });
