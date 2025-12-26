@@ -6,7 +6,7 @@
  * to lazily initialized data, supporting both sync and async initialization.
  */
 
-import { Err, None, Ok, Some, type AsyncResult, type Option, type Result } from '../../core/mod.ts';
+import { Err, None, Ok, RESULT_VOID, Some, type AsyncResult, type Option, type Result, type VoidResult } from '../../core/mod.ts';
 
 /**
  * A container which can be written to only once.
@@ -94,7 +94,7 @@ export interface Once<T> {
      * console.log(once.get()); // Some(42)
      * ```
      */
-    set(value: T): Result<void, T>;
+    set(value: T): VoidResult<T>;
 
     /**
      * Gets the contents, initializing it with `fn` if empty.
@@ -356,12 +356,12 @@ export function Once<T>(): Once<T> {
             return initialized ? Some(value as T) : None;
         },
 
-        set(newValue: T): Result<void, T> {
+        set(newValue: T): VoidResult<T> {
             if (initialized) {
                 return Err(newValue);
             }
             setValue(newValue);
-            return Ok(undefined);
+            return RESULT_VOID;
         },
 
         getOrInit(fn: () => T): T {
