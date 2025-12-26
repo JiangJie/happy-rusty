@@ -8,86 +8,30 @@ import {
 } from '../../../src/mod.ts';
 
 describe('Result Constants', () => {
-    describe('RESULT_TRUE', () => {
+    const constants = [
+        { name: 'RESULT_TRUE', value: RESULT_TRUE, expected: true },
+        { name: 'RESULT_FALSE', value: RESULT_FALSE, expected: false },
+        { name: 'RESULT_ZERO', value: RESULT_ZERO, expected: 0 },
+        { name: 'RESULT_VOID', value: RESULT_VOID, expected: undefined },
+    ] as const;
+
+    describe.each(constants)('$name', ({ value, expected }) => {
         it('should be a valid Result', () => {
-            expect(isResult(RESULT_TRUE)).toBe(true);
+            expect(isResult(value)).toBe(true);
         });
 
         it('should be Ok variant', () => {
-            expect(RESULT_TRUE.isOk()).toBe(true);
-            expect(RESULT_TRUE.isErr()).toBe(false);
+            expect(value.isOk()).toBe(true);
+            expect(value.isErr()).toBe(false);
         });
 
-        it('should contain true', () => {
-            expect(RESULT_TRUE.unwrap()).toBe(true);
-        });
-
-        it('should be immutable (same reference on multiple access)', () => {
-            const ref1 = RESULT_TRUE;
-            const ref2 = RESULT_TRUE;
-            expect(ref1).toBe(ref2);
-        });
-    });
-
-    describe('RESULT_FALSE', () => {
-        it('should be a valid Result', () => {
-            expect(isResult(RESULT_FALSE)).toBe(true);
-        });
-
-        it('should be Ok variant', () => {
-            expect(RESULT_FALSE.isOk()).toBe(true);
-            expect(RESULT_FALSE.isErr()).toBe(false);
-        });
-
-        it('should contain false', () => {
-            expect(RESULT_FALSE.unwrap()).toBe(false);
+        it('should contain expected value', () => {
+            expect(value.unwrap()).toBe(expected);
         });
 
         it('should be immutable (same reference on multiple access)', () => {
-            const ref1 = RESULT_FALSE;
-            const ref2 = RESULT_FALSE;
-            expect(ref1).toBe(ref2);
-        });
-    });
-
-    describe('RESULT_ZERO', () => {
-        it('should be a valid Result', () => {
-            expect(isResult(RESULT_ZERO)).toBe(true);
-        });
-
-        it('should be Ok variant', () => {
-            expect(RESULT_ZERO.isOk()).toBe(true);
-            expect(RESULT_ZERO.isErr()).toBe(false);
-        });
-
-        it('should contain 0', () => {
-            expect(RESULT_ZERO.unwrap()).toBe(0);
-        });
-
-        it('should be immutable (same reference on multiple access)', () => {
-            const ref1 = RESULT_ZERO;
-            const ref2 = RESULT_ZERO;
-            expect(ref1).toBe(ref2);
-        });
-    });
-
-    describe('RESULT_VOID', () => {
-        it('should be a valid Result', () => {
-            expect(isResult(RESULT_VOID)).toBe(true);
-        });
-
-        it('should be Ok variant', () => {
-            expect(RESULT_VOID.isOk()).toBe(true);
-            expect(RESULT_VOID.isErr()).toBe(false);
-        });
-
-        it('should contain undefined (void)', () => {
-            expect(RESULT_VOID.unwrap()).toBeUndefined();
-        });
-
-        it('should be immutable (same reference on multiple access)', () => {
-            const ref1 = RESULT_VOID;
-            const ref2 = RESULT_VOID;
+            const ref1 = value;
+            const ref2 = value;
             expect(ref1).toBe(ref2);
         });
     });

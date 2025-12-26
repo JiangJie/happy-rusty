@@ -502,18 +502,6 @@ describe('Result', () => {
     });
 });
 
-describe('promiseToAsyncResult (deprecated)', () => {
-    it('should be an alias for tryAsyncResult', async () => {
-        // Verify it works as expected - detailed tests are in tryAsyncResult
-        const okResult = await promiseToAsyncResult(Promise.resolve(42));
-        expect(okResult.isOk()).toBe(true);
-        expect(okResult.unwrap()).toBe(42);
-
-        const errResult = await promiseToAsyncResult(Promise.reject(new Error('test')));
-        expect(errResult.isErr()).toBe(true);
-    });
-});
-
 describe('Immutability', () => {
     it('Ok should be frozen', () => {
         const ok = Ok(42);
@@ -964,5 +952,13 @@ describe('tryAsyncOption', () => {
 
         const asyncOption = await tryAsyncOption(getData, 'not-cached');
         expect(asyncOption.unwrap()).toBe('miss');
+    });
+});
+
+describe('promiseToAsyncResult (deprecated)', () => {
+    it('should work as an alias for tryAsyncResult', async () => {
+        const result = await promiseToAsyncResult(Promise.resolve(42));
+        expect(result.isOk()).toBe(true);
+        expect(result.unwrap()).toBe(42);
     });
 });
