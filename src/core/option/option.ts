@@ -417,6 +417,7 @@ export interface Option<T> {
      * @returns An `Option` containing a tuple of the values if both are `Some`, otherwise `None`.
      * @see zipWith
      * @see unzip
+     * @see reduce
      * @example
      * ```ts
      * const x = Some(1);
@@ -439,6 +440,7 @@ export interface Option<T> {
      * @param fn - The function to combine the values from both `Options`.
      * @returns An `Option` containing the result of `fn` if both `Options` are `Some`, otherwise `None`.
      * @see zip
+     * @see reduce
      * @example
      * ```ts
      * const x = Some(2);
@@ -576,6 +578,7 @@ export interface Option<T> {
      * @returns `this` if it is `Some`, otherwise `other`.
      * @see and
      * @see xor
+     * @see reduce
      * @example
      * ```ts
      * const x = None;

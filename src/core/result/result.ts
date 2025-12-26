@@ -195,6 +195,7 @@ export interface Result<T, E> {
      * @throws {TypeError} Throws an error with the provided message if the result is an `Err`.
      * @see unwrap
      * @see expectErr
+     * @see intoOk
      * @example
      * ```ts
      * const x = Ok(5);
@@ -212,6 +213,7 @@ export interface Result<T, E> {
      * @see expect
      * @see unwrapOr
      * @see unwrapErr
+     * @see intoOk
      * @example
      * ```ts
      * const x = Ok(5);
@@ -273,6 +275,7 @@ export interface Result<T, E> {
      * @throws {TypeError} Throws an error with the provided message if the result is an `Ok`.
      * @see unwrapErr
      * @see expect
+     * @see intoErr
      * @example
      * ```ts
      * const x = Err('error');
@@ -289,6 +292,7 @@ export interface Result<T, E> {
      * @throws {TypeError} Throws an error if the result is an `Ok`.
      * @see expectErr
      * @see unwrap
+     * @see intoErr
      * @example
      * ```ts
      * const x = Err('error');
@@ -311,6 +315,9 @@ export interface Result<T, E> {
      * the code will fail to compile rather than potentially throwing at runtime.
      *
      * @returns The contained `Ok` value.
+     * @see unwrap
+     * @see expect
+     * @see intoErr
      * @example
      * ```ts
      * function alwaysSucceeds(): Result<string, never> {
@@ -334,6 +341,9 @@ export interface Result<T, E> {
      * the code will fail to compile rather than potentially throwing at runtime.
      *
      * @returns The contained `Err` value.
+     * @see unwrapErr
+     * @see expectErr
+     * @see intoOk
      * @example
      * ```ts
      * function alwaysFails(): Result<never, string> {
