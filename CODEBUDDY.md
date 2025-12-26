@@ -70,31 +70,40 @@ pnpm run docs
 
 ### Core Structure
 
-The codebase is organized around implementing Rust-style enums and synchronization primitives for JavaScript:
+The codebase is organized into two main modules mirroring Rust's structure:
 
-- **`src/enum/`** - Option and Result implementation
-  - `core.ts` - Defines the `Option<T>` and `Result<T, E>` interfaces with all their methods
+- **`src/core/`** - Core types (Option and Result)
+  - **`src/core/option/`** - Option type implementation
+    - `option.ts` - Defines the `Option<T>` interface with all its methods
+    - `extensions.ts` - Bridge utilities `tryOption()`, `tryAsyncOption()` for converting try-catch patterns to Option
+    - `guards.ts` - Type guard utility `isOption()`
+    - `symbols.ts` - Internal symbol `OptionKindSymbol` for type discrimination
+    - `mod.ts` - Re-exports all Option public APIs
+  - **`src/core/result/`** - Result type implementation
+    - `result.ts` - Defines the `Result<T, E>` interface with all its methods
+    - `extensions.ts` - Bridge utilities `tryResult()`, `tryAsyncResult()` for converting try-catch patterns to Result
+    - `guards.ts` - Type guard utility `isResult()`
+    - `symbols.ts` - Internal symbol `ResultKindSymbol` for type discrimination
+    - `aliases.ts` - Type aliases like `VoidResult<E>`, `IOResult<T>`, `AsyncIOResult<T>`
+    - `constants.ts` - Pre-defined immutable Result constants (`RESULT_TRUE`, `RESULT_FALSE`, `RESULT_ZERO`, `RESULT_VOID`)
+    - `mod.ts` - Re-exports all Result public APIs
   - `prelude.ts` - Exports `Some()`, `None`, `Ok()`, and `Err()` constructors; includes `None` interface with type overrides for better inference
-  - `defines.ts` - Type aliases like `VoidResult<E>`, `IOResult<T>`, `AsyncIOResult<T>`
-  - `symbols.ts` - Internal symbols for type discrimination (`OptionKindSymbol`, `ResultKindSymbol`)
-  - `utils.ts` - Type guard utilities (`isOption()`, `isResult()`)
-  - `extensions.ts` - Bridge utilities like `tryResult()`, `tryAsyncResult()` for converting try-catch patterns to Option/Result
-  - `constants.ts` - Pre-defined immutable Result constants (`RESULT_TRUE`, `RESULT_FALSE`, `RESULT_ZERO`, `RESULT_VOID`)
-  - `mod.ts` - Re-exports all public APIs
+  - `mod.ts` - Re-exports all core public APIs
 
-- **`src/sync/`** - Rust-inspired synchronization primitives
-  - `once.ts` - `Once<T>` for one-time initialization (like Rust's `OnceLock`), supports sync/async init with `getOrInit()`, `getOrInitAsync()`, and fallible variants `getOrTryInit()`, `getOrTryInitAsync()`
-  - `lazy.ts` - `Lazy<T>` and `LazyAsync<T>` for lazy initialization (like Rust's `LazyLock`), initializer provided at construction time
-  - `mutex.ts` - `Mutex<T>` for async mutual exclusion, serializes async operations with `withLock()`, `lock()`, `tryLock()`
-  - `mod.ts` - Re-exports all sync primitives
+- **`src/std/`** - Standard library types (sync primitives and control flow)
+  - **`src/std/sync/`** - Rust-inspired synchronization primitives
+    - `once.ts` - `Once<T>` for one-time initialization (like Rust's `OnceLock`)
+    - `lazy.ts` - `Lazy<T>` and `LazyAsync<T>` for lazy initialization (like Rust's `LazyLock`)
+    - `mutex.ts` - `Mutex<T>` for async mutual exclusion
+    - `mod.ts` - Re-exports all sync primitives
+  - **`src/std/ops/`** - Rust-inspired control flow types
+    - `control_flow.ts` - `ControlFlow<B, C>` with `Break(value)` and `Continue(value)` variants
+    - `guards.ts` - Type guard utility `isControlFlow()`
+    - `symbols.ts` - Internal symbol `ControlFlowKindSymbol` for type discrimination
+    - `mod.ts` - Re-exports all ops types
+  - `mod.ts` - Re-exports all std public APIs
 
-- **`src/ops/`** - Rust-inspired control flow types
-  - `control_flow.ts` - `ControlFlow<B, C>` enum with `Break(value)` and `Continue(value)` variants for short-circuiting operations
-  - `symbols.ts` - Internal symbols for type discrimination (`ControlFlowKindSymbol`)
-  - `utils.ts` - Type guard utilities (`isControlFlow()`)
-  - `mod.ts` - Re-exports all ops types
-
-- **`src/mod.ts`** - Main entry point, re-exports everything from enum/, sync/, and ops/
+- **`src/mod.ts`** - Main entry point, re-exports everything from core/ and std/
 
 ### Key Design Patterns
 
@@ -139,29 +148,29 @@ Dual publishing to:
 ## Testing
 
 - Test files located in `tests/` directory, mirroring `src/` structure:
-  - `tests/enum/option.test.ts` - Option tests
-  - `tests/enum/result.test.ts` - Result tests
-  - `tests/enum/constants.test.ts` - Pre-defined Result constants tests
-  - `tests/enum/utils.test.ts` - Type guard utilities tests
-  - `tests/sync/once.test.ts` - Once tests
-  - `tests/sync/lazy.test.ts` - Lazy tests
-  - `tests/sync/mutex.test.ts` - Mutex tests
-  - `tests/ops/control_flow.test.ts` - ControlFlow tests
+  - `tests/core/option/option.test.ts` - Option tests
+  - `tests/core/result/result.test.ts` - Result tests
+  - `tests/core/result/constants.test.ts` - Pre-defined Result constants tests
+  - `tests/core/result/guards.test.ts` - Type guard utilities tests
+  - `tests/std/sync/once.test.ts` - Once tests
+  - `tests/std/sync/lazy.test.ts` - Lazy tests
+  - `tests/std/sync/mutex.test.ts` - Mutex tests
+  - `tests/std/ops/control_flow.test.ts` - ControlFlow tests
 - Uses Vitest with `@vitest/coverage-v8` for coverage
-- Tests import from `../../src/mod.ts` using relative paths
+- Tests import from `../../../src/mod.ts` using relative paths
 - Run with: `pnpm run test`
 
 ### Running a Single Test
 
 ```bash
 # Run specific test file
-pnpm exec vitest run tests/enum/option.test.ts
+pnpm exec vitest run tests/core/option/option.test.ts
 
 # Run tests matching a pattern
 pnpm exec vitest run -t "Option:Some"
 
 # Run in watch mode for a specific file
-pnpm exec vitest tests/enum/option.test.ts
+pnpm exec vitest tests/core/option/option.test.ts
 ```
 
 ### Updating Dependencies
@@ -178,7 +187,8 @@ pnpm update --latest
 - Trailing commas required in multiline (enforced by `@stylistic/comma-dangle`)
 - Strict TypeScript settings: `noUnusedLocals`, `noUnusedParameters`, `strictNullChecks`
 - File extensions required in imports (`.ts` suffix)
-- Use `@internal` JSDoc tag for private helper functions that should not appear in public API docs (e.g., `safeStringify`, `assertOption`, `assertResult` in `prelude.ts`)
+- Use `@internal` JSDoc tag for exported functions/types that should not appear in public API docs
+- Non-exported functions (like `safeStringify`, `assertOption`, `assertResult` in `prelude.ts`) are automatically excluded from TypeDoc output
 
 ## CI/CD
 
