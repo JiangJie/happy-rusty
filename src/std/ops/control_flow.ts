@@ -209,6 +209,25 @@ export interface ControlFlow<B, C = void> {
      * ```
      */
     continueOk(): Result<C, B>;
+
+    /**
+     * Extracts the value from a `ControlFlow<T, T>` where both type parameters are the same.
+     *
+     * This method is only available when `B` and `C` are the same type.
+     * It returns the contained value regardless of whether this is a `Break` or `Continue`.
+     *
+     * @returns The contained value.
+     *
+     * @example
+     * ```ts
+     * const breakFlow: ControlFlow<number, number> = Break(5);
+     * console.log(breakFlow.intoValue()); // 5
+     *
+     * const continueFlow: ControlFlow<number, number> = Continue(10);
+     * console.log(continueFlow.intoValue()); // 10
+     * ```
+     */
+    intoValue(this: ControlFlow<B, B>): B;
 }
 
 /**
@@ -282,6 +301,9 @@ export function Break<B, C>(value?: B): ControlFlow<B, C> {
         },
         continueOk(): Result<C, B> {
             return Err(value as B);
+        },
+        intoValue(): B {
+            return value as B;
         },
     } as const);
 
@@ -358,6 +380,9 @@ export function Continue<B, C>(value?: C): ControlFlow<B, C> {
         },
         continueOk(): Result<C, B> {
             return Ok(value as C);
+        },
+        intoValue(): B {
+            return value as unknown as B;
         },
     } as const);
 

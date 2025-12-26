@@ -77,6 +77,11 @@ describe('ControlFlow', () => {
             const flow = Break({ code: 404, message: 'Not Found' });
             expect(flow.breakValue().unwrap()).toEqual({ code: 404, message: 'Not Found' });
         });
+
+        it('intoValue() should return the break value when B=C', () => {
+            const flow = Break<number, number>(42);
+            expect(flow.intoValue()).toBe(42);
+        });
     });
 
     describe('Continue', () => {
@@ -147,6 +152,11 @@ describe('ControlFlow', () => {
 
             expect(result.isErr()).toBe(true);
             expect(result.unwrapErr()).toBe('still going');
+        });
+
+        it('intoValue() should return the continue value when B=C', () => {
+            const flow = Continue<number, number>(42);
+            expect(flow.intoValue()).toBe(42);
         });
     });
 
