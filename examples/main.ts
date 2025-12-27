@@ -50,6 +50,11 @@ console.log('│  ControlFlow: Short-circuiting Operations      │');
 console.log('└────────────────────────────────────────────────┘\n');
 await import('./std/ops/control_flow.ts');
 
+console.log('\n┌────────────────────────────────────────────────┐');
+console.log('│  FnOnce: One-Time Callable Functions           │');
+console.log('└────────────────────────────────────────────────┘\n');
+await import('./std/ops/fn_once.ts');
+
 console.log('\n╔════════════════════════════════════════════════╗');
 console.log('║              Examples Complete                 ║');
 console.log('╚════════════════════════════════════════════════╝');
