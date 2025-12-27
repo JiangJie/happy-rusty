@@ -4,4 +4,5 @@
  * Re-exports all public APIs from the ops submodules.
  */
 export * from './control_flow.ts';
+export * from './fn_once.ts';
 export * from './guards.ts';
