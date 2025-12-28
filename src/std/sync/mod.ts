@@ -6,3 +6,4 @@
 export * from './lazy.ts';
 export * from './mutex.ts';
 export * from './once.ts';
+export * from './rwlock.ts';
