@@ -10,10 +10,10 @@
  * - `None` interface - Type overrides for better type inference
  */
 import { isOption } from './option/guards.ts';
-import type { AsyncOption, Option } from './option/option.ts';
+import type { AsyncLikeOption, AsyncOption, Option } from './option/option.ts';
 import { OptionKindSymbol } from './option/symbols.ts';
 import { isResult } from './result/guards.ts';
-import type { AsyncResult, Result } from './result/result.ts';
+import type { AsyncLikeResult, AsyncResult, Result } from './result/result.ts';
 import { ResultKindSymbol } from './result/symbols.ts';
 
 /**
@@ -30,15 +30,15 @@ export interface None extends Option<never> {
     isSome(): false;
     isNone(): true;
     isSomeAnd(predicate: (value: never) => boolean): false;
-    isSomeAndAsync(predicate: (value: never) => Promise<boolean>): Promise<false>;
+    isSomeAndAsync(predicate: (value: never) => PromiseLike<boolean>): Promise<false>;
     isNoneOr(predicate: (value: never) => boolean): true;
-    isNoneOrAsync(predicate: (value: never) => Promise<boolean>): Promise<true>;
+    isNoneOrAsync(predicate: (value: never) => PromiseLike<boolean>): Promise<true>;
 
     expect(msg: string): never;
     unwrap(): never;
     unwrapOr<T>(defaultValue: T): T;
     unwrapOrElse<T>(fn: () => T): T;
-    unwrapOrElseAsync<T>(fn: () => Promise<T>): Promise<T>;
+    unwrapOrElseAsync<T>(fn: () => PromiseLike<T>): Promise<T>;
 
     okOr<E>(error: E): Result<never, E>;
     okOrElse<E>(err: () => E): Result<never, E>;
@@ -56,10 +56,10 @@ export interface None extends Option<never> {
 
     and<U>(other: Option<U>): this;
     andThen<U>(fn: (value: never) => Option<U>): this;
-    andThenAsync<U>(fn: (value: never) => AsyncOption<U>): Promise<this>;
+    andThenAsync<U>(fn: (value: never) => AsyncLikeOption<U>): Promise<this>;
     or<T>(other: Option<T>): Option<T>;
     orElse<T>(fn: () => Option<T>): Option<T>;
-    orElseAsync<T>(fn: () => AsyncOption<T>): AsyncOption<T>;
+    orElseAsync<T>(fn: () => AsyncLikeOption<T>): AsyncOption<T>;
     xor<T>(other: Option<T>): Option<T>;
 
     inspect(fn: (value: never) => void): this;
@@ -104,14 +104,14 @@ export function Some<T>(value: T): Option<T> {
         isSomeAnd(predicate: (value: T) => boolean): boolean {
             return predicate(value);
         },
-        isSomeAndAsync(predicate: (value: T) => Promise<boolean>): Promise<boolean> {
-            return predicate(value);
+        isSomeAndAsync(predicate: (value: T) => PromiseLike<boolean>): Promise<boolean> {
+            return Promise.resolve(predicate(value));
         },
         isNoneOr(predicate: (value: T) => boolean): boolean {
             return predicate(value);
         },
-        isNoneOrAsync(predicate: (value: T) => Promise<boolean>): Promise<boolean> {
-            return predicate(value);
+        isNoneOrAsync(predicate: (value: T) => PromiseLike<boolean>): Promise<boolean> {
+            return Promise.resolve(predicate(value));
         },
 
         expect(_msg: string): T {
@@ -126,7 +126,7 @@ export function Some<T>(value: T): Option<T> {
         unwrapOrElse(_fn: () => T): T {
             return value;
         },
-        unwrapOrElseAsync(_fn: () => Promise<T>): Promise<T> {
+        unwrapOrElseAsync(_fn: () => PromiseLike<T>): Promise<T> {
             return Promise.resolve(value);
         },
 
@@ -189,8 +189,8 @@ export function Some<T>(value: T): Option<T> {
         andThen<U>(fn: (value: T) => Option<U>): Option<U> {
             return fn(value);
         },
-        andThenAsync<U>(fn: (value: T) => AsyncOption<U>): AsyncOption<U> {
-            return fn(value);
+        andThenAsync<U>(fn: (value: T) => AsyncLikeOption<U>): AsyncOption<U> {
+            return Promise.resolve(fn(value));
         },
         or(_other: Option<T>): Option<T> {
             return some;
@@ -198,7 +198,7 @@ export function Some<T>(value: T): Option<T> {
         orElse(_fn: () => Option<T>): Option<T> {
             return some;
         },
-        orElseAsync(_fn: () => AsyncOption<T>): AsyncOption<T> {
+        orElseAsync(_fn: () => AsyncLikeOption<T>): AsyncOption<T> {
             return Promise.resolve(some);
         },
         xor(other: Option<T>): Option<T> {
@@ -262,13 +262,13 @@ export const None: None = Object.freeze<None>({
     isSomeAnd(_predicate: (value: never) => boolean): false {
         return false;
     },
-    isSomeAndAsync(_predicate: (value: never) => Promise<boolean>): Promise<false> {
+    isSomeAndAsync(_predicate: (value: never) => PromiseLike<boolean>): Promise<false> {
         return Promise.resolve(false);
     },
     isNoneOr(_predicate: (value: never) => boolean): true {
         return true;
     },
-    isNoneOrAsync(_predicate: (value: never) => Promise<boolean>): Promise<true> {
+    isNoneOrAsync(_predicate: (value: never) => PromiseLike<boolean>): Promise<true> {
         return Promise.resolve(true);
     },
 
@@ -284,8 +284,8 @@ export const None: None = Object.freeze<None>({
     unwrapOrElse<T>(fn: () => T): T {
         return fn();
     },
-    unwrapOrElseAsync<T>(fn: () => Promise<T>): Promise<T> {
-        return fn();
+    unwrapOrElseAsync<T>(fn: () => PromiseLike<T>): Promise<T> {
+        return Promise.resolve(fn());
     },
 
     okOr<E>(error: E): Result<never, E> {
@@ -335,7 +335,7 @@ export const None: None = Object.freeze<None>({
     andThen<U>(_fn: (value: never) => Option<U>): None {
         return None;
     },
-    andThenAsync<U>(_fn: (value: never) => AsyncOption<U>): Promise<None> {
+    andThenAsync<U>(_fn: (value: never) => AsyncLikeOption<U>): Promise<None> {
         return Promise.resolve(None);
     },
     or<T>(other: Option<T>): Option<T> {
@@ -345,8 +345,8 @@ export const None: None = Object.freeze<None>({
     orElse<T>(fn: () => Option<T>): Option<T> {
         return fn();
     },
-    orElseAsync<T>(fn: () => AsyncOption<T>): AsyncOption<T> {
-        return fn();
+    orElseAsync<T>(fn: () => AsyncLikeOption<T>): AsyncOption<T> {
+        return Promise.resolve(fn());
     },
     xor<T>(other: Option<T>): Option<T> {
         assertOption<T>(other);
@@ -430,13 +430,13 @@ export function Ok<T, E>(value?: T): Result<T, E> {
         isOkAnd(predicate: (value: T) => boolean): boolean {
             return predicate(value as T);
         },
-        isOkAndAsync(predicate: (value: T) => Promise<boolean>): Promise<boolean> {
-            return predicate(value as T);
+        isOkAndAsync(predicate: (value: T) => PromiseLike<boolean>): Promise<boolean> {
+            return Promise.resolve(predicate(value as T));
         },
         isErrAnd(_predicate: (error: E) => boolean): false {
             return false;
         },
-        isErrAndAsync(_predicate: (error: E) => Promise<boolean>): Promise<false> {
+        isErrAndAsync(_predicate: (error: E) => PromiseLike<boolean>): Promise<false> {
             return Promise.resolve(false);
         },
 
@@ -452,7 +452,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
         unwrapOrElse(_fn: (error: E) => T): T {
             return value as T;
         },
-        unwrapOrElseAsync(_fn: (error: E) => Promise<T>): Promise<T> {
+        unwrapOrElseAsync(_fn: (error: E) => PromiseLike<T>): Promise<T> {
             return Promise.resolve(value as T);
         },
 
@@ -508,13 +508,13 @@ export function Ok<T, E>(value?: T): Result<T, E> {
         andThen<U>(fn: (value: T) => Result<U, E>): Result<U, E> {
             return fn(value as T);
         },
-        andThenAsync<U>(fn: (value: T) => AsyncResult<U, E>): AsyncResult<U, E> {
-            return fn(value as T);
+        andThenAsync<U>(fn: (value: T) => AsyncLikeResult<U, E>): AsyncResult<U, E> {
+            return Promise.resolve(fn(value as T));
         },
         orElse<F>(_fn: (error: E) => Result<T, F>): Result<T, F> {
             return ok as unknown as Result<T, F>;
         },
-        orElseAsync<F>(_fn: (error: E) => AsyncResult<T, F>): AsyncResult<T, F> {
+        orElseAsync<F>(_fn: (error: E) => AsyncLikeResult<T, F>): AsyncResult<T, F> {
             return Promise.resolve(ok as unknown as Result<T, F>);
         },
 
@@ -580,14 +580,14 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
         isOkAnd(_predicate: (value: T) => boolean): false {
             return false;
         },
-        isOkAndAsync(_predicate: (value: T) => Promise<boolean>): Promise<boolean> {
+        isOkAndAsync(_predicate: (value: T) => PromiseLike<boolean>): Promise<boolean> {
             return Promise.resolve(false);
         },
         isErrAnd(predicate: (error: E) => boolean): boolean {
             return predicate(error);
         },
-        isErrAndAsync(predicate: (error: E) => Promise<boolean>): Promise<boolean> {
-            return predicate(error);
+        isErrAndAsync(predicate: (error: E) => PromiseLike<boolean>): Promise<boolean> {
+            return Promise.resolve(predicate(error));
         },
 
         expect(msg: string): never {
@@ -602,8 +602,8 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
         unwrapOrElse(fn: (error: E) => T): T {
             return fn(error);
         },
-        unwrapOrElseAsync(fn: (error: E) => Promise<T>): Promise<T> {
-            return fn(error);
+        unwrapOrElseAsync(fn: (error: E) => PromiseLike<T>): Promise<T> {
+            return Promise.resolve(fn(error));
         },
 
         expectErr(_msg: string): E {
@@ -656,14 +656,14 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
         andThen<U>(_fn: (value: T) => Result<U, E>): Result<U, E> {
             return err as unknown as Result<U, E>;
         },
-        andThenAsync<U>(_fn: (value: T) => AsyncResult<U, E>): AsyncResult<U, E> {
+        andThenAsync<U>(_fn: (value: T) => AsyncLikeResult<U, E>): AsyncResult<U, E> {
             return Promise.resolve(err as unknown as Result<U, E>);
         },
         orElse<F>(fn: (error: E) => Result<T, F>): Result<T, F> {
             return fn(error);
         },
-        orElseAsync<F>(fn: (error: E) => AsyncResult<T, F>): AsyncResult<T, F> {
-            return fn(error);
+        orElseAsync<F>(fn: (error: E) => AsyncLikeResult<T, F>): AsyncResult<T, F> {
+            return Promise.resolve(fn(error));
         },
 
         inspect(_fn: (value: T) => void): Result<T, E> {

@@ -143,7 +143,7 @@ export interface Result<T, E> {
 
     /**
      * Asynchronous version of `isOkAnd`.
-     * @param predicate - An async function that takes the `Ok` value and returns a `Promise<boolean>`.
+     * @param predicate - An async function that takes the `Ok` value and returns a `PromiseLike<boolean>`.
      * @returns A promise that resolves to `true` if the Result is `Ok` and the predicate resolves to `true`.
      * @see isOkAnd
      * @see isErrAndAsync
@@ -153,7 +153,7 @@ export interface Result<T, E> {
      * await x.isOkAndAsync(async v => v > 1); // true
      * ```
      */
-    isOkAndAsync(predicate: (value: T) => Promise<boolean>): Promise<boolean>;
+    isOkAndAsync(predicate: (value: T) => PromiseLike<boolean>): Promise<boolean>;
 
     /**
      * Returns `true` if the result is `Err` and the provided predicate returns `true` for the contained error.
@@ -169,7 +169,7 @@ export interface Result<T, E> {
 
     /**
      * Asynchronous version of `isErrAnd`.
-     * @param predicate - An async function that takes the `Err` value and returns a `Promise<boolean>`.
+     * @param predicate - An async function that takes the `Err` value and returns a `PromiseLike<boolean>`.
      * @returns A promise that resolves to `true` if the Result is `Err` and the predicate resolves to `true`.
      * @see isErrAnd
      * @see isOkAndAsync
@@ -179,7 +179,7 @@ export interface Result<T, E> {
      * await x.isErrAndAsync(async e => e.length > 0); // true
      * ```
      */
-    isErrAndAsync(predicate: (error: E) => Promise<boolean>): Promise<boolean>;
+    isErrAndAsync(predicate: (error: E) => PromiseLike<boolean>): Promise<boolean>;
 
     // #endregion
 
@@ -254,8 +254,8 @@ export interface Result<T, E> {
 
     /**
      * Asynchronous version of `unwrapOrElse`.
-     * @param fn - An async function that takes the `Err` value and returns a `Promise<T>`.
-     * @returns A promise that resolves to the contained `Ok` value or the result of the async function.
+     * @param fn - An async function that takes the `Err` value and returns a `PromiseLike<T>`.
+     * @returns A promise that resolves to the contained `Ok` value or the result of the function.
      * @see unwrapOrElse
      * @example
      * ```ts
@@ -263,7 +263,7 @@ export interface Result<T, E> {
      * await x.unwrapOrElseAsync(async e => e.length); // 5
      * ```
      */
-    unwrapOrElseAsync(fn: (error: E) => Promise<T>): Promise<T>;
+    unwrapOrElseAsync(fn: (error: E) => PromiseLike<T>): Promise<T>;
 
     /**
      * These methods extract the contained value in a `Result<T, E>` when it is the `Err` variant.
@@ -577,8 +577,8 @@ export interface Result<T, E> {
 
     /**
      * Asynchronous version of `andThen`.
-     * @typeParam U - The type of the value returned by the async function.
-     * @param fn - An async function that takes the `Ok` value and returns a `Promise<Result<U, E>>`.
+     * @typeParam U - The type of the value returned by the function.
+     * @param fn - An async function that takes the `Ok` value and returns a `PromiseLike<Result<U, E>>`.
      * @returns A promise that resolves to `this` as `Err` if `this` is `Err`, otherwise the result of `fn`.
      * @see andThen
      * @see orElseAsync
@@ -589,7 +589,7 @@ export interface Result<T, E> {
      * console.log(result.unwrap()); // 4
      * ```
      */
-    andThenAsync<U>(fn: (value: T) => AsyncResult<U, E>): AsyncResult<U, E>;
+    andThenAsync<U>(fn: (value: T) => AsyncLikeResult<U, E>): AsyncResult<U, E>;
 
     /**
      * Calls the provided function with the contained error if `this` is `Err`, otherwise returns `this` as `Ok`.
@@ -611,8 +611,8 @@ export interface Result<T, E> {
 
     /**
      * Asynchronous version of `orElse`.
-     * @typeParam F - The type of the error returned by the async function.
-     * @param fn - An async function that takes the `Err` value and returns a `Promise<Result<T, F>>`.
+     * @typeParam F - The type of the error returned by the function.
+     * @param fn - An async function that takes the `Err` value and returns a `PromiseLike<Result<T, F>>`.
      * @returns A promise that resolves to `this` as `Ok` if `this` is `Ok`, otherwise the result of `fn`.
      * @see orElse
      * @see andThenAsync
@@ -623,7 +623,7 @@ export interface Result<T, E> {
      * console.log(result.unwrap()); // 5
      * ```
      */
-    orElseAsync<F>(fn: (error: E) => AsyncResult<T, F>): AsyncResult<T, F>;
+    orElseAsync<F>(fn: (error: E) => AsyncLikeResult<T, F>): AsyncResult<T, F>;
 
     // #endregion
 
@@ -741,3 +741,20 @@ export interface Result<T, E> {
  * ```
  */
 export type AsyncResult<T, E> = Promise<Result<T, E>>;
+
+/**
+ * Represents an asynchronous `Result` that is wrapped in a `PromiseLike`.
+ * This is similar to `AsyncResult<T, E>` but uses `PromiseLike` instead of `Promise`,
+ * allowing compatibility with any thenable object.
+ *
+ * @typeParam T - The type of the value that is produced by a successful operation.
+ * @typeParam E - The type of the error that may be produced by a failed operation.
+ * @example
+ * ```ts
+ * // Works with any PromiseLike, not just Promise
+ * const thenable: AsyncLikeResult<number, string> = {
+ *     then(resolve) { resolve(Ok(42)); }
+ * };
+ * ```
+ */
+export type AsyncLikeResult<T, E> = PromiseLike<Result<T, E>>;
