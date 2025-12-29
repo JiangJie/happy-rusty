@@ -123,7 +123,7 @@ export interface Mutex<T> {
      * });
      * ```
      */
-    withLock<U>(fn: (value: T) => Promise<U> | U): Promise<U>;
+    withLock<U>(fn: (value: T) => PromiseLike<U> | U): Promise<U>;
 
     /**
      * Acquires the lock and returns a guard for manual control.
@@ -389,7 +389,7 @@ export function Mutex<T>(value: T): Mutex<T> {
             return locked ? 'Mutex(<locked>)' : 'Mutex(<unlocked>)';
         },
 
-        async withLock<U>(fn: (value: T) => Promise<U> | U): Promise<U> {
+        async withLock<U>(fn: (value: T) => PromiseLike<U> | U): Promise<U> {
             const guard = await lock();
             try {
                 return await fn(guard.value);

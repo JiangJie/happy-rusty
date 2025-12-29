@@ -149,7 +149,7 @@ export interface RwLock<T> {
      * });
      * ```
      */
-    withRead<U>(fn: (value: T) => Promise<U> | U): Promise<U>;
+    withRead<U>(fn: (value: T) => PromiseLike<U> | U): Promise<U>;
 
     /**
      * Acquires a write lock and executes the callback with the protected value.
@@ -167,7 +167,7 @@ export interface RwLock<T> {
      * });
      * ```
      */
-    withWrite<U>(fn: (value: T) => Promise<U> | U): Promise<U>;
+    withWrite<U>(fn: (value: T) => PromiseLike<U> | U): Promise<U>;
 
     /**
      * Acquires a read lock and returns a guard for manual control.
@@ -541,7 +541,7 @@ export function RwLock<T>(value: T): RwLock<T> {
             return 'RwLock(<unlocked>)';
         },
 
-        async withRead<U>(fn: (value: T) => Promise<U> | U): Promise<U> {
+        async withRead<U>(fn: (value: T) => PromiseLike<U> | U): Promise<U> {
             const guard = await read();
             try {
                 return await fn(guard.value);
@@ -550,7 +550,7 @@ export function RwLock<T>(value: T): RwLock<T> {
             }
         },
 
-        async withWrite<U>(fn: (value: T) => Promise<U> | U): Promise<U> {
+        async withWrite<U>(fn: (value: T) => PromiseLike<U> | U): Promise<U> {
             const guard = await write();
             try {
                 return await fn(guard.value);
