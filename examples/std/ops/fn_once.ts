@@ -1,7 +1,7 @@
 /**
  * FnOnce Examples
  *
- * Demonstrates how to use FnOnce for one-time callable functions.
+ * Demonstrates how to use FnOnce for one-time callable synchronous functions.
  * FnOnce is useful for ensuring operations execute exactly once,
  * such as cleanup handlers, resource disposal, or one-time events.
  */
@@ -168,40 +168,10 @@ emitter.emit({ x: 30 });
 console.log(`Recorded clicks: [${clicks.join(', ')}]`); // Only [10]
 
 // ============================================================================
-// Example 6: Async Function with tryCallAsync
+// Example 6: Initialization Guard
 // ============================================================================
 
-console.log('\n=== Example 6: Async Function with tryCallAsync ===\n');
-
-interface User {
-    id: number;
-    name: string;
-}
-
-// Simulated async API call
-const fetchUser = FnOnce(async (id: number): Promise<User> => {
-    console.log(`Fetching user ${id}...`);
-    await new Promise(r => setTimeout(r, 50));
-    return { id, name: `User ${id}` };
-});
-
-// First call succeeds
-const user1 = await fetchUser.tryCallAsync(42);
-if (user1.isSome()) {
-    console.log(`Fetched: ${JSON.stringify(user1.unwrap())}`);
-}
-
-// Second call returns None (no network request made)
-const user2 = await fetchUser.tryCallAsync(99);
-if (user2.isNone()) {
-    console.log('Already fetched, using cached approach instead');
-}
-
-// ============================================================================
-// Example 7: Initialization Guard
-// ============================================================================
-
-console.log('\n=== Example 7: Initialization Guard ===\n');
+console.log('\n=== Example 6: Initialization Guard ===\n');
 
 class Application {
     private _initialize: ReturnType<typeof FnOnce<[], { ready: boolean; }>>;
@@ -241,10 +211,10 @@ console.log(`Is initialized: ${app.isInitialized}`);
 app.start(); // No-op, already initialized
 
 // ============================================================================
-// Example 8: Callback Factory Pattern
+// Example 7: Callback Factory Pattern
 // ============================================================================
 
-console.log('\n=== Example 8: Callback Factory Pattern ===\n');
+console.log('\n=== Example 7: Callback Factory Pattern ===\n');
 
 type UnsubscribeFn = ReturnType<typeof FnOnce<[], void>>;
 
@@ -271,10 +241,10 @@ unsub2.call();
 unsub1.tryCall(); // No-op
 
 // ============================================================================
-// Example 9: Promise Resolution Guard
+// Example 8: Promise Resolution Guard
 // ============================================================================
 
-console.log('\n=== Example 9: Promise Resolution Guard ===\n');
+console.log('\n=== Example 8: Promise Resolution Guard ===\n');
 
 function createDeferredPromise<T>() {
     let resolve!: (value: T) => void;
@@ -318,10 +288,10 @@ console.log(`Promise result: ${result}`);
 console.log(`Is settled: ${deferred.isSettled()}`);
 
 // ============================================================================
-// Example 10: Comparison with Regular Functions
+// Example 9: Comparison with Regular Functions
 // ============================================================================
 
-console.log('\n=== Example 10: Comparison with Regular Functions ===\n');
+console.log('\n=== Example 9: Comparison with Regular Functions ===\n');
 
 // Regular function - can be called multiple times
 function regularCleanup() {
@@ -362,6 +332,5 @@ console.log('  - No manual boolean flags needed');
 console.log('  - Type-safe: tryCall() returns Option<R>');
 console.log('  - call() throws if already consumed (fail-fast)');
 console.log('  - isConsumed() for status checking');
-console.log('  - tryCallAsync() for ergonomic async handling');
 
 console.log('\n=== FnOnce Examples Complete ===');

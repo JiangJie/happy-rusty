@@ -57,12 +57,6 @@ describe('FnOnce', () => {
             fn.call();
             expect(called).toBe(true);
         });
-
-        it('should work with async functions', async () => {
-            const fn = FnOnce(async (x: number) => x * 2);
-            const result = await fn.call(21);
-            expect(result).toBe(42);
-        });
     });
 
     describe('tryCall', () => {
@@ -120,72 +114,6 @@ describe('FnOnce', () => {
             const fn = FnOnce(() => {});
             fn.tryCall();
             expect(fn.isConsumed()).toBe(true);
-        });
-    });
-
-    describe('tryCallAsync', () => {
-        it('should return Some with result on first call for async function', async () => {
-            const fn = FnOnce(async (x: number) => x * 2);
-            const result = await fn.tryCallAsync(21);
-            expect(result.isSome()).toBe(true);
-            expect(result.unwrap()).toBe(42);
-        });
-
-        it('should return None on subsequent calls for async function', async () => {
-            const fn = FnOnce(async () => 'hello');
-            await fn.tryCallAsync();
-            const result = await fn.tryCallAsync();
-            expect(result.isNone()).toBe(true);
-        });
-
-        it('should work with sync functions', async () => {
-            const fn = FnOnce((x: number) => x * 2);
-            const result = await fn.tryCallAsync(21);
-            expect(result.isSome()).toBe(true);
-            expect(result.unwrap()).toBe(42);
-        });
-
-        it('should return None on subsequent calls for sync function', async () => {
-            const fn = FnOnce(() => 42);
-            await fn.tryCallAsync();
-            const result = await fn.tryCallAsync();
-            expect(result.isNone()).toBe(true);
-        });
-
-        it('should pass arguments to async function', async () => {
-            const fn = FnOnce(async (a: number, b: number) => a + b);
-            const result = await fn.tryCallAsync(2, 3);
-            expect(result.unwrap()).toBe(5);
-        });
-
-        it('should actually execute the async function only once', async () => {
-            const mockFn = vi.fn(async () => 'result');
-            const fn = FnOnce(mockFn);
-
-            await fn.tryCallAsync();
-            await fn.tryCallAsync();
-            await fn.tryCallAsync();
-
-            expect(mockFn).toHaveBeenCalledTimes(1);
-        });
-
-        it('should mark as consumed after tryCallAsync', async () => {
-            const fn = FnOnce(async () => {});
-            expect(fn.isConsumed()).toBe(false);
-            await fn.tryCallAsync();
-            expect(fn.isConsumed()).toBe(true);
-        });
-
-        it('should allow easier unwrapOr usage compared to tryCall', async () => {
-            const asyncFn = FnOnce(async (x: number) => x * 2);
-
-            // With tryCallAsync - cleaner
-            const result1 = (await asyncFn.tryCallAsync(21)).unwrapOr(0);
-            expect(result1).toBe(42);
-
-            // Second call returns None, so unwrapOr gives default
-            const result2 = (await asyncFn.tryCallAsync(21)).unwrapOr(0);
-            expect(result2).toBe(0);
         });
     });
 

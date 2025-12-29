@@ -11,7 +11,7 @@
  * - Resource disposal patterns
  */
 
-import { None, Some, type AsyncOption, type Option } from '../../core/mod.ts';
+import { None, Some, type Option } from '../../core/mod.ts';
 
 /**
  * A function wrapper that can only be called once.
@@ -124,42 +124,6 @@ export interface FnOnce<A extends unknown[], R> {
     tryCall(...args: A): Option<R>;
 
     /**
-     * Async version of `tryCall`. Attempts to call the function and awaits the result,
-     * returning `Some(result)` if successful or `None` if the function has already been consumed.
-     *
-     * This is useful when wrapping async functions, as it returns `Promise<Option<T>>`
-     * instead of `Option<Promise<T>>`, making it easier to work with.
-     *
-     * @param args - The arguments to pass to the function.
-     * @returns A promise that resolves to `Some(result)` if the function was called, `None` if already consumed.
-     *
-     * @example
-     * ```ts
-     * const fetchData = FnOnce(async (id: number) => {
-     *     const response = await fetch(`/api/data/${id}`);
-     *     return response.json();
-     * });
-     *
-     * // With tryCallAsync - cleaner async handling
-     * const result = await fetchData.tryCallAsync(1);
-     * const data = result.unwrapOr({ default: true });
-     *
-     * // vs tryCall - requires awaiting inside Option
-     * const opt = fetchData.tryCall(1);
-     * const data = await opt.unwrapOr(Promise.resolve({ default: true }));
-     * ```
-     *
-     * @example
-     * ```ts
-     * // Also works with sync functions
-     * const syncFn = FnOnce((x: number) => x * 2);
-     * const result = await syncFn.tryCallAsync(21);
-     * console.log(result.unwrapOr(0)); // 42
-     * ```
-     */
-    tryCallAsync(...args: A): AsyncOption<Awaited<R>>;
-
-    /**
      * Returns `true` if the function has been consumed (called).
      *
      * @example
@@ -216,14 +180,6 @@ export function FnOnce<A extends unknown[], R>(fn: (...args: A) => R): FnOnce<A,
             }
             consumed = true;
             return Some(fn(...args));
-        },
-
-        async tryCallAsync(...args: A): AsyncOption<Awaited<R>> {
-            if (consumed) {
-                return None;
-            }
-            consumed = true;
-            return Some(await fn(...args));
         },
 
         isConsumed(): boolean {

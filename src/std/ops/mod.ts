@@ -5,4 +5,5 @@
  */
 export * from './control_flow.ts';
 export * from './fn_once.ts';
+export * from './fn_once_async.ts';
 export * from './guards.ts';
