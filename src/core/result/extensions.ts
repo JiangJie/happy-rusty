@@ -81,7 +81,7 @@ export function tryResult<T, E = Error, Args extends unknown[] = []>(fn: (...arg
  * const result = await tryAsyncResult<User, ApiError>(api.getUser(id));
  * ```
  */
-export async function tryAsyncResult<T, E = Error>(task: PromiseLike<T>): AsyncResult<T, E>;
+export function tryAsyncResult<T, E = Error>(task: PromiseLike<T>): AsyncResult<T, E>;
 /**
  * Executes a function and captures any thrown exception or rejection as an `Err`.
  * If the function succeeds, returns `Ok` with the result.
@@ -128,7 +128,7 @@ export async function tryAsyncResult<T, E = Error>(task: PromiseLike<T>): AsyncR
  * const result = await tryAsyncResult<Config, ConfigError, [string]>(loadConfig, 'app.json');
  * ```
  */
-export async function tryAsyncResult<T, E = Error, Args extends unknown[] = []>(task: (...args: Args) => T | PromiseLike<T>, ...args: Args): AsyncResult<T, E>;
+export function tryAsyncResult<T, E = Error, Args extends unknown[] = []>(task: (...args: Args) => T | PromiseLike<T>, ...args: Args): AsyncResult<T, E>;
 export async function tryAsyncResult<T, E = Error, Args extends unknown[] = []>(task: PromiseLike<T> | ((...args: Args) => T | PromiseLike<T>), ...args: Args): AsyncResult<T, E> {
     try {
         const result = typeof task === 'function' ? task(...args) : task;

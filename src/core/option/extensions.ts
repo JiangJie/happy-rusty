@@ -74,7 +74,7 @@ export function tryOption<T, Args extends unknown[]>(fn: (...args: Args) => T, .
  * const fileContent = await tryAsyncOption(fs.promises.readFile('config.json', 'utf-8'));
  * ```
  */
-export async function tryAsyncOption<T>(task: PromiseLike<T>): AsyncOption<T>;
+export function tryAsyncOption<T>(task: PromiseLike<T>): AsyncOption<T>;
 /**
  * Executes a function and returns `Some` with the result if successful, or `None` if it throws or rejects.
  *
@@ -113,7 +113,7 @@ export async function tryAsyncOption<T>(task: PromiseLike<T>): AsyncOption<T>;
  * });
  * ```
  */
-export async function tryAsyncOption<T, Args extends unknown[]>(task: (...args: Args) => T | PromiseLike<T>, ...args: Args): AsyncOption<T>;
+export function tryAsyncOption<T, Args extends unknown[]>(task: (...args: Args) => T | PromiseLike<T>, ...args: Args): AsyncOption<T>;
 export async function tryAsyncOption<T, Args extends unknown[]>(task: PromiseLike<T> | ((...args: Args) => T | PromiseLike<T>), ...args: Args): AsyncOption<T> {
     try {
         const result = typeof task === 'function' ? task(...args) : task;
