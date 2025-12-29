@@ -141,7 +141,7 @@ export interface FnOnceAsync<A extends unknown[], R> {
  *
  * @typeParam A - Tuple type of the function arguments.
  * @typeParam R - The resolved type of the Promise returned by the async function.
- * @param fn - The async function to wrap.
+ * @param fn - A function that returns `PromiseLike<R>` or `R`.
  * @returns A `FnOnceAsync` instance that wraps the function.
  *
  * @example
@@ -156,7 +156,7 @@ export interface FnOnceAsync<A extends unknown[], R> {
  * // await initialize.call(); // Throws Error: FnOnceAsync has already been consumed
  * ```
  */
-export function FnOnceAsync<A extends unknown[], R>(fn: (...args: A) => PromiseLike<R>): FnOnceAsync<A, R> {
+export function FnOnceAsync<A extends unknown[], R>(fn: (...args: A) => PromiseLike<R> | R): FnOnceAsync<A, R> {
     let consumed = false;
 
     return Object.freeze<FnOnceAsync<A, R>>({

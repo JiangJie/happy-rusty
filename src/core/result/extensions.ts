@@ -128,8 +128,8 @@ export function tryAsyncResult<T, E = Error>(task: PromiseLike<T>): AsyncResult<
  * const result = await tryAsyncResult<Config, ConfigError, [string]>(loadConfig, 'app.json');
  * ```
  */
-export function tryAsyncResult<T, E = Error, Args extends unknown[] = []>(task: (...args: Args) => T | PromiseLike<T>, ...args: Args): AsyncResult<T, E>;
-export async function tryAsyncResult<T, E = Error, Args extends unknown[] = []>(task: PromiseLike<T> | ((...args: Args) => T | PromiseLike<T>), ...args: Args): AsyncResult<T, E> {
+export function tryAsyncResult<T, E = Error, Args extends unknown[] = []>(task: (...args: Args) => PromiseLike<T> | T, ...args: Args): AsyncResult<T, E>;
+export async function tryAsyncResult<T, E = Error, Args extends unknown[] = []>(task: PromiseLike<T> | ((...args: Args) => PromiseLike<T> | T), ...args: Args): AsyncResult<T, E> {
     try {
         const result = typeof task === 'function' ? task(...args) : task;
         return Ok(await result);

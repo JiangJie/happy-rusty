@@ -140,7 +140,7 @@ export interface Option<T> {
 
     /**
      * Asynchronous version of `isSomeAnd`.
-     * @param predicate - An async function that takes the contained value and returns a `PromiseLike<boolean>`.
+     * @param predicate - A function that takes the contained value and returns a `PromiseLike<boolean>` or `boolean`.
      * @returns A promise that resolves to `true` if the Option is `Some` and the predicate resolves to `true`.
      * @see isSomeAnd
      * @example
@@ -149,7 +149,7 @@ export interface Option<T> {
      * await x.isSomeAndAsync(async v => v > 1); // true
      * ```
      */
-    isSomeAndAsync(predicate: (value: T) => PromiseLike<boolean>): Promise<boolean>;
+    isSomeAndAsync(predicate: (value: T) => PromiseLike<boolean> | boolean): Promise<boolean>;
 
     /**
      * Returns `true` if the Option is `None`, or the predicate returns `true` for the contained value.
@@ -169,7 +169,7 @@ export interface Option<T> {
 
     /**
      * Asynchronous version of `isNoneOr`.
-     * @param predicate - An async function that takes the contained value and returns a `PromiseLike<boolean>`.
+     * @param predicate - A function that takes the contained value and returns a `PromiseLike<boolean>` or `boolean`.
      * @returns A promise that resolves to `true` if the Option is `None` or the predicate resolves to `true`.
      * @see isNoneOr
      * @example
@@ -181,7 +181,7 @@ export interface Option<T> {
      * await y.isNoneOrAsync(async v => v > 5); // true
      * ```
      */
-    isNoneOrAsync(predicate: (value: T) => PromiseLike<boolean>): Promise<boolean>;
+    isNoneOrAsync(predicate: (value: T) => PromiseLike<boolean> | boolean): Promise<boolean>;
 
     // #endregion
 
@@ -252,7 +252,7 @@ export interface Option<T> {
 
     /**
      * Asynchronous version of `unwrapOrElse`.
-     * @param fn - An async function that returns a `PromiseLike<T>` as the default value.
+     * @param fn - A function that returns `PromiseLike<T>` or `T` as the default value.
      * @returns A promise that resolves to the contained value or the result of the function.
      * @see unwrapOrElse
      * @example
@@ -261,7 +261,7 @@ export interface Option<T> {
      * await x.unwrapOrElseAsync(async () => 10); // 10
      * ```
      */
-    unwrapOrElseAsync(fn: () => PromiseLike<T>): Promise<T>;
+    unwrapOrElseAsync(fn: () => PromiseLike<T> | T): Promise<T>;
 
     // #endregion
 
@@ -558,7 +558,7 @@ export interface Option<T> {
     /**
      * Asynchronous version of `andThen`.
      * @typeParam U - The type of the value returned by the function.
-     * @param fn - An async function that takes the contained value and returns a `PromiseLike<Option<U>>`.
+     * @param fn - A function that takes the contained value and returns `PromiseLike<Option<U>>` or `Option<U>`.
      * @returns A promise that resolves to `None` if `this` is `None`, otherwise the result of `fn`.
      * @see andThen
      * @see orElseAsync
@@ -569,7 +569,7 @@ export interface Option<T> {
      * console.log(result.unwrap()); // 4
      * ```
      */
-    andThenAsync<U>(fn: (value: T) => AsyncLikeOption<U>): AsyncOption<U>;
+    andThenAsync<U>(fn: (value: T) => AsyncLikeOption<U> | Option<U>): AsyncOption<U>;
 
     /**
      * Returns the Option if it contains a value, otherwise returns `other`.
@@ -611,7 +611,7 @@ export interface Option<T> {
 
     /**
      * Asynchronous version of `orElse`.
-     * @param fn - An async function that produces a `PromiseLike<Option<T>>`.
+     * @param fn - A function that produces `PromiseLike<Option<T>>` or `Option<T>`.
      * @returns A promise that resolves to `this` if it is `Some`, otherwise the result of `fn`.
      * @see orElse
      * @see andThenAsync
@@ -622,7 +622,7 @@ export interface Option<T> {
      * console.log(result.unwrap()); // 10
      * ```
      */
-    orElseAsync(fn: () => AsyncLikeOption<T>): AsyncOption<T>;
+    orElseAsync(fn: () => AsyncLikeOption<T> | Option<T>): AsyncOption<T>;
 
     /**
      * Returns `Some` if exactly one of `this`, `other` is `Some`, otherwise returns `None`.

@@ -149,7 +149,7 @@ export interface Once<T> {
      * If multiple calls occur concurrently, only the first one will run the
      * initialization function. Other calls will wait for it to complete.
      *
-     * @param fn - An async function that returns the value to initialize.
+     * @param fn - A function that returns `PromiseLike<T>` or `T` to initialize.
      * @returns A promise that resolves to the stored value.
      *
      * @example
@@ -165,7 +165,7 @@ export interface Once<T> {
      * // db1 === db2 === db3
      * ```
      */
-    getOrInitAsync(fn: () => PromiseLike<T>): Promise<T>;
+    getOrInitAsync(fn: () => PromiseLike<T> | T): Promise<T>;
 
     /**
      * Gets the contents, initializing it with `fn` if empty.
@@ -199,7 +199,7 @@ export interface Once<T> {
      * initialization function. Other calls will wait for it to complete.
      *
      * @typeParam E - The error type.
-     * @param fn - The async initialization function that may fail.
+     * @param fn - A function that returns `PromiseLike<Result<T, E>>` or `Result<T, E>`.
      * @returns A promise that resolves to `Ok(value)` or `Err(error)`.
      *
      * @example
@@ -216,7 +216,7 @@ export interface Once<T> {
      * });
      * ```
      */
-    getOrTryInitAsync<E>(fn: () => AsyncLikeResult<T, E>): AsyncResult<T, E>;
+    getOrTryInitAsync<E>(fn: () => AsyncLikeResult<T, E> | Result<T, E>): AsyncResult<T, E>;
 
     /**
      * Takes the value out, leaving it uninitialized.
@@ -373,7 +373,7 @@ export function Once<T>(): Once<T> {
 
     // Use `Promise.resolve(fn())` instead of `async` to preserve sync error behavior:
     // sync throws propagate directly, async errors become rejected Promises.
-    function getOrTryInitAsync<E>(fn: () => AsyncLikeResult<T, E>): AsyncResult<T, E> {
+    function getOrTryInitAsync<E>(fn: () => AsyncLikeResult<T, E> | Result<T, E>): AsyncResult<T, E> {
         if (initialized) {
             // Reuse cached promise to avoid creating new Promise on each call
             return (resolvedResultPromise ??= Promise.resolve(Ok(value as T))) as AsyncResult<T, E>;
@@ -448,7 +448,7 @@ export function Once<T>(): Once<T> {
 
         // Use `Promise.resolve(fn())` instead of `async` to preserve sync error behavior:
         // sync throws propagate directly, async errors become rejected Promises.
-        getOrInitAsync(fn: () => PromiseLike<T>): Promise<T> {
+        getOrInitAsync(fn: () => PromiseLike<T> | T): Promise<T> {
             if (initialized) {
                 // Reuse cached promise to avoid creating new Promise on each call
                 return resolvedPromise ??= Promise.resolve(value as T);

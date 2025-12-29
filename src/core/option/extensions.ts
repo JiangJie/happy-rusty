@@ -113,8 +113,8 @@ export function tryAsyncOption<T>(task: PromiseLike<T>): AsyncOption<T>;
  * });
  * ```
  */
-export function tryAsyncOption<T, Args extends unknown[]>(task: (...args: Args) => T | PromiseLike<T>, ...args: Args): AsyncOption<T>;
-export async function tryAsyncOption<T, Args extends unknown[]>(task: PromiseLike<T> | ((...args: Args) => T | PromiseLike<T>), ...args: Args): AsyncOption<T> {
+export function tryAsyncOption<T, Args extends unknown[]>(task: (...args: Args) => PromiseLike<T> | T, ...args: Args): AsyncOption<T>;
+export async function tryAsyncOption<T, Args extends unknown[]>(task: PromiseLike<T> | ((...args: Args) => PromiseLike<T> | T), ...args: Args): AsyncOption<T> {
     try {
         const result = typeof task === 'function' ? task(...args) : task;
         return Some(await result);
