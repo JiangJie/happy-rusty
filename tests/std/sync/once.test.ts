@@ -205,6 +205,27 @@ describe('Once', () => {
             expect(value).toBe(42);
             expect(fn).not.toHaveBeenCalled();
         });
+
+        it('should return same Promise instance after initialization', async () => {
+            const once = Once<number>();
+            await once.getOrInitAsync(async () => 42);
+
+            // After initialization, multiple calls should return the same Promise
+            const promise1 = once.getOrInitAsync(async () => 100);
+            const promise2 = once.getOrInitAsync(async () => 200);
+            const promise3 = once.getOrInitAsync(async () => 300);
+
+            expect(promise1).toBe(promise2);
+            expect(promise2).toBe(promise3);
+        });
+
+        it('should throw sync errors directly, not as rejected Promise', () => {
+            const once = Once<number>();
+            // Sync error should be thrown directly, not wrapped in rejected Promise
+            expect(() => once.getOrInitAsync(() => {
+                throw new Error('sync error');
+            })).toThrow('sync error');
+        });
     });
 
     describe('getOrTryInit', () => {
@@ -384,6 +405,73 @@ describe('Once', () => {
             expect(r2.unwrap()).toBe(42);
             expect(once.isInitialized()).toBe(true);
         });
+
+        it('should throw sync errors directly, not as rejected Promise', () => {
+            const once = Once<number>();
+
+            // Sync error should be thrown directly, not wrapped in rejected Promise
+            expect(() => once.getOrTryInitAsync(() => {
+                throw new Error('sync error');
+            })).toThrow('sync error');
+        });
+
+        it('should return same Promise instance after initialization', async () => {
+            const once = Once<number>();
+            await once.getOrTryInitAsync(async () => Ok(42));
+
+            // After initialization, multiple calls should return the same Promise
+            const promise1 = once.getOrTryInitAsync(async () => Ok(100));
+            const promise2 = once.getOrTryInitAsync(async () => Ok(200));
+            const promise3 = once.getOrTryInitAsync(async () => Ok(300));
+
+            expect(promise1).toBe(promise2);
+            expect(promise2).toBe(promise3);
+
+            // And the value should be the original one
+            const result = await promise1;
+            expect(result.unwrap()).toBe(42);
+        });
+
+        it('should work correctly when destructured (no this binding issue)', async () => {
+            const once = Once<number>();
+            const { getOrTryInitAsync } = once;
+
+            // First call with destructured method
+            const result1 = await getOrTryInitAsync(async () => Ok(42));
+            expect(result1.isOk()).toBe(true);
+            expect(result1.unwrap()).toBe(42);
+
+            // Second call should return cached value
+            const result2 = await getOrTryInitAsync(async () => Ok(100));
+            expect(result2.isOk()).toBe(true);
+            expect(result2.unwrap()).toBe(42);
+        });
+
+        it('should retry correctly when destructured and first call fails', async () => {
+            const once = Once<number>();
+            const { getOrTryInitAsync } = once;
+            let callCount = 0;
+
+            // Simulate concurrent calls where first fails
+            const p1 = getOrTryInitAsync(async () => {
+                callCount++;
+                await new Promise(resolve => setTimeout(resolve, 10));
+                return Err<number, string>('first fails');
+            });
+
+            // Second call starts while first is pending
+            const p2 = getOrTryInitAsync(async () => {
+                callCount++;
+                return Ok(42);
+            });
+
+            const [r1, r2] = await Promise.all([p1, p2]);
+
+            expect(r1.isErr()).toBe(true);
+            expect(r2.isOk()).toBe(true);
+            expect(r2.unwrap()).toBe(42);
+            expect(callCount).toBe(2); // First fails, second retries and succeeds
+        });
     });
 
     describe('take', () => {
@@ -413,6 +501,48 @@ describe('Once', () => {
 
             expect(result.isOk()).toBe(true);
             expect(once.get().unwrap()).toBe(100);
+        });
+
+        it('should clear cached Promise after take', async () => {
+            const once = Once<number>();
+            once.set(42);
+
+            // Get cached Promise
+            const promise1 = once.getOrInitAsync(async () => 999);
+
+            // Take the value
+            once.take();
+
+            // Reinitialize with new value
+            once.set(100);
+
+            // Should get a new Promise with new value
+            const promise2 = once.getOrInitAsync(async () => 999);
+
+            expect(promise1).not.toBe(promise2);
+            expect(await promise1).toBe(42);
+            expect(await promise2).toBe(100);
+        });
+
+        it('should clear cached Result Promise after take', async () => {
+            const once = Once<number>();
+            once.set(42);
+
+            // Get cached Result Promise
+            const promise1 = once.getOrTryInitAsync(async () => Ok(999));
+
+            // Take the value
+            once.take();
+
+            // Reinitialize with new value
+            once.set(100);
+
+            // Should get a new Promise with new value
+            const promise2 = once.getOrTryInitAsync(async () => Ok(999));
+
+            expect(promise1).not.toBe(promise2);
+            expect((await promise1).unwrap()).toBe(42);
+            expect((await promise2).unwrap()).toBe(100);
         });
     });
 
@@ -449,6 +579,19 @@ describe('Once', () => {
 
             const value = await once.waitAsync();
             expect(value).toBe(42);
+        });
+
+        it('should return same Promise instance after initialization', async () => {
+            const once = Once<number>();
+            once.set(42);
+
+            // After initialization, multiple calls should return the same Promise
+            const promise1 = once.waitAsync();
+            const promise2 = once.waitAsync();
+            const promise3 = once.waitAsync();
+
+            expect(promise1).toBe(promise2);
+            expect(promise2).toBe(promise3);
         });
 
         it('should wait for set() to be called', async () => {

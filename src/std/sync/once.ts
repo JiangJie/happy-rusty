@@ -6,7 +6,7 @@
  * to lazily initialized data, supporting both sync and async initialization.
  */
 
-import { Err, None, Ok, RESULT_VOID, Some, type AsyncResult, type Option, type Result, type VoidResult } from '../../core/mod.ts';
+import { Err, None, Ok, RESULT_VOID, Some, type AsyncLikeResult, type AsyncResult, type Option, type Result, type VoidResult } from '../../core/mod.ts';
 
 /**
  * A container which can be written to only once.
@@ -149,7 +149,7 @@ export interface Once<T> {
      * If multiple calls occur concurrently, only the first one will run the
      * initialization function. Other calls will wait for it to complete.
      *
-     * @param fn - The async initialization function.
+     * @param fn - An async function that returns the value to initialize.
      * @returns A promise that resolves to the stored value.
      *
      * @example
@@ -165,7 +165,7 @@ export interface Once<T> {
      * // db1 === db2 === db3
      * ```
      */
-    getOrInitAsync(fn: () => Promise<T>): Promise<T>;
+    getOrInitAsync(fn: () => PromiseLike<T>): Promise<T>;
 
     /**
      * Gets the contents, initializing it with `fn` if empty.
@@ -216,7 +216,7 @@ export interface Once<T> {
      * });
      * ```
      */
-    getOrTryInitAsync<E>(fn: () => AsyncResult<T, E>): AsyncResult<T, E>;
+    getOrTryInitAsync<E>(fn: () => AsyncLikeResult<T, E>): AsyncResult<T, E>;
 
     /**
      * Takes the value out, leaving it uninitialized.
@@ -355,6 +355,8 @@ export function Once<T>(): Once<T> {
     let value: T | undefined;
     let initialized = false;
     let pendingPromise: Promise<T> | undefined;
+    let resolvedPromise: Promise<T> | undefined;
+    let resolvedResultPromise: AsyncResult<T, unknown> | undefined;
     let waiters: ((value: T) => void)[] = [];
 
     /**
@@ -367,6 +369,47 @@ export function Once<T>(): Once<T> {
             waiter(val);
         }
         waiters = [];
+    }
+
+    // Use `Promise.resolve(fn())` instead of `async` to preserve sync error behavior:
+    // sync throws propagate directly, async errors become rejected Promises.
+    function getOrTryInitAsync<E>(fn: () => AsyncLikeResult<T, E>): AsyncResult<T, E> {
+        if (initialized) {
+            // Reuse cached promise to avoid creating new Promise on each call
+            return (resolvedResultPromise ??= Promise.resolve(Ok(value as T))) as AsyncResult<T, E>;
+        }
+
+        // If already initializing, wait for it
+        if (pendingPromise) {
+            return pendingPromise.then(
+                () => Ok(value as T),
+                // Previous initialization failed via Err result, let this call try again.
+                // Note: fn's sync errors won't throw here since we're inside a .then() callback,
+                // they will be caught and converted to rejected Promise by Promise.resolve(fn()).
+                () => getOrTryInitAsync(fn),
+            );
+        }
+
+        // Create a new pending promise for this initialization attempt
+        // fn() is called synchronously here - sync throws propagate directly
+        pendingPromise = Promise.resolve(fn()).then(
+            (result) => {
+                if (result.isOk()) {
+                    const val = result.unwrap();
+                    setValue(val);
+                    return val;
+                }
+                // If Err, throw to signal failure (we'll catch and return the result)
+                throw result;
+            },
+        ).finally(() => {
+            pendingPromise = undefined;
+        });
+
+        return pendingPromise.then(
+            (resultValue) => Ok(resultValue as T),
+            (errResult) => errResult as Result<T, E>,
+        );
     }
 
     return Object.freeze<Once<T>>({
@@ -403,9 +446,12 @@ export function Once<T>(): Once<T> {
             return value as T;
         },
 
-        async getOrInitAsync(fn: () => Promise<T>): Promise<T> {
+        // Use `Promise.resolve(fn())` instead of `async` to preserve sync error behavior:
+        // sync throws propagate directly, async errors become rejected Promises.
+        getOrInitAsync(fn: () => PromiseLike<T>): Promise<T> {
             if (initialized) {
-                return value as T;
+                // Reuse cached promise to avoid creating new Promise on each call
+                return resolvedPromise ??= Promise.resolve(value as T);
             }
 
             // If already initializing, wait for the pending promise
@@ -413,15 +459,14 @@ export function Once<T>(): Once<T> {
                 return pendingPromise;
             }
 
-            pendingPromise = (async () => {
-                try {
-                    const result = await fn();
+            pendingPromise = Promise.resolve(fn()).then(
+                (result) => {
                     setValue(result);
                     return result;
-                } finally {
-                    pendingPromise = undefined;
-                }
-            })();
+                },
+            ).finally(() => {
+                pendingPromise = undefined;
+            });
 
             return pendingPromise;
         },
@@ -438,43 +483,7 @@ export function Once<T>(): Once<T> {
             return result;
         },
 
-        async getOrTryInitAsync<E>(fn: () => AsyncResult<T, E>): AsyncResult<T, E> {
-            if (initialized) {
-                return Ok(value as T);
-            }
-
-            // If already initializing, wait for it
-            if (pendingPromise) {
-                try {
-                    await pendingPromise;
-                    // pendingPromise only resolves on success, so initialized must be true
-                    return Ok(value as T);
-                } catch {
-                    // Previous initialization failed via Err result, let this call try again
-                }
-            }
-
-            // Create a new pending promise for this initialization attempt
-            pendingPromise = (async () => {
-                const result = await fn();
-                if (result.isOk()) {
-                    const val = result.unwrap();
-                    setValue(val);
-                    return val;
-                }
-                // If Err, throw to signal failure (we'll catch and return the result)
-                throw result;
-            })();
-
-            try {
-                const resultValue = await pendingPromise;
-                return Ok(resultValue as T);
-            } catch (errResult) {
-                return errResult as Result<T, E>;
-            } finally {
-                pendingPromise = undefined;
-            }
-        },
+        getOrTryInitAsync,
 
         take(): Option<T> {
             if (!initialized) {
@@ -483,6 +492,8 @@ export function Once<T>(): Once<T> {
             const taken = value as T;
             value = undefined;
             initialized = false;
+            resolvedPromise = undefined;  // Clear cached promise
+            resolvedResultPromise = undefined;  // Clear cached result promise
             return Some(taken);
         },
 
@@ -493,7 +504,8 @@ export function Once<T>(): Once<T> {
         waitAsync(): Promise<T> {
             // If already initialized, return immediately
             if (initialized) {
-                return Promise.resolve(value as T);
+                // Reuse cached promise to avoid creating new Promise on each call
+                return resolvedPromise ??= Promise.resolve(value as T);
             }
 
             // If initialization is in progress, wait for it
