@@ -1,10 +1,10 @@
 /**
  * Lazy example: Lazy initialization on first access
  *
- * Demonstrates using Lazy and LazyAsync for deferred initialization.
+ * Demonstrates using Lazy for deferred synchronous initialization.
  * Unlike Once, the initialization function is bound at creation time.
  */
-import { Lazy, LazyAsync } from '../../../src/mod.ts';
+import { Lazy, Once } from '../../../src/mod.ts';
 
 // ============================================================================
 // Example 1: Basic Lazy usage
@@ -71,55 +71,9 @@ console.log('\nCalling getTimeout():');
 console.log(`Timeout: ${getTimeout()} (config already loaded, no log)`);
 
 // ============================================================================
-// Example 3: LazyAsync for async resources
+// Example 3: Lazy singleton pattern
 // ============================================================================
-console.log('\n=== Example 3: LazyAsync for async resources ===\n');
-
-interface Database {
-    query(sql: string): Promise<unknown[]>;
-    close(): void;
-}
-
-// Simulated database connection
-const createDatabase = async (connectionString: string): Promise<Database> => {
-    console.log(`Connecting to database: ${connectionString}...`);
-    await new Promise(r => setTimeout(r, 100));
-    console.log('Connected!');
-
-    return {
-        async query(sql: string) {
-            console.log(`Executing: ${sql}`);
-            return [{ id: 1, name: 'Example' }];
-        },
-        close() {
-            console.log('Database connection closed');
-        },
-    };
-};
-
-const db = LazyAsync(() => createDatabase('postgres://localhost/myapp'));
-
-async function getUserById(id: number) {
-    const database = await db.force();
-    return database.query(`SELECT * FROM users WHERE id = ${id}`);
-}
-
-// Multiple concurrent calls - only one connection
-console.log('Making concurrent database calls:');
-const [users1, users2, users3] = await Promise.all([
-    getUserById(1),
-    getUserById(2),
-    getUserById(3),
-]);
-
-console.log(`Query 1 result: ${JSON.stringify(users1)}`);
-console.log(`Query 2 result: ${JSON.stringify(users2)}`);
-console.log(`Query 3 result: ${JSON.stringify(users3)}`);
-
-// ============================================================================
-// Example 4: Lazy singleton pattern
-// ============================================================================
-console.log('\n=== Example 4: Lazy singleton pattern ===\n');
+console.log('\n=== Example 3: Lazy singleton pattern ===\n');
 
 class Logger {
     private static _instance = Lazy(() => {
@@ -149,9 +103,9 @@ Logger.instance.error('Something went wrong');
 Logger.instance.info('But we recovered!');
 
 // ============================================================================
-// Example 5: Lazy with expensive computation
+// Example 4: Lazy with expensive computation
 // ============================================================================
-console.log('\n=== Example 5: Lazy expensive computation ===\n');
+console.log('\n=== Example 4: Lazy expensive computation ===\n');
 
 // Compute first N prime numbers
 const primes = Lazy(() => {
@@ -196,51 +150,9 @@ console.log('\nChecking if 100 is prime (uses cached primes):');
 console.log(`100 is prime: ${isPrime(100)}`);
 
 // ============================================================================
-// Example 6: LazyAsync with retry on failure
+// Example 5: Comparison between Lazy and Once
 // ============================================================================
-console.log('\n=== Example 6: LazyAsync with failure handling ===\n');
-
-let attemptCount = 0;
-
-const unreliableResource = LazyAsync(async () => {
-    attemptCount++;
-    console.log(`Attempt ${attemptCount} to load resource...`);
-
-    if (attemptCount < 3) {
-        throw new Error(`Failed on attempt ${attemptCount}`);
-    }
-
-    return { data: 'Resource loaded successfully' };
-});
-
-// Retry loop
-async function loadWithRetry(maxRetries: number) {
-    for (let i = 0; i < maxRetries; i++) {
-        try {
-            return await unreliableResource.force();
-        } catch (error) {
-            console.log(`Error: ${(error as Error).message}`);
-            if (i === maxRetries - 1) {
-                throw error;
-            }
-            console.log('Retrying...');
-        }
-    }
-}
-
-try {
-    const resource = await loadWithRetry(5);
-    console.log(`Success: ${JSON.stringify(resource)}`);
-} catch (error) {
-    console.log(`Failed after all retries: ${(error as Error).message}`);
-}
-
-// ============================================================================
-// Example 7: Comparison between Lazy and Once
-// ============================================================================
-console.log('\n=== Example 7: Lazy vs Once ===\n');
-
-import { Once } from '../../../src/mod.ts';
+console.log('\n=== Example 5: Lazy vs Once ===\n');
 
 // Lazy: initialization function bound at creation
 const lazyValue = Lazy(() => {
@@ -271,3 +183,33 @@ console.log(`  Second getOrInit: ${v2} (returns cached value)`);
 console.log('\nKey differences:');
 console.log('  - Lazy: Function bound at creation, simpler API (just force())');
 console.log('  - Once: Function provided at access, more flexible (getOrInit, set, take)');
+
+// ============================================================================
+// Example 6: Lazy with error handling
+// ============================================================================
+console.log('\n=== Example 6: Lazy with error handling ===\n');
+
+const shouldFail = true;
+
+const riskyValue = Lazy(() => {
+    console.log('Attempting to compute value...');
+    if (shouldFail) {
+        throw new Error('Computation failed!');
+    }
+    return 'Success!';
+});
+
+console.log('First attempt (will fail):');
+try {
+    riskyValue.force();
+} catch (e) {
+    console.log(`Error: ${(e as Error).message}`);
+    console.log(`isInitialized: ${riskyValue.isInitialized()}`);
+}
+
+console.log('\nNote: After error, Lazy is still uninitialized.');
+console.log('Unlike Once, Lazy will retry initialization on next force().');
+
+// In real code, you might create a new Lazy or handle differently
+// For demo purposes, we'll just show the state
+console.log(`Final isInitialized: ${riskyValue.isInitialized()}`);
