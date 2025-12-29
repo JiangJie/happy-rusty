@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Err, None, Ok, Some, type Option } from '../../../src/mod.ts';
+import { ASYNC_NONE, Err, None, Ok, Some, type AsyncOption, type Option } from '../../../src/mod.ts';
 
 describe('Option', () => {
     describe('Some variant', () => {
@@ -594,6 +594,34 @@ describe('Option', () => {
             const none1 = None;
             const none2 = None;
             expect(none1).toBe(none2);
+        });
+    });
+
+    describe('ASYNC_NONE', () => {
+        it('should be a Promise', () => {
+            expect(ASYNC_NONE).toBeInstanceOf(Promise);
+        });
+
+        it('should resolve to None', async () => {
+            const result = await ASYNC_NONE;
+            expect(result).toBe(None);
+            expect(result.isNone()).toBe(true);
+        });
+
+        it('should be the same Promise instance on multiple accesses', () => {
+            const promise1 = ASYNC_NONE;
+            const promise2 = ASYNC_NONE;
+            expect(promise1).toBe(promise2);
+        });
+
+        it('should be assignable to AsyncOption<T> for any T', async () => {
+            const stringOption: AsyncOption<string> = ASYNC_NONE;
+            const numberOption: AsyncOption<number> = ASYNC_NONE;
+            const objectOption: AsyncOption<{ id: number; }> = ASYNC_NONE;
+
+            expect((await stringOption).isNone()).toBe(true);
+            expect((await numberOption).isNone()).toBe(true);
+            expect((await objectOption).isNone()).toBe(true);
         });
     });
 });

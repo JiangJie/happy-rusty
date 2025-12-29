@@ -16,6 +16,10 @@ import { isResult } from './result/guards.ts';
 import type { AsyncLikeResult, AsyncResult, Result } from './result/result.ts';
 import { ResultKindSymbol } from './result/symbols.ts';
 
+// Internal cached Promise constants for runtime optimization
+const PROMISE_TRUE: Promise<true> = Promise.resolve(true);
+const PROMISE_FALSE: Promise<false> = Promise.resolve(false);
+
 /**
  * Represents the absence of a value, as a specialized `Option` type.
  * The type parameter is set to `never` because `None` does not hold a value.
@@ -263,13 +267,13 @@ export const None: None = Object.freeze<None>({
         return false;
     },
     isSomeAndAsync(_predicate: (value: never) => PromiseLike<boolean>): Promise<false> {
-        return Promise.resolve(false);
+        return PROMISE_FALSE;
     },
     isNoneOr(_predicate: (value: never) => boolean): true {
         return true;
     },
     isNoneOrAsync(_predicate: (value: never) => PromiseLike<boolean>): Promise<true> {
-        return Promise.resolve(true);
+        return PROMISE_TRUE;
     },
 
     expect(msg: string): never {
@@ -336,7 +340,7 @@ export const None: None = Object.freeze<None>({
         return None;
     },
     andThenAsync<U>(_fn: (value: never) => AsyncLikeOption<U>): Promise<None> {
-        return Promise.resolve(None);
+        return ASYNC_NONE;
     },
     or<T>(other: Option<T>): Option<T> {
         assertOption<T>(other);
@@ -362,6 +366,38 @@ export const None: None = Object.freeze<None>({
         return other === None;
     },
 } as const);
+
+/**
+ * Async Option constant for `None`.
+ * A pre-resolved `Promise<None>` that can be reused to avoid creating
+ * new Promise instances when returning `None` from async functions.
+ *
+ * Since `None extends Option<never>`, this constant can be assigned to any
+ * `AsyncOption<T>` (i.e., `Promise<Option<T>>`) due to TypeScript's covariance.
+ *
+ * @example
+ * ```ts
+ * async function findUser(id: number): AsyncOption<User> {
+ *     if (id < 0) {
+ *         return ASYNC_NONE;
+ *     }
+ *     const user = await db.findUser(id);
+ *     return user ? Some(user) : ASYNC_NONE;
+ * }
+ * ```
+ *
+ * @example
+ * ```ts
+ * // Useful in conditional async returns
+ * function maybeLoadAsync(shouldLoad: boolean): AsyncOption<Data> {
+ *     if (!shouldLoad) {
+ *         return ASYNC_NONE;
+ *     }
+ *     return loadDataAsync();
+ * }
+ * ```
+ */
+export const ASYNC_NONE: Promise<None> = Promise.resolve(None);
 
 /**
  * Creates a `Result<T, E>` representing a successful outcome containing a value.
@@ -437,7 +473,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
             return false;
         },
         isErrAndAsync(_predicate: (error: E) => PromiseLike<boolean>): Promise<false> {
-            return Promise.resolve(false);
+            return PROMISE_FALSE;
         },
 
         expect(_msg: string): T {
@@ -581,7 +617,7 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
             return false;
         },
         isOkAndAsync(_predicate: (value: T) => PromiseLike<boolean>): Promise<boolean> {
-            return Promise.resolve(false);
+            return PROMISE_FALSE;
         },
         isErrAnd(predicate: (error: E) => boolean): boolean {
             return predicate(error);
