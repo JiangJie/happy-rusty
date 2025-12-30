@@ -155,6 +155,20 @@ describe('Mutex', () => {
                 expect(arr).toEqual([1, 2, 3]);
             });
         });
+
+        it('should flatten nested Promise (Awaited<U>)', async () => {
+            const mutex = Mutex(10);
+            // fn returns Promise<Promise<number>>, but Promise.resolve flattens it
+            const result = await mutex.withLock(() => Promise.resolve(Promise.resolve(42)));
+            // Runtime: result is 42 (number), not Promise<42>
+            expect(result).toBe(42);
+        });
+
+        it('should work with sync return value', async () => {
+            const mutex = Mutex(10);
+            const result = await mutex.withLock((value) => value * 10);
+            expect(result).toBe(100);
+        });
     });
 
     describe('lock', () => {
@@ -361,6 +375,17 @@ describe('Mutex', () => {
             await getPromise;
             expect(events).toEqual(['locked', 'unlocked', 'got']);
         });
+
+        it('should flatten nested Promise (Awaited<T> behavior)', async () => {
+            // When T is Promise<number>, get() returns Promise<Awaited<Promise<number>>> = Promise<number>
+            const { promise, resolve } = Promise.withResolvers<number>();
+            resolve(42);
+
+            const mutex = Mutex(promise);
+            const result = await mutex.get();
+            // Runtime: async function returns Promise.resolve(guard.value) which flattens Promise<number>
+            expect(result).toBe(42);
+        });
     });
 
     describe('set', () => {
@@ -458,6 +483,23 @@ describe('Mutex', () => {
             expect(old2).toBe(2);
             expect(old3).toBe(3);
             expect(await mutex.get()).toBe(4);
+        });
+
+        it('should flatten nested Promise (Awaited<T> behavior)', async () => {
+            // When T is Promise<number>, replace() returns Promise<Awaited<Promise<number>>> = Promise<number>
+            const { promise: oldPromise, resolve: resolveOld } = Promise.withResolvers<number>();
+            resolveOld(42);
+
+            const { promise: newPromise, resolve: resolveNew } = Promise.withResolvers<number>();
+            resolveNew(100);
+
+            const mutex = Mutex(oldPromise);
+            const old = await mutex.replace(newPromise);
+            // Runtime: async function returns Promise.resolve(guard.value) which flattens Promise<number>
+            expect(old).toBe(42);
+
+            const newValue = await mutex.get();
+            expect(newValue).toBe(100);
         });
     });
 

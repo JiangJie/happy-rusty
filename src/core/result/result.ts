@@ -263,7 +263,7 @@ export interface Result<T, E> {
      * await x.unwrapOrElseAsync(async e => e.length); // 5
      * ```
      */
-    unwrapOrElseAsync(fn: (error: E) => PromiseLike<T> | T): Promise<T>;
+    unwrapOrElseAsync(fn: (error: E) => PromiseLike<T> | T): Promise<Awaited<T>>;
 
     /**
      * These methods extract the contained value in a `Result<T, E>` when it is the `Err` variant.

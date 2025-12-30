@@ -100,6 +100,11 @@ describe('Result', () => {
                 });
                 expect(result).toBe(1);
             });
+
+            it('unwrapOrElseAsync() should work with sync return value', async () => {
+                const result = await ok.unwrapOrElseAsync(() => 100);
+                expect(result).toBe(1);
+            });
         });
 
         describe('transforming to Option', () => {
@@ -361,6 +366,21 @@ describe('Result', () => {
                     return e.message === await Promise.resolve('lose') ? 0 : -1;
                 });
                 expect(result).toBe(0);
+            });
+
+            it('unwrapOrElseAsync() should flatten nested Promise (Awaited<T>)', async () => {
+                // When T is Promise<number>, the callback returns Promise<Promise<number>>
+                // But Promise.resolve() flattens it to Promise<number>, so we only need one await
+                const errPromise: Result<Promise<number>, Error> = Err(new Error('test'));
+                const result = await errPromise.unwrapOrElseAsync(() => Promise.resolve(Promise.resolve(42)));
+                // Runtime: Promise.resolve(Promise.resolve(42)) flattens to Promise<42>
+                // So result is 42, not Promise<42>
+                expect(result).toBe(42);
+            });
+
+            it('unwrapOrElseAsync() should work with sync return value', async () => {
+                const result = await err.unwrapOrElseAsync(() => 100);
+                expect(result).toBe(100);
             });
         });
 
@@ -844,6 +864,29 @@ describe('tryAsyncResult', () => {
         const asyncResult = await tryAsyncResult(getData, 'not-cached');
         expect(asyncResult.unwrap()).toBe(200);
     });
+
+    it('should flatten nested Promises (Awaited<T> behavior)', async () => {
+        // When T is Promise<number>, the result should be Result<number, E>, not Result<Promise<number>, E>
+        const nestedPromise = Promise.resolve(Promise.resolve(42));
+        const result = await tryAsyncResult(nestedPromise);
+        expect(result.isOk()).toBe(true);
+        // Runtime: Promise.resolve() flattens nested Promises
+        expect(result.unwrap()).toBe(42);
+    });
+
+    it('should flatten nested Promises from function return', async () => {
+        const fn = async () => Promise.resolve(99);
+        const result = await tryAsyncResult(fn);
+        expect(result.unwrap()).toBe(99);
+    });
+
+    it('should flatten nested Promises using Promise.withResolvers', async () => {
+        const { promise, resolve } = Promise.withResolvers<Promise<number>>();
+        resolve(Promise.resolve(88));
+        // tryAsyncResult should flatten: Promise<Promise<number>> -> Result<number, E>
+        const result = await tryAsyncResult(promise);
+        expect(result.unwrap()).toBe(88);
+    });
 });
 
 describe('tryAsyncOption', () => {
@@ -977,6 +1020,29 @@ describe('tryAsyncOption', () => {
         const asyncOption = await tryAsyncOption(getData, 'not-cached');
         expect(asyncOption.unwrap()).toBe('miss');
     });
+
+    it('should flatten nested Promises (Awaited<T> behavior)', async () => {
+        // When T is Promise<number>, the result should be Option<number>, not Option<Promise<number>>
+        const nestedPromise = Promise.resolve(Promise.resolve(42));
+        const option = await tryAsyncOption(nestedPromise);
+        expect(option.isSome()).toBe(true);
+        // Runtime: Promise.resolve() flattens nested Promises
+        expect(option.unwrap()).toBe(42);
+    });
+
+    it('should flatten nested Promises from function return', async () => {
+        const fn = async () => Promise.resolve(99);
+        const option = await tryAsyncOption(fn);
+        expect(option.unwrap()).toBe(99);
+    });
+
+    it('should flatten nested Promises using Promise.withResolvers', async () => {
+        const { promise, resolve } = Promise.withResolvers<Promise<number>>();
+        resolve(Promise.resolve(77));
+        // tryAsyncOption should flatten: Promise<Promise<number>> -> Option<number>
+        const option = await tryAsyncOption(promise);
+        expect(option.unwrap()).toBe(77);
+    });
 });
 
 describe('promiseToAsyncResult (deprecated)', () => {
@@ -984,5 +1050,126 @@ describe('promiseToAsyncResult (deprecated)', () => {
         const result = await promiseToAsyncResult(Promise.resolve(42));
         expect(result.isOk()).toBe(true);
         expect(result.unwrap()).toBe(42);
+    });
+});
+
+describe('Awaited<T> type behavior', () => {
+    describe('andThenAsync works with async functions', () => {
+        it('Ok.andThenAsync should work with async fn returning Result', async () => {
+            const ok: Result<number, string> = Ok(10);
+            // fn returns Promise<Result<number, string>>, result should be Result<number, string>
+            const result = await ok.andThenAsync(async (v) => Ok<number, string>(v * 2));
+            expect(result.isOk()).toBe(true);
+            expect(result.unwrap()).toBe(20);
+        });
+
+        it('Ok.andThenAsync should handle sync Result return', async () => {
+            const ok = Ok(10);
+            const result = await ok.andThenAsync((v) => Ok(v * 2));
+            expect(result.unwrap()).toBe(20);
+        });
+
+        it('Err.andThenAsync should return Err without calling fn', async () => {
+            const err = Err<number, string>('error');
+            const fn = vi.fn(async () => Ok<number, string>(20));
+            const result = await err.andThenAsync(fn);
+            expect(result.isErr()).toBe(true);
+            expect(result.unwrapErr()).toBe('error');
+            expect(fn).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('orElseAsync works with async functions', () => {
+        it('Err.orElseAsync should work with async fn returning Result', async () => {
+            const err = Err<number, string>('error');
+            // fn returns Promise<Result<number, number>>, result should be Result<number, number>
+            const result = await err.orElseAsync(async (e) => Ok<number, number>(e.length));
+            expect(result.isOk()).toBe(true);
+            expect(result.unwrap()).toBe(5); // 'error'.length
+        });
+
+        it('Err.orElseAsync should handle sync Result return', async () => {
+            const err = Err<number, string>('error');
+            const result = await err.orElseAsync((e) => Ok<number, number>(e.length));
+            expect(result.unwrap()).toBe(5);
+        });
+
+        it('Ok.orElseAsync should return self without calling fn', async () => {
+            const ok = Ok<number, string>(10);
+            const fn = vi.fn(async () => Ok<number, number>(20));
+            const result = await ok.orElseAsync(fn);
+            expect(result.unwrap()).toBe(10);
+            expect(fn).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('unwrapOrElseAsync flattens nested Promises', () => {
+        it('Err.unwrapOrElseAsync should flatten when fn returns Promise<T>', async () => {
+            const err = Err<number, string>('error');
+            const result = await err.unwrapOrElseAsync(async () => 42);
+            expect(result).toBe(42);
+        });
+
+        it('Ok.unwrapOrElseAsync should return value without calling fn', async () => {
+            const ok = Ok(10);
+            const fn = vi.fn(async () => 20);
+            const result = await ok.unwrapOrElseAsync(fn);
+            expect(result).toBe(10);
+            expect(fn).not.toHaveBeenCalled();
+        });
+
+        it('should correctly type Awaited<T> when T is Promise', async () => {
+            // When Result contains Promise<number>, unwrapOrElseAsync returns number, not Promise<number>
+            const okPromise: Result<Promise<number>, string> = Ok(Promise.resolve(99));
+            const result = await okPromise.unwrapOrElseAsync(() => Promise.resolve(0));
+            // Promise.resolve(Promise.resolve(99)) flattens to 99
+            expect(result).toBe(99);
+        });
+
+        it('should flatten nested Promise using Promise.withResolvers', async () => {
+            // Use Promise.withResolvers to create a Promise that resolves to another Promise
+            const { promise, resolve } = Promise.withResolvers<Promise<number>>();
+            resolve(Promise.resolve(42));
+
+            // T is Promise<number>, so unwrapOrElseAsync expects (error: E) => PromiseLike<Promise<number>> | Promise<number>
+            // and returns Promise<Awaited<Promise<number>>> = Promise<number>
+            const err: Result<Promise<number>, string> = Err('error');
+            // unwrapOrElseAsync should flatten: Promise<Promise<number>> -> number
+            const result = await err.unwrapOrElseAsync(() => promise);
+            expect(result).toBe(42);
+        });
+    });
+
+    describe('andThenAsync does NOT flatten inner Result values', () => {
+        it('andThenAsync should NOT flatten Promise inside Result', async () => {
+            // T is Promise<number>, so andThenAsync can return Result<Promise<number>, string>
+            const ok: Result<number, string> = Ok(10);
+            // fn returns Ok(Promise<number>), the inner Promise is NOT awaited
+            const { promise, resolve } = Promise.withResolvers<number>();
+            resolve(20);
+
+            const result = await ok.andThenAsync(async () => Ok(promise));
+            // result is Result<Promise<number>, string>, NOT Result<number, string>
+            // unwrap() returns Promise<number>, not 20
+            const inner = result.unwrap();
+            expect(inner).toBeInstanceOf(Promise);
+            expect(await inner).toBe(20);
+        });
+    });
+
+    describe('orElseAsync does NOT flatten inner Result values', () => {
+        it('orElseAsync should NOT flatten Promise inside Result', async () => {
+            // T is Promise<number>, so orElseAsync can return Result<Promise<number>, F>
+            const err: Result<Promise<number>, string> = Err('error');
+            // fn returns Ok(Promise<number>), the inner Promise is NOT awaited
+            const { promise, resolve } = Promise.withResolvers<number>();
+            resolve(42);
+
+            const result = await err.orElseAsync(async () => Ok(promise));
+            // result is Result<Promise<number>, number>, NOT Result<number, number>
+            const inner = result.unwrap();
+            expect(inner).toBeInstanceOf(Promise);
+            expect(await inner).toBe(42);
+        });
     });
 });

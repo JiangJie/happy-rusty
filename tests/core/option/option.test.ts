@@ -78,6 +78,15 @@ describe('Option', () => {
                 });
                 expect(result).toBe(10);
             });
+
+            it('unwrapOrElseAsync() should return Awaited<T> (flatten nested Promise)', async () => {
+                // This test verifies that Promise<Awaited<T>> correctly flattens nested Promises
+                // When Some contains Promise<number>, Promise.resolve(value) unwraps it
+                const somePromise: Option<Promise<number>> = Some(Promise.resolve(42));
+                const result = await somePromise.unwrapOrElseAsync(() => Promise.resolve(Promise.resolve(100)));
+                // Runtime: Promise.resolve(Promise.resolve(42)) flattens to 42, not Promise<42>
+                expect(result).toBe(42);
+            });
         });
 
         describe('transforming to Result', () => {
@@ -405,6 +414,21 @@ describe('Option', () => {
                 });
                 expect(result).toBe(0);
             });
+
+            it('unwrapOrElseAsync() should flatten nested Promise (Awaited<T>)', async () => {
+                // When T is Promise<number>, the callback returns Promise<Promise<number>>
+                // But Promise.resolve() flattens it to Promise<number>, so we only need one await
+                const nonePromise: Option<Promise<number>> = None;
+                const result = await nonePromise.unwrapOrElseAsync(() => Promise.resolve(Promise.resolve(42)));
+                // Runtime: Promise.resolve(Promise.resolve(42)) flattens to Promise<42>
+                // So result is 42, not Promise<42>
+                expect(result).toBe(42);
+            });
+
+            it('unwrapOrElseAsync() should work with sync return value', async () => {
+                const result = await none.unwrapOrElseAsync(() => 100);
+                expect(result).toBe(100);
+            });
         });
 
         describe('transforming to Result', () => {
@@ -622,6 +646,114 @@ describe('Option', () => {
             expect((await stringOption).isNone()).toBe(true);
             expect((await numberOption).isNone()).toBe(true);
             expect((await objectOption).isNone()).toBe(true);
+        });
+    });
+
+    describe('Awaited<T> type behavior', () => {
+        describe('andThenAsync', () => {
+            it('Some.andThenAsync should work with async fn returning Option', async () => {
+                const some = Some(10);
+                const result = await some.andThenAsync(async (v) => Some(v * 2));
+                expect(result.isSome()).toBe(true);
+                expect(result.unwrap()).toBe(20);
+            });
+
+            it('Some.andThenAsync should handle sync Option return', async () => {
+                const some = Some(10);
+                const result = await some.andThenAsync((v) => Some(v * 2));
+                expect(result.unwrap()).toBe(20);
+            });
+
+            it('None.andThenAsync should return None without calling fn', async () => {
+                const fn = vi.fn(async () => Some(20));
+                const result = await None.andThenAsync(fn);
+                expect(result.isNone()).toBe(true);
+                expect(fn).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('orElseAsync', () => {
+            it('None.orElseAsync should work with async fn returning Option', async () => {
+                const result = await None.orElseAsync(async () => Some(42));
+                expect(result.isSome()).toBe(true);
+                expect(result.unwrap()).toBe(42);
+            });
+
+            it('None.orElseAsync should handle sync Option return', async () => {
+                const result = await None.orElseAsync(() => Some(42));
+                expect(result.unwrap()).toBe(42);
+            });
+
+            it('Some.orElseAsync should return self without calling fn', async () => {
+                const some = Some(10);
+                const fn = vi.fn(async () => Some(20));
+                const result = await some.orElseAsync(fn);
+                expect(result.unwrap()).toBe(10);
+                expect(fn).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('unwrapOrElseAsync flattens nested Promises', () => {
+            it('None.unwrapOrElseAsync should flatten when fn returns Promise<T>', async () => {
+                const result = await None.unwrapOrElseAsync(async () => 42);
+                expect(result).toBe(42);
+            });
+
+            it('Some.unwrapOrElseAsync should return value without calling fn', async () => {
+                const some = Some(10);
+                const fn = vi.fn(async () => 20);
+                const result = await some.unwrapOrElseAsync(fn);
+                expect(result).toBe(10);
+                expect(fn).not.toHaveBeenCalled();
+            });
+
+            it('should correctly type Awaited<T> when T is Promise', async () => {
+                // When Option contains Promise<number>, unwrapOrElseAsync returns number, not Promise<number>
+                const somePromise: Option<Promise<number>> = Some(Promise.resolve(99));
+                const result = await somePromise.unwrapOrElseAsync(() => Promise.resolve(0));
+                // Promise.resolve(Promise.resolve(99)) flattens to 99
+                expect(result).toBe(99);
+            });
+
+            it('should flatten nested Promise using Promise.withResolvers', async () => {
+                // Use Promise.withResolvers to create a Promise that resolves to another Promise
+                const { promise, resolve } = Promise.withResolvers<Promise<number>>();
+                resolve(Promise.resolve(42));
+
+                // unwrapOrElseAsync should flatten: Promise<Promise<number>> -> number
+                const result = await None.unwrapOrElseAsync(() => promise);
+                expect(result).toBe(42);
+            });
+        });
+
+        describe('andThenAsync does NOT flatten inner Option values', () => {
+            it('andThenAsync should NOT flatten Promise inside Option', async () => {
+                const some = Some(10);
+                // fn returns Some(Promise<number>), the inner Promise is NOT awaited
+                const { promise, resolve } = Promise.withResolvers<number>();
+                resolve(20);
+
+                const result = await some.andThenAsync(async () => Some(promise));
+                // result is Option<Promise<number>>, NOT Option<number>
+                // unwrap() returns Promise<number>, not 20
+                const inner = result.unwrap();
+                expect(inner).toBeInstanceOf(Promise);
+                expect(await inner).toBe(20);
+            });
+        });
+
+        describe('orElseAsync does NOT flatten inner Option values', () => {
+            it('orElseAsync should NOT flatten Promise inside Option', async () => {
+                // fn returns Some(Promise<number>), the inner Promise is NOT awaited
+                const { promise, resolve } = Promise.withResolvers<number>();
+                resolve(42);
+
+                const result = await None.orElseAsync(async () => Some(promise));
+                // result is Option<Promise<number>>, NOT Option<number>
+                const inner = result.unwrap();
+                expect(inner).toBeInstanceOf(Promise);
+                expect(await inner).toBe(42);
+            });
         });
     });
 });

@@ -70,7 +70,7 @@ export interface LazyAsync<T> {
      * console.log(await lazy.force()); // 42
      * ```
      */
-    force(): Promise<T>;
+    force(): Promise<Awaited<T>>;
 
     /**
      * Gets the value if it has been initialized.
@@ -88,7 +88,7 @@ export interface LazyAsync<T> {
      * console.log(lazy.get()); // Some(42)
      * ```
      */
-    get(): Option<T>;
+    get(): Option<Awaited<T>>;
 
     /**
      * Returns `true` if the value has been initialized.
@@ -165,9 +165,9 @@ export interface LazyAsync<T> {
  * ```
  */
 export function LazyAsync<T>(fn: () => PromiseLike<T> | T): LazyAsync<T> {
-    let value: T | undefined;
+    let value: Awaited<T> | undefined;
     let initialized = false;
-    let pendingPromise: Promise<T> | undefined;
+    let pendingPromise: Promise<Awaited<T>> | undefined;
 
     return Object.freeze<LazyAsync<T>>({
         [Symbol.toStringTag]: 'LazyAsync',
@@ -178,10 +178,10 @@ export function LazyAsync<T>(fn: () => PromiseLike<T> | T): LazyAsync<T> {
 
         // Use `Promise.resolve(fn())` instead of `async` to preserve sync error behavior:
         // sync throws propagate directly, async errors become rejected Promises.
-        force(): Promise<T> {
+        force(): Promise<Awaited<T>> {
             if (initialized) {
                 // Reuse cached promise to avoid creating new Promise on each call
-                return pendingPromise ??= Promise.resolve(value as T);
+                return pendingPromise ??= Promise.resolve(value as Awaited<T>);
             }
 
             if (pendingPromise) {
@@ -203,8 +203,8 @@ export function LazyAsync<T>(fn: () => PromiseLike<T> | T): LazyAsync<T> {
             return pendingPromise;
         },
 
-        get(): Option<T> {
-            return initialized ? Some(value as T) : None;
+        get(): Option<Awaited<T>> {
+            return initialized ? Some(value as Awaited<T>) : None;
         },
 
         isInitialized(): boolean {

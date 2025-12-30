@@ -335,6 +335,20 @@ describe('RwLock', () => {
             expect(sum).toBe(6);
         });
 
+        it('should flatten nested Promise (Awaited<T>)', async () => {
+            const rwlock = RwLock(10);
+            // fn returns Promise<Promise<number>>, but Promise.resolve flattens it
+            const result = await rwlock.withRead(() => Promise.resolve(Promise.resolve(42)));
+            // Runtime: result is 42 (number), not Promise<42>
+            expect(result).toBe(42);
+        });
+
+        it('should work with sync return value', async () => {
+            const rwlock = RwLock(10);
+            const result = await rwlock.withRead((value) => value * 2);
+            expect(result).toBe(20);
+        });
+
         it('should release lock on error', async () => {
             const rwlock = RwLock(42);
 
@@ -380,6 +394,20 @@ describe('RwLock', () => {
             });
 
             expect(await rwlock.get()).toEqual({ count: 100 });
+        });
+
+        it('should flatten nested Promise (Awaited<T>)', async () => {
+            const rwlock = RwLock(10);
+            // fn returns Promise<Promise<number>>, but Promise.resolve flattens it
+            const result = await rwlock.withWrite(() => Promise.resolve(Promise.resolve(42)));
+            // Runtime: result is 42 (number), not Promise<42>
+            expect(result).toBe(42);
+        });
+
+        it('should work with sync return value', async () => {
+            const rwlock = RwLock(10);
+            const result = await rwlock.withWrite((value) => value * 2);
+            expect(result).toBe(20);
         });
 
         it('should release lock on error', async () => {
@@ -673,6 +701,58 @@ describe('RwLock', () => {
             const finalConfig = await config.get();
             expect(finalConfig.features).toContain('feature-b');
             expect(finalConfig.timeout).toBe(10000);
+        });
+    });
+
+    describe('Awaited<T> behavior', () => {
+        it('get() should flatten nested Promise using Promise.withResolvers', async () => {
+            const { promise, resolve } = Promise.withResolvers<number>();
+            resolve(42);
+
+            const rwlock = RwLock(promise);
+            const result = await rwlock.get();
+
+            // Runtime flattens Promise<Promise<number>> to number
+            expect(result).toBe(42);
+        });
+
+        it('replace() should flatten nested Promise using Promise.withResolvers', async () => {
+            const { promise: promise1, resolve: resolve1 } = Promise.withResolvers<number>();
+            resolve1(42);
+
+            const { promise: promise2, resolve: resolve2 } = Promise.withResolvers<number>();
+            resolve2(100);
+
+            const rwlock = RwLock(promise1);
+            const old = await rwlock.replace(promise2);
+
+            // Runtime flattens Promise<Promise<number>> to number
+            expect(old).toBe(42);
+
+            const newValue = await rwlock.get();
+            expect(newValue).toBe(100);
+        });
+
+        it('withRead() should flatten nested Promise (Awaited<U>)', async () => {
+            const rwlock = RwLock(10);
+            const { promise, resolve } = Promise.withResolvers<number>();
+            resolve(42);
+
+            const result = await rwlock.withRead(() => promise);
+
+            // Runtime flattens Promise<Promise<number>> to number
+            expect(result).toBe(42);
+        });
+
+        it('withWrite() should flatten nested Promise (Awaited<U>)', async () => {
+            const rwlock = RwLock(10);
+            const { promise, resolve } = Promise.withResolvers<number>();
+            resolve(42);
+
+            const result = await rwlock.withWrite(() => promise);
+
+            // Runtime flattens Promise<Promise<number>> to number
+            expect(result).toBe(42);
         });
     });
 });

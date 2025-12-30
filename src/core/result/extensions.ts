@@ -81,7 +81,7 @@ export function tryResult<T, E = Error, Args extends unknown[] = []>(fn: (...arg
  * const result = await tryAsyncResult<User, ApiError>(api.getUser(id));
  * ```
  */
-export function tryAsyncResult<T, E = Error>(task: PromiseLike<T>): AsyncResult<T, E>;
+export function tryAsyncResult<T, E = Error>(task: PromiseLike<T>): AsyncResult<Awaited<T>, E>;
 /**
  * Executes a function and captures any thrown exception or rejection as an `Err`.
  * If the function succeeds, returns `Ok` with the result.
@@ -128,8 +128,8 @@ export function tryAsyncResult<T, E = Error>(task: PromiseLike<T>): AsyncResult<
  * const result = await tryAsyncResult<Config, ConfigError, [string]>(loadConfig, 'app.json');
  * ```
  */
-export function tryAsyncResult<T, E = Error, Args extends unknown[] = []>(task: (...args: Args) => PromiseLike<T> | T, ...args: Args): AsyncResult<T, E>;
-export async function tryAsyncResult<T, E = Error, Args extends unknown[] = []>(task: PromiseLike<T> | ((...args: Args) => PromiseLike<T> | T), ...args: Args): AsyncResult<T, E> {
+export function tryAsyncResult<T, E = Error, Args extends unknown[] = []>(task: (...args: Args) => PromiseLike<T> | T, ...args: Args): AsyncResult<Awaited<T>, E>;
+export async function tryAsyncResult<T, E = Error, Args extends unknown[] = []>(task: PromiseLike<T> | ((...args: Args) => PromiseLike<T> | T), ...args: Args): AsyncResult<Awaited<T>, E> {
     try {
         const result = typeof task === 'function' ? task(...args) : task;
         return Ok(await result);
@@ -149,6 +149,6 @@ export async function tryAsyncResult<T, E = Error, Args extends unknown[] = []>(
  * @param task - A promise, promise-like object, or a function that returns a promise-like object.
  * @returns A promise that resolves to `Ok<T>` if successful, or `Err<E>` if the promise rejects or the function throws.
  */
-export async function promiseToAsyncResult<T, E = Error>(task: PromiseLike<T> | (() => PromiseLike<T>)): AsyncResult<T, E> {
+export async function promiseToAsyncResult<T, E = Error>(task: PromiseLike<T> | (() => PromiseLike<T>)): AsyncResult<Awaited<T>, E> {
     return tryAsyncResult(task as Parameters<typeof tryAsyncResult<T, E>>[0]);
 }

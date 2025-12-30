@@ -97,7 +97,7 @@ export interface FnOnceAsync<A extends unknown[], R> {
      * // await fetchUser.call(2); // Throws Error
      * ```
      */
-    call(...args: A): Promise<R>;
+    call(...args: A): Promise<Awaited<R>>;
 
     /**
      * Attempts to call the async function, returning `Some(result)` if successful
@@ -120,7 +120,7 @@ export interface FnOnceAsync<A extends unknown[], R> {
      * const result2 = await fetchData.tryCall(2); // None
      * ```
      */
-    tryCall(...args: A): AsyncOption<R>;
+    tryCall(...args: A): AsyncOption<Awaited<R>>;
 
     /**
      * Returns `true` if the function has been consumed (called).
@@ -166,7 +166,7 @@ export function FnOnceAsync<A extends unknown[], R>(fn: (...args: A) => PromiseL
             return `FnOnceAsync(${ consumed ? 'consumed' : 'pending' })`;
         },
 
-        call(...args: A): Promise<R> {
+        call(...args: A): Promise<Awaited<R>> {
             if (consumed) {
                 throw new Error('FnOnceAsync has already been consumed');
             }
@@ -176,7 +176,7 @@ export function FnOnceAsync<A extends unknown[], R>(fn: (...args: A) => PromiseL
 
         // Use `Promise.resolve(fn())` instead of `async` to preserve sync error behavior:
         // sync throws propagate directly, async errors become rejected Promises.
-        tryCall(...args: A): AsyncOption<R> {
+        tryCall(...args: A): AsyncOption<Awaited<R>> {
             if (consumed) {
                 return ASYNC_NONE;
             }

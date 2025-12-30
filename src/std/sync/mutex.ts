@@ -123,7 +123,7 @@ export interface Mutex<T> {
      * });
      * ```
      */
-    withLock<U>(fn: (value: T) => PromiseLike<U> | U): Promise<U>;
+    withLock<U>(fn: (value: T) => PromiseLike<U> | U): Promise<Awaited<U>>;
 
     /**
      * Acquires the lock and returns a guard for manual control.
@@ -202,7 +202,7 @@ export interface Mutex<T> {
      * console.log(value); // 42
      * ```
      */
-    get(): Promise<T>;
+    get(): Promise<Awaited<T>>;
 
     /**
      * Acquires the lock and sets a new value.
@@ -240,7 +240,7 @@ export interface Mutex<T> {
      * console.log(await mutex.get()); // 100
      * ```
      */
-    replace(value: T): Promise<T>;
+    replace(value: T): Promise<Awaited<T>>;
 }
 
 /**
@@ -389,7 +389,7 @@ export function Mutex<T>(value: T): Mutex<T> {
             return locked ? 'Mutex(<locked>)' : 'Mutex(<unlocked>)';
         },
 
-        async withLock<U>(fn: (value: T) => PromiseLike<U> | U): Promise<U> {
+        async withLock<U>(fn: (value: T) => PromiseLike<U> | U): Promise<Awaited<U>> {
             const guard = await lock();
             try {
                 return await fn(guard.value);
@@ -412,10 +412,10 @@ export function Mutex<T>(value: T): Mutex<T> {
             return locked;
         },
 
-        async get(): Promise<T> {
+        async get(): Promise<Awaited<T>> {
             const guard = await lock();
             try {
-                return guard.value;
+                return guard.value as Awaited<T>;
             } finally {
                 guard.unlock();
             }
@@ -430,12 +430,12 @@ export function Mutex<T>(value: T): Mutex<T> {
             }
         },
 
-        async replace(value: T): Promise<T> {
+        async replace(value: T): Promise<Awaited<T>> {
             const guard = await lock();
             try {
                 const old = guard.value;
                 guard.value = value;
-                return old;
+                return old as Awaited<T>;
             } finally {
                 guard.unlock();
             }

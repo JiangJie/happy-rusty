@@ -149,7 +149,7 @@ export interface RwLock<T> {
      * });
      * ```
      */
-    withRead<U>(fn: (value: T) => PromiseLike<U> | U): Promise<U>;
+    withRead<U>(fn: (value: T) => PromiseLike<U> | U): Promise<Awaited<U>>;
 
     /**
      * Acquires a write lock and executes the callback with the protected value.
@@ -167,7 +167,7 @@ export interface RwLock<T> {
      * });
      * ```
      */
-    withWrite<U>(fn: (value: T) => PromiseLike<U> | U): Promise<U>;
+    withWrite<U>(fn: (value: T) => PromiseLike<U> | U): Promise<Awaited<U>>;
 
     /**
      * Acquires a read lock and returns a guard for manual control.
@@ -281,7 +281,7 @@ export interface RwLock<T> {
      * const value = await rwlock.get();
      * ```
      */
-    get(): Promise<T>;
+    get(): Promise<Awaited<T>>;
 
     /**
      * Acquires a write lock and sets a new value.
@@ -310,7 +310,7 @@ export interface RwLock<T> {
      * console.log(await rwlock.get()); // 100
      * ```
      */
-    replace(value: T): Promise<T>;
+    replace(value: T): Promise<Awaited<T>>;
 }
 
 /**
@@ -541,7 +541,7 @@ export function RwLock<T>(value: T): RwLock<T> {
             return 'RwLock(<unlocked>)';
         },
 
-        async withRead<U>(fn: (value: T) => PromiseLike<U> | U): Promise<U> {
+        async withRead<U>(fn: (value: T) => PromiseLike<U> | U): Promise<Awaited<U>> {
             const guard = await read();
             try {
                 return await fn(guard.value);
@@ -550,7 +550,7 @@ export function RwLock<T>(value: T): RwLock<T> {
             }
         },
 
-        async withWrite<U>(fn: (value: T) => PromiseLike<U> | U): Promise<U> {
+        async withWrite<U>(fn: (value: T) => PromiseLike<U> | U): Promise<Awaited<U>> {
             const guard = await write();
             try {
                 return await fn(guard.value);
@@ -585,10 +585,10 @@ export function RwLock<T>(value: T): RwLock<T> {
             return writer;
         },
 
-        async get(): Promise<T> {
+        async get(): Promise<Awaited<T>> {
             const guard = await read();
             try {
-                return guard.value;
+                return guard.value as Awaited<T>;
             } finally {
                 guard.unlock();
             }
@@ -603,12 +603,12 @@ export function RwLock<T>(value: T): RwLock<T> {
             }
         },
 
-        async replace(value: T): Promise<T> {
+        async replace(value: T): Promise<Awaited<T>> {
             const guard = await write();
             try {
                 const old = guard.value;
                 guard.value = value;
-                return old;
+                return old as Awaited<T>;
             } finally {
                 guard.unlock();
             }

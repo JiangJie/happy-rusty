@@ -261,7 +261,7 @@ export interface Option<T> {
      * await x.unwrapOrElseAsync(async () => 10); // 10
      * ```
      */
-    unwrapOrElseAsync(fn: () => PromiseLike<T> | T): Promise<T>;
+    unwrapOrElseAsync(fn: () => PromiseLike<T> | T): Promise<Awaited<T>>;
 
     // #endregion
 

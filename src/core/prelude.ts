@@ -42,7 +42,7 @@ export interface None extends Option<never> {
     unwrap(): never;
     unwrapOr<T>(defaultValue: T): T;
     unwrapOrElse<T>(fn: () => T): T;
-    unwrapOrElseAsync<T>(fn: () => PromiseLike<T> | T): Promise<T>;
+    unwrapOrElseAsync<T>(fn: () => PromiseLike<T> | T): Promise<Awaited<T>>;
 
     okOr<E>(error: E): Result<never, E>;
     okOrElse<E>(err: () => E): Result<never, E>;
@@ -130,7 +130,7 @@ export function Some<T>(value: T): Option<T> {
         unwrapOrElse(_fn: () => T): T {
             return value;
         },
-        unwrapOrElseAsync(_fn: () => PromiseLike<T> | T): Promise<T> {
+        unwrapOrElseAsync(_fn: () => PromiseLike<T> | T): Promise<Awaited<T>> {
             return Promise.resolve(value);
         },
 
@@ -288,7 +288,7 @@ export const None: None = Object.freeze<None>({
     unwrapOrElse<T>(fn: () => T): T {
         return fn();
     },
-    unwrapOrElseAsync<T>(fn: () => PromiseLike<T> | T): Promise<T> {
+    unwrapOrElseAsync<T>(fn: () => PromiseLike<T> | T): Promise<Awaited<T>> {
         return Promise.resolve(fn());
     },
 
@@ -488,7 +488,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
         unwrapOrElse(_fn: (error: E) => T): T {
             return value as T;
         },
-        unwrapOrElseAsync(_fn: (error: E) => PromiseLike<T> | T): Promise<T> {
+        unwrapOrElseAsync(_fn: (error: E) => PromiseLike<T> | T): Promise<Awaited<T>> {
             return Promise.resolve(value as T);
         },
 
@@ -638,7 +638,7 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
         unwrapOrElse(fn: (error: E) => T): T {
             return fn(error);
         },
-        unwrapOrElseAsync(fn: (error: E) => PromiseLike<T> | T): Promise<T> {
+        unwrapOrElseAsync(fn: (error: E) => PromiseLike<T> | T): Promise<Awaited<T>> {
             return Promise.resolve(fn(error));
         },
 

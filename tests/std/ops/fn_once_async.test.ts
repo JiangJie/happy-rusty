@@ -26,6 +26,20 @@ describe('FnOnceAsync', () => {
             expect(await fn.call()).toBe(42);
         });
 
+        it('should flatten nested Promise (Awaited<T>)', async () => {
+            // fn returns Promise<Promise<number>>, but Promise.resolve flattens it
+            const fn = FnOnceAsync(() => Promise.resolve(Promise.resolve(42)));
+            const result = await fn.call();
+            // Runtime: result is 42 (number), not Promise<42>
+            expect(result).toBe(42);
+        });
+
+        it('should work with sync return value', async () => {
+            const fn = FnOnceAsync(() => 42);
+            const result = await fn.call();
+            expect(result).toBe(42);
+        });
+
         it('should pass arguments to the async function', async () => {
             const fn = FnOnceAsync(async (a: number, b: number) => a + b);
             expect(await fn.call(2, 3)).toBe(5);

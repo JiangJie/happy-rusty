@@ -100,6 +100,27 @@ describe('LazyAsync', () => {
             expect(promise1).toBe(promise2);
             expect(promise2).toBe(promise3);
         });
+
+        it('should flatten nested Promise (Awaited<T>)', async () => {
+            // fn returns Promise<Promise<number>>, but Promise.resolve flattens it
+            const lazy = LazyAsync(() => {
+                const { promise, resolve } = Promise.withResolvers<Promise<number>>();
+                resolve(Promise.resolve(42));
+                return promise;
+            });
+            const result = await lazy.force();
+            const option = lazy.get();
+            // Runtime: result is 42 (number), not Promise<42>
+            expect(result).toBe(42);
+            expect(option.isSome()).toBe(true);
+            expect(option.unwrap()).toBe(42);
+        });
+
+        it('should work with sync return value', async () => {
+            const lazy = LazyAsync(() => 100);
+            const result = await lazy.force();
+            expect(result).toBe(100);
+        });
     });
 
     describe('get', () => {
