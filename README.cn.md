@@ -20,8 +20,9 @@
 
 - **Option&lt;T&gt;** - 表示可选值：每个 `Option` 要么是 `Some(T)`，要么是 `None`
 - **Result&lt;T, E&gt;** - 表示成功（`Ok(T)`）或失败（`Err(E)`）
-- **同步原语** - Rust 风格的 `Once<T>`、`Lazy<T>`、`LazyAsync<T>` 和 `Mutex<T>`
+- **同步原语** - Rust 风格的 `Once<T>`、`OnceAsync<T>`、`Lazy<T>`、`LazyAsync<T>`、`Mutex<T>` 和 `RwLock<T>`
 - **控制流** - 用于短路操作的 `ControlFlow<B, C>`，包含 `Break` 和 `Continue`
+- **FnOnce** - 一次性可调用函数封装（`FnOnce` 和 `FnOnceAsync`）
 - **完整的 TypeScript 支持**，具有严格的类型推断
 - **异步支持** - 所有转换方法都有异步版本
 - **零依赖**
@@ -112,158 +113,61 @@ const config = parseJSON<Config>(jsonStr)
 
 ### 异步方法
 
-所有转换方法都有带 `Async` 后缀的异步变体：
-
-```ts
-// 异步 Option 方法
-isSomeAndAsync(asyncFn)
-unwrapOrElseAsync(asyncFn)
-andThenAsync(asyncFn)
-orElseAsync(asyncFn)
-
-// 异步 Result 方法
-isOkAndAsync(asyncFn)
-isErrAndAsync(asyncFn)
-unwrapOrElseAsync(asyncFn)
-andThenAsync(asyncFn)
-orElseAsync(asyncFn)
-```
+所有转换方法都有带 `Async` 后缀的异步变体（如 `andThenAsync`、`mapAsync`、`unwrapOrElseAsync`）。
 
 ### 类型别名
 
 ```ts
-// 常用模式的便捷类型别名
 type AsyncOption<T> = Promise<Option<T>>;
 type AsyncResult<T, E> = Promise<Result<T, E>>;
-
-// 用于 I/O 操作
-type IOResult<T> = Result<T, Error>;
-type AsyncIOResult<T> = Promise<IOResult<T>>;
-
-// 用于 void 返回值
-type VoidResult<E> = Result<void, E>;
-type VoidIOResult = IOResult<void>;
-type AsyncVoidResult<E> = Promise<VoidResult<E>>;
-type AsyncVoidIOResult = Promise<VoidIOResult>;
+type IOResult<T> = Result<T, Error>;          // 用于 I/O 操作
+type AsyncIOResult<T> = Promise<IOResult<T>>; // 异步 I/O 操作
 ```
 
 ### 工具函数
 
 ```ts
-import { isOption, isResult, isControlFlow, tryOption, tryResult, tryAsyncOption, tryAsyncResult } from 'happy-rusty';
+import { tryResult, tryAsyncResult } from 'happy-rusty';
 
-// 类型守卫
-if (isOption(value)) { /* ... */ }
-if (isResult(value)) { /* ... */ }
-if (isControlFlow(value)) { /* ... */ }
-
-// 捕获异常为 Option（成功 → Some，异常 → None）
-const parsed = tryOption(JSON.parse, jsonString);  // 直接传参（类似 Promise.try）
-const url = tryOption(() => new URL(input));       // 或使用闭包
-
-// 捕获异常为 Result（成功 → Ok，异常 → Err）
-const result = tryResult(JSON.parse, jsonString);
-const asyncResult = await tryAsyncResult(fetch, '/api/data');
-asyncResult.inspect(data => console.log(data))
-           .inspectErr(err => console.error(err));
-
-// 异步函数可以返回同步或异步值
-const data = await tryAsyncResult((id) => {
-    if (cache.has(id)) return cache.get(id);  // 同步返回
-    return fetchFromServer(id);                // 异步返回
-}, 'user-123');
-```
-
-### 常量
-
-```ts
-import { RESULT_TRUE, RESULT_FALSE, RESULT_ZERO, RESULT_VOID } from 'happy-rusty';
-
-// 可复用的不可变 Result 常量
-function validate(): Result<boolean, Error> {
-    return isValid ? RESULT_TRUE : RESULT_FALSE;
-}
-
-function doSomething(): Result<void, Error> {
-    // ...
-    return RESULT_VOID;
-}
+// 捕获异常为 Result（类似 Promise.try，但返回 Result）
+const parsed = tryResult(JSON.parse, jsonString);  // Ok(value) 或 Err(error)
+const response = await tryAsyncResult(fetch, '/api/data');
 ```
 
 ### 同步原语
 
 ```ts
-import { Once, Lazy, LazyAsync, Mutex } from 'happy-rusty';
+import { Lazy, LazyAsync, Mutex } from 'happy-rusty';
 
-// Once - 一次性初始化（类似 Rust 的 OnceLock）
-const config = Once<Config>();
-config.set(loadConfig());           // 只能设置一次
-config.get();                       // Some(config) 或 None
-config.getOrInit(() => defaultCfg); // 获取或初始化
-
-// Lazy - 惰性初始化，在构造时提供初始化函数
+// Lazy - 首次访问时计算一次
 const expensive = Lazy(() => computeExpensiveValue());
-expensive.force();  // 首次访问时计算，之后缓存
+expensive.force();  // 计算一次后缓存
 
-// LazyAsync - 异步惰性初始化
-const db = LazyAsync(async () => await Database.connect(url));
+// LazyAsync - 异步惰性初始化（并发安全）
+const db = LazyAsync(async () => Database.connect(url));
 await db.force();  // 只建立一次连接，并发调用会等待
 
 // Mutex - 异步互斥锁
 const state = Mutex({ count: 0 });
-await state.withLock(async (s) => {
-    s.count += 1;  // 独占访问
-});
-```
-
-### 控制流
-
-```ts
-import { Break, Continue, ControlFlow } from 'happy-rusty';
-
-// 短路操作
-function findFirst<T>(arr: T[], pred: (t: T) => boolean): Option<T> {
-    for (const item of arr) {
-        const flow = pred(item) ? Break(item) : Continue();
-        if (flow.isBreak()) {
-            return Some(flow.breakValue().unwrap());
-        }
-    }
-    return None;
-}
-
-// 带提前退出的自定义 fold
-function tryFold<T, Acc>(
-    arr: T[],
-    init: Acc,
-    f: (acc: Acc, item: T) => ControlFlow<Acc, Acc>
-): Acc {
-    let acc = init;
-    for (const item of arr) {
-        const flow = f(acc, item);
-        if (flow.isBreak()) return flow.breakValue().unwrap();
-        acc = flow.continueValue().unwrap();
-    }
-    return acc;
-}
+await state.withLock(async (s) => { s.count += 1; });
 ```
 
 ## 示例
 
-- [Option 基础用法](examples/option.ts)
-- [AsyncOption](examples/option.async.ts)
-- [Result 基础用法](examples/result.ts)
-- [AsyncResult](examples/result.async.ts)
-- [Once](examples/once.ts)
-- [Lazy](examples/lazy.ts)
-- [Mutex](examples/mutex.ts)
-- [ControlFlow](examples/control_flow.ts)
+- [Option](examples/core/option/option.ts) / [AsyncOption](examples/core/option/option.async.ts)
+- [Result](examples/core/result/result.ts) / [AsyncResult](examples/core/result/result.async.ts)
+- [Once](examples/std/sync/once.ts) / [OnceAsync](examples/std/sync/once_async.ts)
+- [Lazy](examples/std/sync/lazy.ts) / [LazyAsync](examples/std/sync/lazy_async.ts)
+- [Mutex](examples/std/sync/mutex.ts)
+- [RwLock](examples/std/sync/rwlock.ts)
+- [ControlFlow](examples/std/ops/control_flow.ts)
+- [FnOnce](examples/std/ops/fn_once.ts) / [FnOnceAsync](examples/std/ops/fn_once_async.ts)
 
 ## 设计说明
 
 ### 不可变性
 
-所有类型（`Option`、`Result`、`ControlFlow`、`Lazy`、`LazyAsync`、`Once`、`Mutex`、`MutexGuard`）都通过 `Object.freeze()` 实现**运行时不可变**。这可以防止意外修改方法或属性：
+所有类型（`Option`、`Result`、`ControlFlow`、`Lazy`、`LazyAsync`、`Once`、`OnceAsync`、`Mutex`、`MutexGuard`、`RwLock`、`FnOnce`、`FnOnceAsync`）都通过 `Object.freeze()` 实现**运行时不可变**。这可以防止意外修改方法或属性：
 
 ```ts
 const some = Some(42);

@@ -8,8 +8,9 @@ This file provides guidance to CodeBuddy Code when working with code in this rep
 
 - **Option\<T\>** - Represents optional values (`Some(T)` or `None`) for null-safe programming
 - **Result\<T, E\>** - Represents success (`Ok(T)`) or failure (`Err(E)`) for explicit error handling
-- **Sync Primitives** - `Once<T>`, `Lazy<T>`, `LazyAsync<T>`, `Mutex<T>` for initialization and concurrency control
+- **Sync Primitives** - `Once<T>`, `OnceAsync<T>`, `Lazy<T>`, `LazyAsync<T>`, `Mutex<T>`, `RwLock<T>` for initialization and concurrency control
 - **ControlFlow\<B, C\>** - `Break(value)` and `Continue(value)` for short-circuiting operations
+- **FnOnce** - One-time callable function wrappers (`FnOnce` and `FnOnceAsync`)
 
 Key characteristics:
 - Zero dependencies
@@ -92,12 +93,17 @@ The codebase is organized into two main modules mirroring Rust's structure:
 
 - **`src/std/`** - Standard library types (sync primitives and control flow)
   - **`src/std/sync/`** - Rust-inspired synchronization primitives
-    - `once.ts` - `Once<T>` for one-time initialization (like Rust's `OnceLock`)
-    - `lazy.ts` - `Lazy<T>` and `LazyAsync<T>` for lazy initialization (like Rust's `LazyLock`)
+    - `once.ts` - `Once<T>` for sync one-time initialization (like Rust's `OnceLock`)
+    - `once_async.ts` - `OnceAsync<T>` for async one-time initialization with concurrent call handling
+    - `lazy.ts` - `Lazy<T>` for sync lazy initialization (like Rust's `LazyLock`)
+    - `lazy_async.ts` - `LazyAsync<T>` for async lazy initialization
     - `mutex.ts` - `Mutex<T>` for async mutual exclusion
+    - `rwlock.ts` - `RwLock<T>` for async read-write lock (multiple readers or single writer)
     - `mod.ts` - Re-exports all sync primitives
-  - **`src/std/ops/`** - Rust-inspired control flow types
+  - **`src/std/ops/`** - Rust-inspired control flow and function types
     - `control_flow.ts` - `ControlFlow<B, C>` with `Break(value)` and `Continue(value)` variants
+    - `fn_once.ts` - `FnOnce` for sync one-time callable functions
+    - `fn_once_async.ts` - `FnOnceAsync` for async one-time callable functions
     - `guards.ts` - Type guard utility `isControlFlow()`
     - `symbols.ts` - Internal symbol `ControlFlowKindSymbol` for type discrimination
     - `mod.ts` - Re-exports all ops types
@@ -109,7 +115,7 @@ The codebase is organized into two main modules mirroring Rust's structure:
 
 1. **Tagged Union Pattern**: Uses internal symbols (`OptionKindSymbol`, `ResultKindSymbol`) to distinguish between variants (Some/None, Ok/Err)
 
-2. **Runtime Immutability**: All instances (`Some`, `None`, `Ok`, `Err`, `Break`, `Continue`, `Lazy`, `LazyAsync`, `Once`, `Mutex`, `MutexGuard`) are frozen with `Object.freeze()`. TypeScript interfaces intentionally omit `readonly` modifiers because:
+2. **Runtime Immutability**: All instances (`Some`, `None`, `Ok`, `Err`, `Break`, `Continue`, `Lazy`, `LazyAsync`, `Once`, `OnceAsync`, `Mutex`, `MutexGuard`, `RwLock`, `FnOnce`, `FnOnceAsync`) are frozen with `Object.freeze()`. TypeScript interfaces intentionally omit `readonly` modifiers because:
    - `None extends Option<never>` requires method syntax (bivariant) rather than arrow function property syntax (contravariant) for type compatibility
    - Runtime protection via `Object.freeze()` is sufficient; compile-time `readonly` provides marginal additional benefit
    - Avoiding `Mutable* + Readonly<>` pattern keeps exported types clean
@@ -118,7 +124,7 @@ The codebase is organized into two main modules mirroring Rust's structure:
 
 4. **Async Support**: Parallel async versions of methods (e.g., `isSomeAndAsync`, `andThenAsync`) and `AsyncOption`/`AsyncResult` type aliases
 
-5. **Concurrent-Safe Async Primitives**: `Once`, `Lazy`, and `Mutex` handle concurrent async calls correctly - only one initialization runs, others wait for it
+5. **Concurrent-Safe Async Primitives**: `OnceAsync`, `LazyAsync`, `Mutex`, and `RwLock` handle concurrent async calls correctly - only one initialization runs, others wait for it
 
 ### Toolchain
 
@@ -153,9 +159,14 @@ Dual publishing to:
   - `tests/core/result/constants.test.ts` - Pre-defined Result constants tests
   - `tests/core/result/guards.test.ts` - Type guard utilities tests
   - `tests/std/sync/once.test.ts` - Once tests
+  - `tests/std/sync/once_async.test.ts` - OnceAsync tests
   - `tests/std/sync/lazy.test.ts` - Lazy tests
+  - `tests/std/sync/lazy_async.test.ts` - LazyAsync tests
   - `tests/std/sync/mutex.test.ts` - Mutex tests
+  - `tests/std/sync/rwlock.test.ts` - RwLock tests
   - `tests/std/ops/control_flow.test.ts` - ControlFlow tests
+  - `tests/std/ops/fn_once.test.ts` - FnOnce tests
+  - `tests/std/ops/fn_once_async.test.ts` - FnOnceAsync tests
 - Uses Vitest with `@vitest/coverage-v8` for coverage
 - Tests import from `../../../src/mod.ts` using relative paths
 - Run with: `pnpm run test`

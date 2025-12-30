@@ -20,8 +20,9 @@ Rust's `Option`, `Result`, and sync primitives for JavaScript/TypeScript - Bette
 
 - **Option&lt;T&gt;** - Represents an optional value: every `Option` is either `Some(T)` or `None`
 - **Result&lt;T, E&gt;** - Represents either success (`Ok(T)`) or failure (`Err(E)`)
-- **Sync Primitives** - Rust-inspired `Once<T>`, `Lazy<T>`, `LazyAsync<T>`, and `Mutex<T>`
+- **Sync Primitives** - Rust-inspired `Once<T>`, `OnceAsync<T>`, `Lazy<T>`, `LazyAsync<T>`, `Mutex<T>`, and `RwLock<T>`
 - **Control Flow** - `ControlFlow<B, C>` with `Break` and `Continue` for short-circuiting operations
+- **FnOnce** - One-time callable function wrappers (`FnOnce` and `FnOnceAsync`)
 - **Full TypeScript support** with strict type inference
 - **Async support** - Async versions of all transformation methods
 - **Zero dependencies**
@@ -112,158 +113,61 @@ const config = parseJSON<Config>(jsonStr)
 
 ### Async Methods
 
-All transformation methods have async variants with `Async` suffix:
-
-```ts
-// Async Option methods
-isSomeAndAsync(asyncFn)
-unwrapOrElseAsync(asyncFn)
-andThenAsync(asyncFn)
-orElseAsync(asyncFn)
-
-// Async Result methods
-isOkAndAsync(asyncFn)
-isErrAndAsync(asyncFn)
-unwrapOrElseAsync(asyncFn)
-andThenAsync(asyncFn)
-orElseAsync(asyncFn)
-```
+All transformation methods have async variants with `Async` suffix (e.g., `andThenAsync`, `mapAsync`, `unwrapOrElseAsync`).
 
 ### Type Aliases
 
 ```ts
-// Convenient type aliases for common patterns
 type AsyncOption<T> = Promise<Option<T>>;
 type AsyncResult<T, E> = Promise<Result<T, E>>;
-
-// For I/O operations
-type IOResult<T> = Result<T, Error>;
-type AsyncIOResult<T> = Promise<IOResult<T>>;
-
-// For void returns
-type VoidResult<E> = Result<void, E>;
-type VoidIOResult = IOResult<void>;
-type AsyncVoidResult<E> = Promise<VoidResult<E>>;
-type AsyncVoidIOResult = Promise<VoidIOResult>;
+type IOResult<T> = Result<T, Error>;          // For I/O operations
+type AsyncIOResult<T> = Promise<IOResult<T>>; // Async I/O operations
 ```
 
 ### Utility Functions
 
 ```ts
-import { isOption, isResult, isControlFlow, tryOption, tryResult, tryAsyncOption, tryAsyncResult } from 'happy-rusty';
+import { tryResult, tryAsyncResult } from 'happy-rusty';
 
-// Type guards
-if (isOption(value)) { /* ... */ }
-if (isResult(value)) { /* ... */ }
-if (isControlFlow(value)) { /* ... */ }
-
-// Capture exceptions as Option (success → Some, exception → None)
-const parsed = tryOption(JSON.parse, jsonString);  // with arguments (like Promise.try)
-const url = tryOption(() => new URL(input));       // or with closure
-
-// Capture exceptions as Result (success → Ok, exception → Err)
-const result = tryResult(JSON.parse, jsonString);
-const asyncResult = await tryAsyncResult(fetch, '/api/data');
-asyncResult.inspect(data => console.log(data))
-           .inspectErr(err => console.error(err));
-
-// Async functions can return sync or async values
-const data = await tryAsyncResult((id) => {
-    if (cache.has(id)) return cache.get(id);  // sync return
-    return fetchFromServer(id);                // async return
-}, 'user-123');
-```
-
-### Constants
-
-```ts
-import { RESULT_TRUE, RESULT_FALSE, RESULT_ZERO, RESULT_VOID } from 'happy-rusty';
-
-// Reusable immutable Result constants
-function validate(): Result<boolean, Error> {
-    return isValid ? RESULT_TRUE : RESULT_FALSE;
-}
-
-function doSomething(): Result<void, Error> {
-    // ...
-    return RESULT_VOID;
-}
+// Capture exceptions as Result (like Promise.try, but returns Result)
+const parsed = tryResult(JSON.parse, jsonString);  // Ok(value) or Err(error)
+const response = await tryAsyncResult(fetch, '/api/data');
 ```
 
 ### Sync Primitives
 
 ```ts
-import { Once, Lazy, LazyAsync, Mutex } from 'happy-rusty';
+import { Lazy, LazyAsync, Mutex } from 'happy-rusty';
 
-// Once - one-time initialization (like Rust's OnceLock)
-const config = Once<Config>();
-config.set(loadConfig());           // Set once
-config.get();                       // Some(config) or None
-config.getOrInit(() => defaultCfg); // Get or initialize
-
-// Lazy - lazy initialization with initializer at construction
+// Lazy - compute once on first access
 const expensive = Lazy(() => computeExpensiveValue());
-expensive.force();  // Compute on first access, cached thereafter
+expensive.force();  // Computed once, cached thereafter
 
-// LazyAsync - async lazy initialization
-const db = LazyAsync(async () => await Database.connect(url));
+// LazyAsync - async lazy initialization (concurrent-safe)
+const db = LazyAsync(async () => Database.connect(url));
 await db.force();  // Only one connection, concurrent calls wait
 
 // Mutex - async mutual exclusion
 const state = Mutex({ count: 0 });
-await state.withLock(async (s) => {
-    s.count += 1;  // Exclusive access
-});
-```
-
-### Control Flow
-
-```ts
-import { Break, Continue, ControlFlow } from 'happy-rusty';
-
-// Short-circuit operations
-function findFirst<T>(arr: T[], pred: (t: T) => boolean): Option<T> {
-    for (const item of arr) {
-        const flow = pred(item) ? Break(item) : Continue();
-        if (flow.isBreak()) {
-            return Some(flow.breakValue().unwrap());
-        }
-    }
-    return None;
-}
-
-// Custom fold with early exit
-function tryFold<T, Acc>(
-    arr: T[],
-    init: Acc,
-    f: (acc: Acc, item: T) => ControlFlow<Acc, Acc>
-): Acc {
-    let acc = init;
-    for (const item of arr) {
-        const flow = f(acc, item);
-        if (flow.isBreak()) return flow.breakValue().unwrap();
-        acc = flow.continueValue().unwrap();
-    }
-    return acc;
-}
+await state.withLock(async (s) => { s.count += 1; });
 ```
 
 ## Examples
 
-- [Option basics](examples/option.ts)
-- [AsyncOption](examples/option.async.ts)
-- [Result basics](examples/result.ts)
-- [AsyncResult](examples/result.async.ts)
-- [Once](examples/once.ts)
-- [Lazy](examples/lazy.ts)
-- [Mutex](examples/mutex.ts)
-- [ControlFlow](examples/control_flow.ts)
+- [Option](examples/core/option/option.ts) / [AsyncOption](examples/core/option/option.async.ts)
+- [Result](examples/core/result/result.ts) / [AsyncResult](examples/core/result/result.async.ts)
+- [Once](examples/std/sync/once.ts) / [OnceAsync](examples/std/sync/once_async.ts)
+- [Lazy](examples/std/sync/lazy.ts) / [LazyAsync](examples/std/sync/lazy_async.ts)
+- [Mutex](examples/std/sync/mutex.ts)
+- [RwLock](examples/std/sync/rwlock.ts)
+- [ControlFlow](examples/std/ops/control_flow.ts)
+- [FnOnce](examples/std/ops/fn_once.ts) / [FnOnceAsync](examples/std/ops/fn_once_async.ts)
 
 ## Design Notes
 
 ### Immutability
 
-All types (`Option`, `Result`, `ControlFlow`, `Lazy`, `LazyAsync`, `Once`, `Mutex`, `MutexGuard`) are **immutable at runtime** via `Object.freeze()`. This prevents accidental modification of methods or properties:
+All types (`Option`, `Result`, `ControlFlow`, `Lazy`, `LazyAsync`, `Once`, `OnceAsync`, `Mutex`, `MutexGuard`, `RwLock`, `FnOnce`, `FnOnceAsync`) are **immutable at runtime** via `Object.freeze()`. This prevents accidental modification of methods or properties:
 
 ```ts
 const some = Some(42);
