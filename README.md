@@ -20,7 +20,7 @@ Rust's `Option`, `Result`, and sync primitives for JavaScript/TypeScript - Bette
 
 - **Option&lt;T&gt;** - Represents an optional value: every `Option` is either `Some(T)` or `None`
 - **Result&lt;T, E&gt;** - Represents either success (`Ok(T)`) or failure (`Err(E)`)
-- **Sync Primitives** - Rust-inspired `Once<T>`, `OnceAsync<T>`, `Lazy<T>`, `LazyAsync<T>`, `Mutex<T>`, and `RwLock<T>`
+- **Sync Primitives** - Rust-inspired `Once<T>`, `OnceAsync<T>`, `Lazy<T>`, `LazyAsync<T>`, `Mutex<T>`, `RwLock<T>`, and `Channel<T>`
 - **Control Flow** - `ControlFlow<B, C>` with `Break` and `Continue` for short-circuiting operations
 - **FnOnce** - One-time callable function wrappers (`FnOnce` and `FnOnceAsync`)
 - **Full TypeScript support** with strict type inference
@@ -137,7 +137,7 @@ const response = await tryAsyncResult(fetch, '/api/data');
 ### Sync Primitives
 
 ```ts
-import { Lazy, LazyAsync, Mutex } from 'happy-rusty';
+import { Lazy, LazyAsync, Mutex, Channel } from 'happy-rusty';
 
 // Lazy - compute once on first access
 const expensive = Lazy(() => computeExpensiveValue());
@@ -150,6 +150,11 @@ await db.force();  // Only one connection, concurrent calls wait
 // Mutex - async mutual exclusion
 const state = Mutex({ count: 0 });
 await state.withLock(async (s) => { s.count += 1; });
+
+// Channel - MPMC async message passing
+const ch = Channel<string>(10);  // bounded capacity
+await ch.send('hello');
+for await (const msg of ch) { console.log(msg); }
 ```
 
 ## Examples
@@ -160,6 +165,7 @@ await state.withLock(async (s) => { s.count += 1; });
 - [Lazy](examples/std/sync/lazy.ts) / [LazyAsync](examples/std/sync/lazy_async.ts)
 - [Mutex](examples/std/sync/mutex.ts)
 - [RwLock](examples/std/sync/rwlock.ts)
+- [Channel](examples/std/sync/channel.ts)
 - [ControlFlow](examples/std/ops/control_flow.ts)
 - [FnOnce](examples/std/ops/fn_once.ts) / [FnOnceAsync](examples/std/ops/fn_once_async.ts)
 
@@ -167,7 +173,7 @@ await state.withLock(async (s) => { s.count += 1; });
 
 ### Immutability
 
-All types (`Option`, `Result`, `ControlFlow`, `Lazy`, `LazyAsync`, `Once`, `OnceAsync`, `Mutex`, `MutexGuard`, `RwLock`, `FnOnce`, `FnOnceAsync`) are **immutable at runtime** via `Object.freeze()`. This prevents accidental modification of methods or properties:
+All types (`Option`, `Result`, `ControlFlow`, `Lazy`, `LazyAsync`, `Once`, `OnceAsync`, `Mutex`, `MutexGuard`, `RwLock`, `Channel`, `Sender`, `Receiver`, `FnOnce`, `FnOnceAsync`) are **immutable at runtime** via `Object.freeze()`. This prevents accidental modification of methods or properties:
 
 ```ts
 const some = Some(42);

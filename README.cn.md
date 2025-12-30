@@ -20,7 +20,7 @@
 
 - **Option&lt;T&gt;** - 表示可选值：每个 `Option` 要么是 `Some(T)`，要么是 `None`
 - **Result&lt;T, E&gt;** - 表示成功（`Ok(T)`）或失败（`Err(E)`）
-- **同步原语** - Rust 风格的 `Once<T>`、`OnceAsync<T>`、`Lazy<T>`、`LazyAsync<T>`、`Mutex<T>` 和 `RwLock<T>`
+- **同步原语** - Rust 风格的 `Once<T>`、`OnceAsync<T>`、`Lazy<T>`、`LazyAsync<T>`、`Mutex<T>`、`RwLock<T>` 和 `Channel<T>`
 - **控制流** - 用于短路操作的 `ControlFlow<B, C>`，包含 `Break` 和 `Continue`
 - **FnOnce** - 一次性可调用函数封装（`FnOnce` 和 `FnOnceAsync`）
 - **完整的 TypeScript 支持**，具有严格的类型推断
@@ -137,7 +137,7 @@ const response = await tryAsyncResult(fetch, '/api/data');
 ### 同步原语
 
 ```ts
-import { Lazy, LazyAsync, Mutex } from 'happy-rusty';
+import { Lazy, LazyAsync, Mutex, Channel } from 'happy-rusty';
 
 // Lazy - 首次访问时计算一次
 const expensive = Lazy(() => computeExpensiveValue());
@@ -150,6 +150,11 @@ await db.force();  // 只建立一次连接，并发调用会等待
 // Mutex - 异步互斥锁
 const state = Mutex({ count: 0 });
 await state.withLock(async (s) => { s.count += 1; });
+
+// Channel - MPMC 异步消息传递
+const ch = Channel<string>(10);  // 有界容量
+await ch.send('hello');
+for await (const msg of ch) { console.log(msg); }
 ```
 
 ## 示例
@@ -160,6 +165,7 @@ await state.withLock(async (s) => { s.count += 1; });
 - [Lazy](examples/std/sync/lazy.ts) / [LazyAsync](examples/std/sync/lazy_async.ts)
 - [Mutex](examples/std/sync/mutex.ts)
 - [RwLock](examples/std/sync/rwlock.ts)
+- [Channel](examples/std/sync/channel.ts)
 - [ControlFlow](examples/std/ops/control_flow.ts)
 - [FnOnce](examples/std/ops/fn_once.ts) / [FnOnceAsync](examples/std/ops/fn_once_async.ts)
 
@@ -167,7 +173,7 @@ await state.withLock(async (s) => { s.count += 1; });
 
 ### 不可变性
 
-所有类型（`Option`、`Result`、`ControlFlow`、`Lazy`、`LazyAsync`、`Once`、`OnceAsync`、`Mutex`、`MutexGuard`、`RwLock`、`FnOnce`、`FnOnceAsync`）都通过 `Object.freeze()` 实现**运行时不可变**。这可以防止意外修改方法或属性：
+所有类型（`Option`、`Result`、`ControlFlow`、`Lazy`、`LazyAsync`、`Once`、`OnceAsync`、`Mutex`、`MutexGuard`、`RwLock`、`Channel`、`Sender`、`Receiver`、`FnOnce`、`FnOnceAsync`）都通过 `Object.freeze()` 实现**运行时不可变**。这可以防止意外修改方法或属性：
 
 ```ts
 const some = Some(42);

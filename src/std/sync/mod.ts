@@ -3,6 +3,7 @@
  * Main entry point for the sync module.
  * Re-exports all public APIs from the sync submodules.
  */
+export * from './channel.ts';
 export * from './lazy.ts';
 export * from './lazy_async.ts';
 export * from './mutex.ts';
