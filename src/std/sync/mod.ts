@@ -7,4 +7,5 @@ export * from './lazy.ts';
 export * from './lazy_async.ts';
 export * from './mutex.ts';
 export * from './once.ts';
+export * from './once_async.ts';
 export * from './rwlock.ts';

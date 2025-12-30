@@ -2,7 +2,9 @@
  * Once example: One-time initialization with value storage
  *
  * Demonstrates using Once for lazy initialization of expensive resources,
- * configuration loading, and singleton patterns. Supports both sync and async.
+ * configuration loading, and singleton patterns. Once is for synchronous use only.
+ *
+ * For async initialization, see once_async.ts which demonstrates OnceAsync.
  */
 import { Err, Ok, Once } from '../../../src/mod.ts';
 
@@ -95,54 +97,9 @@ tokenOnce.set('new-token');
 console.log(`After re-set: ${tokenOnce.get().unwrap()}`);
 
 // ============================================================================
-// Example 4: Async initialization with getOrInitAsync
+// Example 4: Singleton pattern
 // ============================================================================
-console.log('\n=== Example 4: Async initialization ===\n');
-
-interface User {
-    id: number;
-    name: string;
-}
-
-const userCacheOnce = Once<Map<number, User>>();
-
-async function getUserCache(): Promise<Map<number, User>> {
-    return await userCacheOnce.getOrInitAsync(async () => {
-        console.log('Fetching users from API...');
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        const cache = new Map<number, User>([
-            [1, { id: 1, name: 'Alice' }],
-            [2, { id: 2, name: 'Bob' }],
-            [3, { id: 3, name: 'Charlie' }],
-        ]);
-        console.log(`Loaded ${cache.size} users into cache`);
-        return cache;
-    });
-}
-
-async function getUser(id: number): Promise<User | undefined> {
-    const cache = await getUserCache();
-    return cache.get(id);
-}
-
-// Multiple concurrent calls - only one initialization
-console.log('Making concurrent getUser() calls:');
-const [user1, user2, user3] = await Promise.all([
-    getUser(1),
-    getUser(2),
-    getUser(3),
-]);
-
-console.log(`User 1: ${user1?.name}`);
-console.log(`User 2: ${user2?.name}`);
-console.log(`User 3: ${user3?.name}`);
-
-// ============================================================================
-// Example 5: Singleton pattern
-// ============================================================================
-console.log('\n=== Example 5: Singleton pattern ===\n');
+console.log('\n=== Example 4: Singleton pattern ===\n');
 
 class Logger {
     private static instance = Once<Logger>();
@@ -170,110 +127,67 @@ console.log(`Same instance: ${logger1 === logger2 && logger2 === logger3}`);
 logger1.log('Hello from logger!');
 
 // ============================================================================
-// Example 6: Mixed sync/async usage
+// Example 5: tryInsert() for conditional initialization
 // ============================================================================
-console.log('\n=== Example 6: Mixed sync/async usage ===\n');
+console.log('\n=== Example 5: tryInsert() ===\n');
 
-const mixedOnce = Once<string>();
+const cacheOnce = Once<Map<string, number>>();
 
-// First call with async
-const asyncValue = await mixedOnce.getOrInitAsync(async () => {
-    console.log('Async initialization...');
-    await new Promise(r => setTimeout(r, 50));
-    return 'initialized-async';
-});
-console.log(`Async result: ${asyncValue}`);
-
-// Subsequent call with sync - returns same value without calling fn
-const syncValue = mixedOnce.getOrInit(() => {
-    console.log('This should not print');
-    return 'initialized-sync';
-});
-console.log(`Sync result: ${syncValue}`);
-console.log(`Same value: ${asyncValue === syncValue}`);
-
-// Async after sync also works
-const asyncAgain = await mixedOnce.getOrInitAsync(async () => {
-    console.log('This should not print either');
-    return 'initialized-async-again';
-});
-console.log(`Async again result: ${asyncAgain}`);
-console.log(`Still same value: ${asyncValue === asyncAgain}`);
-
-// ============================================================================
-// Example 7: waitAsync - Producer-Consumer pattern
-// ============================================================================
-console.log('\n=== Example 7: waitAsync - Producer-Consumer pattern ===\n');
-
-// Scenario: Multiple consumers wait for a configuration to be loaded by a producer
-
-const appConfig = Once<{ port: number; host: string; }>();
-
-// Consumer function - waits for config to be available
-async function startServer(name: string): Promise<void> {
-    console.log(`[${name}] Waiting for config...`);
-    const config = await appConfig.waitAsync();
-    console.log(`[${name}] Started on ${config.host}:${config.port}`);
+// First insert succeeds
+const insert1 = cacheOnce.tryInsert(new Map([['a', 1], ['b', 2]]));
+console.log(`First insert: ${insert1.isOk() ? 'Success' : 'Failed'}`);
+if (insert1.isOk()) {
+    console.log(`Cache size: ${insert1.unwrap().size}`);
 }
 
-// Producer function - loads config after some delay
-async function loadConfig(): Promise<void> {
-    console.log('[Producer] Loading config...');
-    await new Promise(r => setTimeout(r, 100));
-    appConfig.set({ port: 8080, host: 'localhost' });
-    console.log('[Producer] Config loaded');
+// Second insert fails, returns both current and passed values
+const insert2 = cacheOnce.tryInsert(new Map([['x', 100]]));
+console.log(`Second insert: ${insert2.isOk() ? 'Success' : 'Failed'}`);
+if (insert2.isErr()) {
+    const [current, passed] = insert2.unwrapErr();
+    console.log(`Current cache size: ${current.size}, Passed cache size: ${passed.size}`);
 }
-
-// Start consumers first (they will wait)
-const server1 = startServer('Server1');
-const server2 = startServer('Server2');
-const server3 = startServer('Server3');
-
-// Start producer after a small delay
-await new Promise(r => setTimeout(r, 50));
-await loadConfig();
-
-// Wait for all servers to start
-await Promise.all([server1, server2, server3]);
 
 // ============================================================================
-// Example 8: waitAsync - Service dependency
+// Example 6: Configuration with validation
 // ============================================================================
-console.log('\n=== Example 8: waitAsync - Service dependency ===\n');
+console.log('\n=== Example 6: Configuration with validation ===\n');
 
-// Scenario: Services depend on a database connection being established
-
-const dbConnection = Once<{ query: (sql: string) => string; }>();
-
-class UserService {
-    async getUsers(): Promise<string> {
-        const db = await dbConnection.waitAsync();
-        return db.query('SELECT * FROM users');
-    }
+interface AppConfig {
+    port: number;
+    host: string;
+    maxConnections: number;
 }
 
-class OrderService {
-    async getOrders(): Promise<string> {
-        const db = await dbConnection.waitAsync();
-        return db.query('SELECT * FROM orders');
-    }
+const appConfig = Once<AppConfig>();
+
+function loadAppConfig(rawConfig: Record<string, unknown>): AppConfig {
+    return appConfig.getOrTryInit(() => {
+        // Validate required fields
+        if (typeof rawConfig['port'] !== 'number' || rawConfig['port'] < 1 || rawConfig['port'] > 65535) {
+            return Err(new Error('Invalid port number'));
+        }
+        if (typeof rawConfig['host'] !== 'string' || rawConfig['host'].length === 0) {
+            return Err(new Error('Invalid host'));
+        }
+
+        return Ok({
+            port: rawConfig['port'] as number,
+            host: rawConfig['host'] as string,
+            maxConnections: (rawConfig['maxConnections'] as number) || 100,
+        });
+    }).unwrapOr({
+        port: 3000,
+        host: 'localhost',
+        maxConnections: 100,
+    });
 }
 
-const userService = new UserService();
-const orderService = new OrderService();
+// Load with valid config
+const config1 = loadAppConfig({ port: 8080, host: 'api.example.com', maxConnections: 500 });
+console.log('Loaded config:', config1);
 
-// Services start querying before DB is ready
-const usersPromise = userService.getUsers();
-const ordersPromise = orderService.getOrders();
-
-// Database connects after services start
-await new Promise(r => setTimeout(r, 50));
-console.log('Establishing database connection...');
-dbConnection.set({
-    query: (sql: string) => `Result of: ${sql}`,
-});
-console.log('Database connected');
-
-// Now the queries complete
-console.log(await usersPromise);
-console.log(await ordersPromise);
+// Try to load again with different config - returns cached value
+const config2 = loadAppConfig({ port: 9000, host: 'other.example.com' });
+console.log('Second load (cached):', config2);
+console.log(`Same config: ${config1 === config2}`);

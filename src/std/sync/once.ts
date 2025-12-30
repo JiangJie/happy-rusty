@@ -3,19 +3,24 @@
  * Rust-inspired [OnceLock](https://doc.rust-lang.org/std/sync/struct.OnceLock.html) for one-time initialization.
  *
  * `Once<T>` is a container which can be written to only once. It provides safe access
- * to lazily initialized data, supporting both sync and async initialization.
+ * to lazily initialized data with synchronous initialization.
+ *
+ * **When to use `Once<T>` vs `OnceAsync<T>`:**
+ * - Use `Once<T>` for sync-only initialization
+ * - Use `OnceAsync<T>` for async initialization with concurrent call handling
  */
 
-import { Err, None, Ok, RESULT_VOID, Some, type AsyncLikeResult, type AsyncResult, type Option, type Result, type VoidResult } from '../../core/mod.ts';
+import { Err, None, Ok, RESULT_VOID, Some, type Option, type Result, type VoidResult } from '../../core/mod.ts';
 
 /**
  * A container which can be written to only once.
  *
  * This is useful for lazy initialization of global data or expensive computations
- * that should only happen once. Supports both synchronous and asynchronous
- * initialization functions via separate methods.
+ * that should only happen once. For synchronous initialization only.
  *
  * @typeParam T - The type of the value stored.
+ *
+ * @see {@link OnceAsync} for async one-time initialization
  *
  * @example
  * ```ts
@@ -34,13 +39,6 @@ import { Err, None, Ok, RESULT_VOID, Some, type AsyncLikeResult, type AsyncResul
  * // Sync lazy initialization
  * const config = Once<Config>();
  * const cfg = config.getOrInit(() => loadConfigFromFile());
- * ```
- *
- * @example
- * ```ts
- * // Async lazy initialization
- * const db = Once<Database>();
- * const conn = await db.getOrInitAsync(async () => Database.connect(url));
  * ```
  */
 export interface Once<T> {
@@ -144,30 +142,6 @@ export interface Once<T> {
     getOrInit(fn: () => T): T;
 
     /**
-     * Gets the contents, initializing it with async `fn` if empty.
-     *
-     * If multiple calls occur concurrently, only the first one will run the
-     * initialization function. Other calls will wait for it to complete.
-     *
-     * @param fn - A function that returns `PromiseLike<T>` or `T` to initialize.
-     * @returns A promise that resolves to the stored value.
-     *
-     * @example
-     * ```ts
-     * const db = Once<Database>();
-     *
-     * // Multiple concurrent calls - only one connection happens
-     * const [db1, db2, db3] = await Promise.all([
-     *     db.getOrInitAsync(() => Database.connect(url)),
-     *     db.getOrInitAsync(() => Database.connect(url)),
-     *     db.getOrInitAsync(() => Database.connect(url)),
-     * ]);
-     * // db1 === db2 === db3
-     * ```
-     */
-    getOrInitAsync(fn: () => PromiseLike<T> | T): Promise<T>;
-
-    /**
      * Gets the contents, initializing it with `fn` if empty.
      * If `fn` returns `Err`, remains uninitialized.
      *
@@ -190,33 +164,6 @@ export interface Once<T> {
      * ```
      */
     getOrTryInit<E>(fn: () => Result<T, E>): Result<T, E>;
-
-    /**
-     * Gets the contents, initializing it with async `fn` if empty.
-     * If `fn` returns `Err`, remains uninitialized.
-     *
-     * If multiple calls occur concurrently, only the first one will run the
-     * initialization function. Other calls will wait for it to complete.
-     *
-     * @typeParam E - The error type.
-     * @param fn - A function that returns `PromiseLike<Result<T, E>>` or `Result<T, E>`.
-     * @returns A promise that resolves to `Ok(value)` or `Err(error)`.
-     *
-     * @example
-     * ```ts
-     * const config = Once<Config>();
-     *
-     * const result = await config.getOrTryInitAsync(async () => {
-     *     try {
-     *         const response = await fetch('/api/config');
-     *         return Ok(await response.json());
-     *     } catch (e) {
-     *         return Err(e as Error);
-     *     }
-     * });
-     * ```
-     */
-    getOrTryInitAsync<E>(fn: () => AsyncLikeResult<T, E> | Result<T, E>): AsyncResult<T, E>;
 
     /**
      * Takes the value out, leaving it uninitialized.
@@ -248,46 +195,6 @@ export interface Once<T> {
      * ```
      */
     isInitialized(): boolean;
-
-    /**
-     * Waits for the cell to be initialized, then returns the value.
-     *
-     * If the cell is already initialized, returns immediately.
-     * If initialization is in progress, waits for it to complete.
-     * If the cell is uninitialized and no initialization is in progress,
-     * the returned promise will resolve when another caller initializes the cell.
-     *
-     * @returns A promise that resolves to the stored value once initialized.
-     *
-     * @example
-     * ```ts
-     * const once = Once<number>();
-     *
-     * // Start waiting in background
-     * const waitPromise = once.waitAsync();
-     *
-     * // Later, initialize the value
-     * once.set(42);
-     *
-     * // waitPromise resolves with 42
-     * console.log(await waitPromise); // 42
-     * ```
-     *
-     * @example
-     * ```ts
-     * const config = Once<Config>();
-     *
-     * // Multiple consumers can wait for initialization
-     * const [cfg1, cfg2] = await Promise.all([
-     *     config.waitAsync(),
-     *     config.waitAsync(),
-     * ]);
-     *
-     * // Meanwhile, one producer initializes
-     * config.set(loadConfig());
-     * ```
-     */
-    waitAsync(): Promise<T>;
 }
 
 /**
@@ -316,37 +223,13 @@ export interface Once<T> {
  *
  * @example
  * ```ts
- * // Async lazy initialization
- * const db = Once<Database>();
- *
- * async function getDb(): Promise<Database> {
- *     return await db.getOrInitAsync(async () => {
- *         console.log('Connecting to database...');
- *         return await Database.connect(connectionString);
- *     });
- * }
- *
- * // Multiple calls - connection happens only once
- * const [db1, db2] = await Promise.all([getDb(), getDb()]);
- * console.log(db1 === db2); // true
- * ```
- *
- * @example
- * ```ts
- * // Fallible async initialization
+ * // Fallible sync initialization
  * const config = Once<Config>();
  *
- * async function loadConfig(): Promise<Result<Config, Error>> {
- *     return await config.getOrTryInitAsync(async () => {
- *         try {
- *             const response = await fetch('/api/config');
- *             if (!response.ok) {
- *                 return Err(new Error(`HTTP ${response.status}`));
- *             }
- *             return Ok(await response.json());
- *         } catch (e) {
- *             return Err(e as Error);
- *         }
+ * function loadConfig(): Result<Config, Error> {
+ *     return config.getOrTryInit(() => {
+ *         const data = readFileSync('config.json');
+ *         return data ? Ok(JSON.parse(data)) : Err(new Error('Config not found'));
  *     });
  * }
  * ```
@@ -354,62 +237,13 @@ export interface Once<T> {
 export function Once<T>(): Once<T> {
     let value: T | undefined;
     let initialized = false;
-    let pendingPromise: Promise<T> | undefined;
-    let resolvedPromise: Promise<T> | undefined;
-    let resolvedResultPromise: AsyncResult<T, unknown> | undefined;
-    let waiters: ((value: T) => void)[] = [];
 
     /**
-     * Sets the value, marks as initialized, and notifies all waiters.
+     * Sets the value and marks as initialized.
      */
     function setValue(val: T): void {
         value = val;
         initialized = true;
-        for (const waiter of waiters) {
-            waiter(val);
-        }
-        waiters = [];
-    }
-
-    // Use `Promise.resolve(fn())` instead of `async` to preserve sync error behavior:
-    // sync throws propagate directly, async errors become rejected Promises.
-    function getOrTryInitAsync<E>(fn: () => AsyncLikeResult<T, E> | Result<T, E>): AsyncResult<T, E> {
-        if (initialized) {
-            // Reuse cached promise to avoid creating new Promise on each call
-            return (resolvedResultPromise ??= Promise.resolve(Ok(value as T))) as AsyncResult<T, E>;
-        }
-
-        // If already initializing, wait for it
-        if (pendingPromise) {
-            return pendingPromise.then(
-                () => Ok(value as T),
-                // Previous initialization failed via Err result, let this call try again.
-                // Note: fn's sync errors won't throw here since we're inside a .then() callback,
-                // they will be caught and converted to rejected Promise by Promise.resolve(fn()).
-                () => getOrTryInitAsync(fn),
-            );
-        }
-
-        // Create a new pending promise for this initialization attempt
-        // fn() is called synchronously here - sync throws propagate directly
-        pendingPromise = Promise.resolve(fn()).then(
-            (result) => {
-                if (result.isOk()) {
-                    const val = result.unwrap();
-                    setValue(val);
-                    return val;
-                }
-                // If Err, throw to signal failure (we'll catch and return the result)
-                throw result;
-            },
-        ).finally(() => {
-            pendingPromise = undefined;
-        });
-
-        return pendingPromise.then(
-            (resultValue) => Ok(resultValue as T),
-            (errResult) => errResult as Result<T, E>,
-        );
     }
 
     return Object.freeze<Once<T>>({
@@ -446,31 +280,6 @@ export function Once<T>(): Once<T> {
             return value as T;
         },
 
-        // Use `Promise.resolve(fn())` instead of `async` to preserve sync error behavior:
-        // sync throws propagate directly, async errors become rejected Promises.
-        getOrInitAsync(fn: () => PromiseLike<T> | T): Promise<T> {
-            if (initialized) {
-                // Reuse cached promise to avoid creating new Promise on each call
-                return resolvedPromise ??= Promise.resolve(value as T);
-            }
-
-            // If already initializing, wait for the pending promise
-            if (pendingPromise) {
-                return pendingPromise;
-            }
-
-            pendingPromise = Promise.resolve(fn()).then(
-                (result) => {
-                    setValue(result);
-                    return result;
-                },
-            ).finally(() => {
-                pendingPromise = undefined;
-            });
-
-            return pendingPromise;
-        },
-
         getOrTryInit<E>(fn: () => Result<T, E>): Result<T, E> {
             if (initialized) {
                 return Ok(value as T);
@@ -483,8 +292,6 @@ export function Once<T>(): Once<T> {
             return result;
         },
 
-        getOrTryInitAsync,
-
         take(): Option<T> {
             if (!initialized) {
                 return None;
@@ -492,31 +299,11 @@ export function Once<T>(): Once<T> {
             const taken = value as T;
             value = undefined;
             initialized = false;
-            resolvedPromise = undefined;  // Clear cached promise
-            resolvedResultPromise = undefined;  // Clear cached result promise
             return Some(taken);
         },
 
         isInitialized(): boolean {
             return initialized;
-        },
-
-        waitAsync(): Promise<T> {
-            // If already initialized, return immediately
-            if (initialized) {
-                // Reuse cached promise to avoid creating new Promise on each call
-                return resolvedPromise ??= Promise.resolve(value as T);
-            }
-
-            // If initialization is in progress, wait for it
-            if (pendingPromise) {
-                return pendingPromise;
-            }
-
-            // Otherwise, add to waiters and wait for someone to initialize
-            return new Promise<T>((resolve) => {
-                waiters.push(resolve);
-            });
         },
     } as const);
 }
