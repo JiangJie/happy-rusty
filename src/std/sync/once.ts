@@ -15,8 +15,8 @@ import { Err, None, Ok, RESULT_VOID, Some, type Option, type Result, type VoidRe
 /**
  * A container which can be written to only once.
  *
- * This is useful for lazy initialization of global data or expensive computations
- * that should only happen once. For synchronous initialization only.
+ * Useful for lazy initialization of global data or expensive computations
+ * that should only happen once.
  *
  * @typeParam T - The type of the value stored.
  *

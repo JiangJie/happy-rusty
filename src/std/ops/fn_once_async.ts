@@ -2,10 +2,9 @@
  * @module
  * Rust-inspired [AsyncFnOnce](https://doc.rust-lang.org/std/ops/trait.AsyncFnOnce.html) for one-time callable async functions.
  *
- * `FnOnceAsync` wraps an async function that can only be called once. After the first call,
- * subsequent calls will throw an error or return `None`.
- *
- * This is the async counterpart to `FnOnce`, similar to Rust's `AsyncFnOnce` trait (stabilized in Rust 1.85).
+ * **When to use `FnOnce` vs `FnOnceAsync`:**
+ * - Use `FnOnce` for sync functions
+ * - Use `FnOnceAsync` for async functions
  */
 
 import { ASYNC_NONE, Some, type AsyncOption } from '../../core/mod.ts';
@@ -14,11 +13,18 @@ import { ASYNC_NONE, Some, type AsyncOption } from '../../core/mod.ts';
  * An async function wrapper that can only be called once.
  *
  * After the first invocation, the function is consumed and cannot be called again.
- * This mirrors Rust's `AsyncFnOnce` trait, which represents async closures that
- * take ownership of captured variables and can only be called once.
+ * This mirrors Rust's `AsyncFnOnce` trait (stabilized in Rust 1.85), which represents
+ * async closures that take ownership of captured variables and can only be called once.
+ *
+ * **Use cases:**
+ * - One-time async callbacks (cleanup functions, initialization)
+ * - Ensuring certain async operations execute exactly once
+ * - Async resource disposal patterns
  *
  * @typeParam A - Tuple type of the function arguments.
  * @typeParam R - The resolved type of the Promise returned by the async function.
+ *
+ * @see {@link FnOnce} for sync one-time callable functions
  *
  * @example
  * ```ts

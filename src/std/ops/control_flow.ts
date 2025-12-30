@@ -1,12 +1,6 @@
 /**
  * @module
  * Rust-inspired [ControlFlow](https://doc.rust-lang.org/std/ops/enum.ControlFlow.html) for control flow handling.
- *
- * `ControlFlow` is used to tell an operation whether it should exit early or go on as usual.
- * This is useful for:
- * - Short-circuiting iterators
- * - Signaling early termination in fold-like operations
- * - Implementing custom control flow patterns
  */
 
 import { Err, None, Ok, Some, type Option, type Result } from '../../core/mod.ts';
@@ -17,6 +11,11 @@ import { ControlFlowKindSymbol } from './symbols.ts';
  *
  * This is the return type of `try_fold` and similar iterator methods that support
  * short-circuiting. It can also be used in custom control flow scenarios.
+ *
+ * **Use cases:**
+ * - Short-circuiting iterators
+ * - Signaling early termination in fold-like operations
+ * - Implementing custom control flow patterns
  *
  * @typeParam B - The type of the value returned on `Break` (early exit).
  * @typeParam C - The type of the value returned on `Continue` (default: `void`).

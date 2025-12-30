@@ -2,8 +2,12 @@
  * @module
  * Rust-inspired [LazyLock](https://doc.rust-lang.org/std/sync/struct.LazyLock.html) for lazy initialization.
  *
- * `Lazy<T>` is a value which is initialized on the first access. Unlike `Once<T>`,
- * the initialization function is provided at construction time.
+ * Unlike `Once<T>`, which allows setting values manually or with different
+ * initializers, `Lazy<T>` binds the initializer at creation time.
+ *
+ * **When to use `Lazy<T>` vs `LazyAsync<T>`:**
+ * - Use `Lazy<T>` for sync-only initialization
+ * - Use `LazyAsync<T>` for async initialization with concurrent call handling
  */
 
 import { None, Some, type Option } from '../../core/mod.ts';
@@ -11,14 +15,12 @@ import { None, Some, type Option } from '../../core/mod.ts';
 /**
  * A value which is initialized on the first access.
  *
- * This is a lazily evaluated value. The initialization function is provided
- * at construction time and executed on first access. Subsequent accesses
- * return the cached value.
- *
- * Unlike `Once<T>`, which allows setting values manually or with different
- * initializers, `Lazy<T>` binds the initializer at creation time.
+ * The initialization function is provided at construction time and executed
+ * on first access. Subsequent accesses return the cached value.
  *
  * @typeParam T - The type of the value stored.
+ *
+ * @see {@link LazyAsync} for async lazy initialization
  *
  * @example
  * ```ts

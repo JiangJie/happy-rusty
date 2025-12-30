@@ -2,8 +2,9 @@
  * @module
  * Rust-inspired [LazyLock](https://doc.rust-lang.org/std/sync/struct.LazyLock.html) for async lazy initialization.
  *
- * `LazyAsync<T>` is a value which is initialized asynchronously on the first access.
- * Unlike `Lazy<T>`, the initialization function returns `PromiseLike<T> | T`.
+ * **When to use `Lazy<T>` vs `LazyAsync<T>`:**
+ * - Use `Lazy<T>` for sync-only initialization
+ * - Use `LazyAsync<T>` for async initialization with concurrent call handling
  */
 
 import { None, Some, type Option } from '../../core/mod.ts';
@@ -11,11 +12,13 @@ import { None, Some, type Option } from '../../core/mod.ts';
 /**
  * A value which is initialized asynchronously on the first access.
  *
- * Similar to `Lazy<T>`, but the initialization function is async.
+ * The initialization function can return `PromiseLike<T>` or `T`.
  * If multiple calls to `force()` occur concurrently before initialization
  * completes, only one initialization will run.
  *
  * @typeParam T - The type of the value stored.
+ *
+ * @see {@link Lazy} for sync-only lazy initialization
  *
  * @example
  * ```ts

@@ -2,13 +2,9 @@
  * @module
  * Rust-inspired [FnOnce](https://doc.rust-lang.org/std/ops/trait.FnOnce.html) for one-time callable functions.
  *
- * `FnOnce` wraps a function that can only be called once. After the first call,
- * subsequent calls will throw an error or return `None`.
- *
- * This is useful for:
- * - One-time callbacks (cleanup functions, event handlers)
- * - Ensuring certain operations execute exactly once
- * - Resource disposal patterns
+ * **When to use `FnOnce` vs `FnOnceAsync`:**
+ * - Use `FnOnce` for sync functions
+ * - Use `FnOnceAsync` for async functions
  */
 
 import { None, Some, type Option } from '../../core/mod.ts';
@@ -20,8 +16,15 @@ import { None, Some, type Option } from '../../core/mod.ts';
  * This mirrors Rust's `FnOnce` trait, which represents closures that take ownership
  * of captured variables and can only be called once.
  *
+ * **Use cases:**
+ * - One-time callbacks (cleanup functions, event handlers)
+ * - Ensuring certain operations execute exactly once
+ * - Resource disposal patterns
+ *
  * @typeParam A - Tuple type of the function arguments.
  * @typeParam R - Return type of the function.
+ *
+ * @see {@link FnOnceAsync} for async one-time callable functions
  *
  * @example
  * ```ts
