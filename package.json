@@ -3,7 +3,7 @@
   "description": "Rust's Option, Result, and sync primitives for JavaScript/TypeScript - Better error handling and null-safety patterns.",
   "author": "jiang115jie@gmail.com",
   "license": "MIT",
-  "version": "1.7.1",
+  "version": "1.8.0",
   "type": "module",
   "main": "dist/main.cjs",
   "module": "dist/main.mjs",
@@ -44,7 +44,6 @@
   "keywords": [
     "rust",
     "typescript",
-    "enum",
     "Option",
     "Some",
     "None",
@@ -54,9 +53,14 @@
     "Once",
     "Lazy",
     "Mutex",
+    "RwLock",
+    "Channel",
     "ControlFlow",
+    "FnOnce",
     "error-handling",
-    "null-safety"
+    "null-safety",
+    "async",
+    "concurrency"
   ],
   "devDependencies": {
     "@eslint/js": "^9.39.2",

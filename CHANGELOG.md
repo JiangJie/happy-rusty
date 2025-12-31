@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2025-12-31
+
+### Added
+- **New Sync Primitives**:
+  - `OnceAsync<T>` - Async-first one-time initialization with concurrent call handling
+  - `RwLock<T>` - Async read-write lock (multiple concurrent readers or single writer)
+  - `Channel<T>` - MPMC (multi-producer multi-consumer) async message passing with optional bounded capacity
+- **New Function Types**:
+  - `FnOnce<A, R>` - One-time callable sync function wrapper
+  - `FnOnceAsync<A, R>` - One-time callable async function wrapper
+- **New Methods**:
+  - `Option.reduce()` - Rust API alignment for reducing Option to its contained value
+  - `Result.intoOk()` / `Result.intoErr()` - Infallible extraction for `Result<T, never>` and `Result<never, E>`
+  - `ControlFlow.intoValue()` - Extract value when both branches have the same type
+  - `Once.tryInsert()` / `Once.waitAsync()` - Additional initialization control
+  - `Mutex.get()` / `Mutex.set()` / `Mutex.replace()` - Convenience methods
+- **New Type Aliases**:
+  - `SafeResult<T>` - `Result<T, never>` for operations that cannot fail
+  - `AsyncSafeResult<T>` - Async version of SafeResult
+- **Iterator Protocol** - `Option` and `Result` now implement `Symbol.iterator` for `for...of` loops:
+  ```ts
+  for (const value of Some(42)) { console.log(value); } // 42
+  for (const value of None) { /* never executes */ }
+  ```
+- **Rust Documentation Links** - All Rust-equivalent interfaces now link to official Rust docs via `@see` tags
+
+### Changed
+- **Module Reorganization** - Source code restructured into `core/` (Option, Result) and `std/` (sync, ops) directories, mirroring Rust's stdlib organization
+- **Async Callback Types** - All async methods now accept `PromiseLike<T> | T` instead of just `Promise<T>`, allowing mixed sync/async callbacks
+- **Async Return Types** - Use `Awaited<T>` to properly flatten nested Promises in async method return types
+- **Internal Optimizations** - Cached Promise constants (`ASYNC_NONE`, etc.) for better runtime performance
+
+### Fixed
+- `this` binding issue in `Once.getOrTryInitAsync`
+- Nested Promise flattening in async methods
+
 ## [1.7.1] - 2025-12-26
 
 ### Added
@@ -221,6 +257,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full TypeScript support
 - Comprehensive API matching Rust's Option and Result
 
+[1.8.0]: https://github.com/JiangJie/happy-rusty/compare/v1.7.1...v1.8.0
 [1.7.1]: https://github.com/JiangJie/happy-rusty/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/JiangJie/happy-rusty/compare/v1.6.2...v1.7.0
 [1.6.2]: https://github.com/JiangJie/happy-rusty/compare/v1.6.1...v1.6.2
