@@ -4,7 +4,6 @@ import {
     None,
     Ok,
     Some,
-    promiseToAsyncResult,
     tryAsyncOption,
     tryAsyncResult,
     tryOption,
@@ -1042,14 +1041,6 @@ describe('tryAsyncOption', () => {
         // tryAsyncOption should flatten: Promise<Promise<number>> -> Option<number>
         const option = await tryAsyncOption(promise);
         expect(option.unwrap()).toBe(77);
-    });
-});
-
-describe('promiseToAsyncResult (deprecated)', () => {
-    it('should work as an alias for tryAsyncResult', async () => {
-        const result = await promiseToAsyncResult(Promise.resolve(42));
-        expect(result.isOk()).toBe(true);
-        expect(result.unwrap()).toBe(42);
     });
 });
 

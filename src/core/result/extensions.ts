@@ -137,18 +137,3 @@ export async function tryAsyncResult<T, E = Error, Args extends unknown[] = []>(
         return Err(err as E);
     }
 }
-
-/**
- * Converts a Promise or a function returning a Promise to a Result type,
- * capturing the resolved value in an `Ok`, or the error in an `Err`.
- *
- * @deprecated Use {@link tryAsyncResult} instead. This function will be removed in the next major version.
- *
- * @typeParam T - The type of the value that the promise resolves to.
- * @typeParam E - The type of the error that the promise may reject with, defaults to `Error`.
- * @param task - A promise, promise-like object, or a function that returns a promise-like object.
- * @returns A promise that resolves to `Ok<T>` if successful, or `Err<E>` if the promise rejects or the function throws.
- */
-export async function promiseToAsyncResult<T, E = Error>(task: PromiseLike<T> | (() => PromiseLike<T>)): AsyncResult<Awaited<T>, E> {
-    return tryAsyncResult(task as Parameters<typeof tryAsyncResult<T, E>>[0]);
-}
