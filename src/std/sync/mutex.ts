@@ -25,11 +25,22 @@ export interface MutexGuard<T> {
 
     /**
      * The protected value. Can be read or modified while the guard is held.
+     *
+     * @example
+     * ```ts
+     * const guard = await mutex.lock();
+     * console.log(guard.value); // Read value
+     * guard.value = newValue;   // Modify value
+     * guard.unlock();
+     * ```
      */
     value: T;
 
     /**
      * Custom `toString` implementation.
+     *
+     * @returns A string representation of the guard.
+     *
      * @example
      * ```ts
      * const guard = await mutex.lock();

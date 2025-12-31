@@ -35,11 +35,26 @@ export interface RwLockReadGuard<T> {
 
     /**
      * The protected value (read-only access).
+     *
+     * @example
+     * ```ts
+     * const guard = await rwlock.read();
+     * console.log(guard.value); // Read the value
+     * guard.unlock();
+     * ```
      */
     readonly value: T;
 
     /**
      * Custom `toString` implementation.
+     *
+     * @returns A string representation of the guard.
+     *
+     * @example
+     * ```ts
+     * const guard = await rwlock.read();
+     * console.log(guard.toString()); // 'RwLockReadGuard(42)'
+     * ```
      */
     toString(): string;
 
@@ -47,6 +62,16 @@ export interface RwLockReadGuard<T> {
      * Releases the read lock.
      *
      * After calling `unlock()`, the guard should not be used.
+     *
+     * @example
+     * ```ts
+     * const guard = await rwlock.read();
+     * try {
+     *     console.log(guard.value);
+     * } finally {
+     *     guard.unlock();
+     * }
+     * ```
      */
     unlock(): void;
 }
@@ -67,11 +92,27 @@ export interface RwLockWriteGuard<T> {
 
     /**
      * The protected value (read-write access).
+     *
+     * @example
+     * ```ts
+     * const guard = await rwlock.write();
+     * console.log(guard.value); // Read the value
+     * guard.value = newValue;   // Modify the value
+     * guard.unlock();
+     * ```
      */
     value: T;
 
     /**
      * Custom `toString` implementation.
+     *
+     * @returns A string representation of the guard.
+     *
+     * @example
+     * ```ts
+     * const guard = await rwlock.write();
+     * console.log(guard.toString()); // 'RwLockWriteGuard(42)'
+     * ```
      */
     toString(): string;
 
@@ -79,6 +120,16 @@ export interface RwLockWriteGuard<T> {
      * Releases the write lock.
      *
      * After calling `unlock()`, the guard should not be used.
+     *
+     * @example
+     * ```ts
+     * const guard = await rwlock.write();
+     * try {
+     *     guard.value = newValue;
+     * } finally {
+     *     guard.unlock();
+     * }
+     * ```
      */
     unlock(): void;
 }
