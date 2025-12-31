@@ -708,16 +708,7 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
             return ASYNC_FALSE;
         }
 
-        // If there are waiting receivers, deliver directly (rendezvous or empty buffer)
-        if (receiveWaitQueue.length > 0) {
-            const receiver = receiveWaitQueue.shift() as ReceiveWaiter;
-            receiver(Some(value));
-            return ASYNC_TRUE;
-        }
-
-        // If buffer has space, add to buffer
-        if (buffer.length < capacity) {
-            buffer.push(value);
+        if (trySend(value)) {
             return ASYNC_TRUE;
         }
 
@@ -749,28 +740,11 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
     }
 
     function receive(): AsyncOption<T> {
-        // If buffer has items, return one
-        if (buffer.length > 0) {
-            const value = buffer.shift() as T;
-
-            // Wake up a waiting sender if any (move their value to buffer)
-            if (sendWaitQueue.length > 0) {
-                const sender = sendWaitQueue.shift() as SendWaiter;
-                buffer.push(sender.value);
-                sender.resolve(true);
-            }
-
-            return Promise.resolve(Some(value));
+        const result = tryReceive();
+        if (result.isSome()) {
+            return Promise.resolve(result);
         }
 
-        // Buffer is empty, check for waiting senders (rendezvous)
-        if (sendWaitQueue.length > 0) {
-            const sender = sendWaitQueue.shift() as SendWaiter;
-            sender.resolve(true);
-            return Promise.resolve(Some(sender.value));
-        }
-
-        // Channel is closed and empty
         if (closed) {
             return ASYNC_NONE;
         }
@@ -830,16 +804,7 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
             return ASYNC_FALSE;
         }
 
-        // If there are waiting receivers, deliver directly
-        if (receiveWaitQueue.length > 0) {
-            const receiver = receiveWaitQueue.shift() as ReceiveWaiter;
-            receiver(Some(value));
-            return ASYNC_TRUE;
-        }
-
-        // If buffer has space, add to buffer
-        if (buffer.length < capacity) {
-            buffer.push(value);
+        if (trySend(value)) {
             return ASYNC_TRUE;
         }
 
@@ -864,28 +829,11 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
     }
 
     function receiveTimeout(ms: number): AsyncOption<T> {
-        // If buffer has items, return one
-        if (buffer.length > 0) {
-            const value = buffer.shift() as T;
-
-            // Wake up a waiting sender if any
-            if (sendWaitQueue.length > 0) {
-                const sender = sendWaitQueue.shift() as SendWaiter;
-                buffer.push(sender.value);
-                sender.resolve(true);
-            }
-
-            return Promise.resolve(Some(value));
+        const result = tryReceive();
+        if (result.isSome()) {
+            return Promise.resolve(result);
         }
 
-        // Buffer is empty, check for waiting senders (rendezvous)
-        if (sendWaitQueue.length > 0) {
-            const sender = sendWaitQueue.shift() as SendWaiter;
-            sender.resolve(true);
-            return Promise.resolve(Some(sender.value));
-        }
-
-        // Channel is closed and empty
         if (closed) {
             return ASYNC_NONE;
         }
