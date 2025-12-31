@@ -17,8 +17,8 @@ import type { AsyncLikeResult, AsyncResult, Result } from './result/result.ts';
 import { ResultKindSymbol } from './result/symbols.ts';
 
 // Internal cached Promise constants for runtime optimization
-const PROMISE_TRUE: Promise<true> = Promise.resolve(true);
-const PROMISE_FALSE: Promise<false> = Promise.resolve(false);
+const ASYNC_TRUE: Promise<true> = Promise.resolve(true);
+const ASYNC_FALSE: Promise<false> = Promise.resolve(false);
 
 /**
  * Represents the absence of a value, as a specialized `Option` type.
@@ -267,13 +267,13 @@ export const None: None = Object.freeze<None>({
         return false;
     },
     isSomeAndAsync(_predicate: (value: never) => PromiseLike<boolean> | boolean): Promise<false> {
-        return PROMISE_FALSE;
+        return ASYNC_FALSE;
     },
     isNoneOr(_predicate: (value: never) => boolean): true {
         return true;
     },
     isNoneOrAsync(_predicate: (value: never) => PromiseLike<boolean> | boolean): Promise<true> {
-        return PROMISE_TRUE;
+        return ASYNC_TRUE;
     },
 
     expect(msg: string): never {
@@ -473,7 +473,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
             return false;
         },
         isErrAndAsync(_predicate: (error: E) => PromiseLike<boolean> | boolean): Promise<false> {
-            return PROMISE_FALSE;
+            return ASYNC_FALSE;
         },
 
         expect(_msg: string): T {
@@ -617,7 +617,7 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
             return false;
         },
         isOkAndAsync(_predicate: (value: T) => PromiseLike<boolean> | boolean): Promise<boolean> {
-            return PROMISE_FALSE;
+            return ASYNC_FALSE;
         },
         isErrAnd(predicate: (error: E) => boolean): boolean {
             return predicate(error);

@@ -10,9 +10,9 @@
 
 import { ASYNC_NONE, None, Some, type AsyncOption, type Option } from '../../core/mod.ts';
 
-// Cached promises for common return values
-const PROMISE_TRUE = Promise.resolve(true);
-const PROMISE_FALSE = Promise.resolve(false);
+// Internal cached Promise constants for runtime optimization
+const ASYNC_TRUE = Promise.resolve(true);
+const ASYNC_FALSE = Promise.resolve(false);
 
 /**
  * A sender view of a channel that can only send values.
@@ -579,20 +579,20 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
 
     function send(value: T): Promise<boolean> {
         if (closed) {
-            return PROMISE_FALSE;
+            return ASYNC_FALSE;
         }
 
         // If there are waiting receivers, deliver directly (rendezvous or empty buffer)
         if (receiveWaitQueue.length > 0) {
             const receiver = receiveWaitQueue.shift() as ReceiveWaiter;
             receiver(Some(value));
-            return PROMISE_TRUE;
+            return ASYNC_TRUE;
         }
 
         // If buffer has space, add to buffer
         if (buffer.length < capacity) {
             buffer.push(value);
-            return PROMISE_TRUE;
+            return ASYNC_TRUE;
         }
 
         // Buffer is full (or capacity is 0), wait for space
@@ -701,20 +701,20 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
 
     function sendTimeout(value: T, ms: number): Promise<boolean> {
         if (closed) {
-            return PROMISE_FALSE;
+            return ASYNC_FALSE;
         }
 
         // If there are waiting receivers, deliver directly
         if (receiveWaitQueue.length > 0) {
             const receiver = receiveWaitQueue.shift() as ReceiveWaiter;
             receiver(Some(value));
-            return PROMISE_TRUE;
+            return ASYNC_TRUE;
         }
 
         // If buffer has space, add to buffer
         if (buffer.length < capacity) {
             buffer.push(value);
-            return PROMISE_TRUE;
+            return ASYNC_TRUE;
         }
 
         // Buffer is full, wait with timeout
