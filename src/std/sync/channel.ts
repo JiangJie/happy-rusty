@@ -42,11 +42,17 @@ export interface Sender<T> {
     /**
      * The maximum number of values that can be buffered.
      * `0` for rendezvous channels, `Infinity` for unbounded channels.
+     *
+     * @see {@link Channel.capacity}
      */
     readonly capacity: number;
 
     /**
      * The current number of values in the buffer.
+     *
+     * Note: This does **not** count waiting senders/receivers; it only counts buffered items.
+     *
+     * @see {@link Channel.length}
      */
     readonly length: number;
 
@@ -58,12 +64,16 @@ export interface Sender<T> {
     /**
      * Returns `true` if the channel buffer is empty.
      * Note: A rendezvous channel (capacity=0) is always empty.
+     *
+     * @see {@link Channel.isEmpty}
      */
     readonly isEmpty: boolean;
 
     /**
      * Returns `true` if the channel buffer is full.
      * Note: A rendezvous channel (capacity=0) is always full.
+     *
+     * @see {@link Channel.isFull}
      */
     readonly isFull: boolean;
 
@@ -77,6 +87,8 @@ export interface Sender<T> {
      *
      * @param value - The value to send.
      * @returns A promise that resolves to `true` if sent successfully, `false` if the channel is closed.
+     *
+     * @see {@link Channel.send}
      *
      * @example
      * ```ts
@@ -98,6 +110,8 @@ export interface Sender<T> {
      * @param value - The value to send.
      * @returns `true` if sent successfully, `false` if full or closed.
      *
+     * @see {@link Channel.trySend}
+     *
      * @example
      * ```ts
      * if (!sender.trySend(42)) {
@@ -117,6 +131,8 @@ export interface Sender<T> {
      * @param ms - Timeout in milliseconds.
      * @returns A promise that resolves to `true` if sent successfully,
      *          `false` if timed out, channel is full, or closed.
+     *
+     * @see {@link Channel.sendTimeout}
      *
      * @example
      * ```ts
@@ -172,11 +188,17 @@ export interface Receiver<T> {
     /**
      * The maximum number of values that can be buffered.
      * `0` for rendezvous channels, `Infinity` for unbounded channels.
+     *
+     * @see {@link Channel.capacity}
      */
     readonly capacity: number;
 
     /**
      * The current number of values in the buffer.
+     *
+     * Note: This does **not** count waiting senders/receivers; it only counts buffered items.
+     *
+     * @see {@link Channel.length}
      */
     readonly length: number;
 
@@ -188,12 +210,16 @@ export interface Receiver<T> {
     /**
      * Returns `true` if the channel buffer is empty.
      * Note: A rendezvous channel (capacity=0) is always empty.
+     *
+     * @see {@link Channel.isEmpty}
      */
     readonly isEmpty: boolean;
 
     /**
      * Returns `true` if the channel buffer is full.
      * Note: A rendezvous channel (capacity=0) is always full.
+     *
+     * @see {@link Channel.isFull}
      */
     readonly isFull: boolean;
 
@@ -206,6 +232,8 @@ export interface Receiver<T> {
      * - If the channel is closed and empty, returns `None`.
      *
      * @returns A promise that resolves to `Some(value)` or `None` if closed and empty.
+     *
+     * @see {@link Channel.receive}
      *
      * @example
      * ```ts
@@ -228,6 +256,8 @@ export interface Receiver<T> {
      *
      * @returns `Some(value)` if available, `None` if empty.
      *
+     * @see {@link Channel.tryReceive}
+     *
      * @example
      * ```ts
      * const result = receiver.tryReceive();
@@ -245,6 +275,8 @@ export interface Receiver<T> {
      * @param ms - Timeout in milliseconds.
      * @returns A promise that resolves to `Some(value)` or `None` if timed out,
      *          empty, or closed.
+     *
+     * @see {@link Channel.receiveTimeout}
      *
      * @example
      * ```ts
@@ -333,11 +365,35 @@ export interface Channel<T> {
     /**
      * The maximum number of values that can be buffered.
      * `0` for rendezvous channels, `Infinity` for unbounded channels.
+     *
+     * @example
+     * ```ts
+     * const rendezvous = Channel<number>(0);
+     * console.log(rendezvous.capacity); // 0
+     *
+     * const unbounded = Channel<number>();
+     * console.log(unbounded.capacity); // Infinity
+     * ```
      */
     readonly capacity: number;
 
     /**
      * The current number of values in the buffer.
+     *
+     * Note: This does **not** count waiting senders/receivers; it only counts buffered items.
+     *
+     * @example
+     * ```ts
+     * const ch = Channel<number>(0);
+     * const sendP = ch.send(1);
+     * const recvP = ch.receive();
+     *
+     * // Rendezvous channels don't buffer values.
+     * console.log(ch.length); // 0
+     *
+     * await recvP;
+     * await sendP;
+     * ```
      */
     readonly length: number;
 
@@ -349,12 +405,34 @@ export interface Channel<T> {
     /**
      * Returns `true` if the channel buffer is empty.
      * Note: A rendezvous channel (capacity=0) is always empty.
+     *
+     * @example
+     * ```ts
+     * const rendezvous = Channel<number>(0);
+     * console.log(rendezvous.isEmpty); // true
+     *
+     * const bounded = Channel<number>(1);
+     * console.log(bounded.isEmpty); // true
+     * await bounded.send(1);
+     * console.log(bounded.isEmpty); // false
+     * ```
      */
     readonly isEmpty: boolean;
 
     /**
      * Returns `true` if the channel buffer is full.
      * Note: A rendezvous channel (capacity=0) is always full.
+     *
+     * @example
+     * ```ts
+     * const rendezvous = Channel<number>(0);
+     * console.log(rendezvous.isFull); // true
+     *
+     * const bounded = Channel<number>(1);
+     * console.log(bounded.isFull); // false
+     * await bounded.send(1);
+     * console.log(bounded.isFull); // true
+     * ```
      */
     readonly isFull: boolean;
 
@@ -406,6 +484,15 @@ export interface Channel<T> {
      *
      * @param value - The value to send.
      * @returns A promise that resolves to `true` if sent successfully, `false` if the channel is closed.
+     *
+     * @example
+     * ```ts
+     * const ch = Channel<number>(1);
+     *
+     * const ok1 = await ch.send(1); // true
+     * ch.close();
+     * const ok2 = await ch.send(2); // false
+     * ```
      */
     send(value: T): Promise<boolean>;
 
@@ -418,6 +505,14 @@ export interface Channel<T> {
      *
      * @param value - The value to send.
      * @returns `true` if sent successfully, `false` if full or closed.
+     *
+     * @example
+     * ```ts
+     * const ch = Channel<number>(0);
+     *
+     * // Rendezvous channels are always "full" unless a receiver is waiting
+     * const ok = ch.trySend(1); // usually false
+     * ```
      */
     trySend(value: T): boolean;
 
@@ -431,6 +526,14 @@ export interface Channel<T> {
      * @param ms - Timeout in milliseconds.
      * @returns A promise that resolves to `true` if sent successfully,
      *          `false` if timed out, channel is full, or closed.
+     *
+     * @example
+     * ```ts
+     * const ch = Channel<number>(0);
+     *
+     * // No receiver arrives within 10ms
+     * const ok = await ch.sendTimeout(123, 10); // false
+     * ```
      */
     sendTimeout(value: T, ms: number): Promise<boolean>;
 
@@ -443,6 +546,16 @@ export interface Channel<T> {
      * - If the channel is closed and empty, returns `None`.
      *
      * @returns A promise that resolves to `Some(value)` or `None` if closed and empty.
+     *
+     * @example
+     * ```ts
+     * const ch = Channel<number>(10);
+     * void ch.send(1);
+     *
+     * const v1 = await ch.receive(); // Some(1)
+     * ch.close();
+     * const v2 = await ch.receive(); // None
+     * ```
      */
     receive(): AsyncOption<T>;
 
@@ -454,6 +567,12 @@ export interface Channel<T> {
      * - Otherwise returns `None`.
      *
      * @returns `Some(value)` if available, `None` if empty.
+     *
+     * @example
+     * ```ts
+     * const ch = Channel<number>(10);
+     * console.log(ch.tryReceive().isNone()); // true
+     * ```
      */
     tryReceive(): Option<T>;
 
@@ -466,6 +585,13 @@ export interface Channel<T> {
      * @param ms - Timeout in milliseconds.
      * @returns A promise that resolves to `Some(value)` or `None` if timed out,
      *          empty, or closed.
+     *
+     * @example
+     * ```ts
+     * const ch = Channel<number>(10);
+     * const v = await ch.receiveTimeout(5);
+     * console.log(v.isNone()); // true
+     * ```
      */
     receiveTimeout(ms: number): AsyncOption<T>;
 
