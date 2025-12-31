@@ -21,6 +21,7 @@ import { None, Some, type Option } from '../../core/mod.ts';
  * @typeParam T - The type of the value stored.
  *
  * @see {@link LazyAsync} for async lazy initialization
+ * @see https://doc.rust-lang.org/std/sync/struct.LazyLock.html
  *
  * @example
  * ```ts

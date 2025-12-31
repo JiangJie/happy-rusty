@@ -90,6 +90,7 @@ export interface RwLockWriteGuard<T> {
  * Writers are given priority to prevent writer starvation.
  *
  * @typeParam T - The type of the protected value.
+ * @see https://doc.rust-lang.org/std/sync/struct.RwLock.html
  *
  * @example
  * ```ts

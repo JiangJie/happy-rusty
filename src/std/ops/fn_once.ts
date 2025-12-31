@@ -25,6 +25,7 @@ import { None, Some, type Option } from '../../core/mod.ts';
  * @typeParam R - Return type of the function.
  *
  * @see {@link FnOnceAsync} for async one-time callable functions
+ * @see https://doc.rust-lang.org/std/ops/trait.FnOnce.html
  *
  * @example
  * ```ts

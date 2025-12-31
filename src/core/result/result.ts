@@ -1,6 +1,6 @@
 /**
  * @module
- * A Rust-inspired [Result](https://doc.rust-lang.org/core/result/index.html) enum type, used for better error handling.
+ * A Rust-inspired [Result](https://doc.rust-lang.org/std/result/index.html) enum type, used for better error handling.
  */
 
 import type { Option } from '../option/option.ts';
@@ -20,6 +20,7 @@ pub enum Result<T, E> {
 ```
  * @typeParam T - The type of the value contained in a successful `Result`.
  * @typeParam E - The type of the error contained in an unsuccessful `Result`.
+ * @see https://doc.rust-lang.org/std/result/enum.Result.html
  */
 export interface Result<T, E> {
     // #region Internal properties

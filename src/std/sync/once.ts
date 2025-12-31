@@ -21,6 +21,7 @@ import { Err, None, Ok, RESULT_VOID, Some, type Option, type Result, type VoidRe
  * @typeParam T - The type of the value stored.
  *
  * @see {@link OnceAsync} for async one-time initialization
+ * @see https://doc.rust-lang.org/std/sync/struct.OnceLock.html
  *
  * @example
  * ```ts

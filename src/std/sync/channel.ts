@@ -5,7 +5,6 @@
  * Provides a type-safe channel with optional bounded capacity and backpressure support.
  * Supports rendezvous (capacity=0) for synchronous handoff between sender and receiver.
  *
- * @see https://doc.rust-lang.org/std/sync/mpmc/fn.channel.html
  */
 
 import { ASYNC_NONE, None, Some, type AsyncOption, type Option } from '../../core/mod.ts';
@@ -265,6 +264,7 @@ export interface Receiver<T> {
  * typed values. Values are delivered in FIFO order.
  *
  * @typeParam T - The type of values that can be sent through the channel.
+ * @see https://doc.rust-lang.org/std/sync/mpmc/fn.channel.html
  *
  * @example
  * ```ts

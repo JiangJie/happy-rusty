@@ -19,6 +19,7 @@ import { ControlFlowKindSymbol } from './symbols.ts';
  *
  * @typeParam B - The type of the value returned on `Break` (early exit).
  * @typeParam C - The type of the value returned on `Continue` (default: `void`).
+ * @see https://doc.rust-lang.org/std/ops/enum.ControlFlow.html
  *
  * @example
  * ```ts

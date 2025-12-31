@@ -68,6 +68,7 @@ export interface MutexGuard<T> {
  * serializes async operations in the single-threaded event loop.
  *
  * @typeParam T - The type of the protected value.
+ * @see https://doc.rust-lang.org/std/sync/struct.Mutex.html
  *
  * @example
  * ```ts

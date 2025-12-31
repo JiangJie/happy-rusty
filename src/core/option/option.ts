@@ -1,6 +1,6 @@
 /**
  * @module
- * A Rust-inspired [Option](https://doc.rust-lang.org/core/option/index.html) enum type, used as an alternative to the use of null and undefined.
+ * A Rust-inspired [Option](https://doc.rust-lang.org/std/option/index.html) enum type, used as an alternative to the use of null and undefined.
  */
 
 import type { Result } from '../result/result.ts';
@@ -18,6 +18,7 @@ pub enum Option<T> {
 }
 ```
  * @typeParam T - The type of the value contained in the `Some` variant.
+ * @see https://doc.rust-lang.org/std/option/enum.Option.html
  */
 export interface Option<T> {
     // #region Internal properties
