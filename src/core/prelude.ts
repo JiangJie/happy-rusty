@@ -573,6 +573,21 @@ export function Ok<T, E>(value?: T): Result<T, E> {
         asErr(): never {
             throw new TypeError('Result::asErr() called on an `Ok` value');
         },
+
+        andTryAsync<U>(fn: (value: T) => PromiseLike<U> | U): AsyncResult<Awaited<U>, E> {
+            try {
+                const result = fn(value as T);
+                return Promise.resolve(result).then(
+                    Ok<Awaited<U>, E>,
+                    Err<Awaited<U>, E>,
+                );
+            } catch (e) {
+                return Promise.resolve(Err<Awaited<U>, E>(e as E));
+            }
+        },
+        orTryAsync<F>(_fn: (error: E) => PromiseLike<T> | T): AsyncResult<Awaited<T>, F> {
+            return Promise.resolve(ok as unknown as Result<Awaited<T>, F>);
+        },
     } as const);
 
     return ok;
@@ -720,6 +735,21 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
         },
         asErr<U>(): Result<U, E> {
             return err as unknown as Result<U, E>;
+        },
+
+        andTryAsync<U>(_fn: (value: T) => PromiseLike<U> | U): AsyncResult<Awaited<U>, E> {
+            return Promise.resolve(err as unknown as Result<Awaited<U>, E>);
+        },
+        orTryAsync<F>(fn: (error: E) => PromiseLike<T> | T): AsyncResult<Awaited<T>, F> {
+            try {
+                const result = fn(error);
+                return Promise.resolve(result).then(
+                    Ok<Awaited<T>, F>,
+                    Err<Awaited<T>, F>,
+                );
+            } catch (e) {
+                return Promise.resolve(Err<Awaited<T>, F>(e as F));
+            }
         },
     } as const);
 

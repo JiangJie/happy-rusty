@@ -718,6 +718,92 @@ export interface Result<T, E> {
     asErr<U>(): Result<U, E>;
 
     // #endregion
+
+    // #region Try extensions
+
+    /**
+     * Like `andThenAsync`, but automatically catches any thrown exceptions or Promise rejections
+     * and converts them to `Err`.
+     *
+     * This is useful when calling async functions that may throw, without needing to wrap
+     * the call in `tryAsyncResult`.
+     *
+     * **Note**: The error type `E` is preserved. If the function throws, the thrown value
+     * is cast to `E`. The caller is responsible for ensuring that thrown exceptions
+     * are compatible with type `E`, similar to how `tryAsyncResult<T, E>` works.
+     *
+     * @typeParam U - The type of the value returned by the function.
+     * @param fn - A function that takes the `Ok` value and returns `PromiseLike<U>` or `U`. May throw or reject.
+     * @returns A promise that resolves to `Ok(U)` if successful, or `Err(E)` if `this` is `Err` or if `fn` throws/rejects.
+     * @see andThenAsync
+     * @see tryAsyncResult
+     * @example
+     * ```ts
+     * const x: Result<number, Error> = Ok(2);
+     *
+     * // If the async function succeeds
+     * const result = await x.andTryAsync(async v => {
+     *     const response = await fetch(`/api/multiply/${v}`);
+     *     return response.json();
+     * });
+     * console.log(result.unwrap()); // { value: 4 }
+     *
+     * // If the async function throws or rejects
+     * const failed = await x.andTryAsync(async v => {
+     *     throw new Error('Network error');
+     * });
+     * console.log(failed.unwrapErr()); // Error: Network error
+     *
+     * // If this is already Err, fn is not called
+     * const y: Result<number, Error> = Err(new Error('original error'));
+     * const skipped = await y.andTryAsync(async v => v * 2);
+     * console.log(skipped.unwrapErr()); // Error: original error
+     * ```
+     */
+    andTryAsync<U>(fn: (value: T) => PromiseLike<U> | U): AsyncResult<Awaited<U>, E>;
+
+    /**
+     * Like `orElseAsync`, but automatically catches any thrown exceptions or Promise rejections
+     * and converts them to `Err`.
+     *
+     * This is useful when error recovery logic may itself throw, without needing to wrap
+     * the call in `tryAsyncResult`.
+     *
+     * **Note**: The error type `F` is preserved. If the function throws, the thrown value
+     * is cast to `F`. The caller is responsible for ensuring that thrown exceptions
+     * are compatible with type `F`, similar to how `tryAsyncResult<T, E>` works.
+     *
+     * @typeParam F - The type of the error returned by the function.
+     * @param fn - A function that takes the `Err` value and returns `PromiseLike<T>` or `T`. May throw or reject.
+     * @returns A promise that resolves to `Ok(T)` if `this` is `Ok` or if `fn` succeeds, or `Err(F)` if `fn` throws/rejects.
+     * @see orElseAsync
+     * @see tryAsyncResult
+     * @example
+     * ```ts
+     * const x: Result<number, Error> = Err(new Error('primary failed'));
+     *
+     * // If the recovery function succeeds
+     * const result = await x.orTryAsync(async e => {
+     *     const response = await fetch('/api/fallback');
+     *     return response.json();
+     * });
+     * console.log(result.unwrap()); // { value: 42 }
+     *
+     * // If the recovery function throws or rejects
+     * const failed = await x.orTryAsync(async e => {
+     *     throw new Error('fallback also failed');
+     * });
+     * console.log(failed.unwrapErr()); // Error: fallback also failed
+     *
+     * // If this is already Ok, fn is not called
+     * const y: Result<number, Error> = Ok(10);
+     * const skipped = await y.orTryAsync(async e => 999);
+     * console.log(skipped.unwrap()); // 10
+     * ```
+     */
+    orTryAsync<F>(fn: (error: E) => PromiseLike<T> | T): AsyncResult<Awaited<T>, F>;
+
+    // #endregion
 }
 
 /**

@@ -199,3 +199,70 @@ async function processUserNotification(userId: number): Promise<Result<string, A
 
 const notificationResult = await processUserNotification(1);
 console.log(notificationResult.unwrapOr('Failed to send notification'));
+
+// Example 6: andTryAsync - auto-catching exceptions in chain
+console.log('\n=== Example 6: andTryAsync (auto-catch exceptions) ===');
+
+async function parseJson(text: string): Promise<unknown> {
+    // Simulate async parsing that may throw
+    await new Promise(resolve => setTimeout(resolve, 10));
+    return JSON.parse(text); // May throw SyntaxError
+}
+
+const validJson = Ok('{"name": "Alice", "age": 30}');
+const invalidJson = Ok('not valid json');
+
+// Success case: valid JSON
+const parsed1 = await validJson.andTryAsync(async text => {
+    return await parseJson(text);
+});
+console.log(`Valid JSON parsed: ${parsed1.map(obj => JSON.stringify(obj)).unwrapOr('failed')}`);
+
+// Failure case: invalid JSON throws, automatically caught
+const parsed2 = await invalidJson.andTryAsync(async text => {
+    return await parseJson(text);
+});
+console.log(`Invalid JSON result: ${parsed2.isErr() ? 'Caught error' : 'Unexpected success'}`);
+parsed2.inspectErr(e => console.log(`  Error: ${(e as Error).message}`));
+
+// Err case: fn is not called
+const errResult: Result<string, Error> = Err(new Error('already failed'));
+const skipped = await errResult.andTryAsync(async text => {
+    console.log('This should not be printed');
+    return await parseJson(text);
+});
+console.log(`Err case preserved: ${skipped.unwrapErr().message}`);
+
+// Example 7: orTryAsync - auto-catching exceptions in recovery
+console.log('\n=== Example 7: orTryAsync (auto-catch in recovery) ===');
+
+async function fetchFromBackup(key: string): Promise<string> {
+    await new Promise(resolve => setTimeout(resolve, 10));
+    if (key === 'missing') {
+        throw new Error('Backup also failed');
+    }
+    return `backup-value-for-${key}`;
+}
+
+// Recovery succeeds
+const failed1: Result<string, Error> = Err(new Error('primary failed'));
+const recovered1 = await failed1.orTryAsync(async _e => {
+    return await fetchFromBackup('existing');
+});
+console.log(`Recovery succeeded: ${recovered1.unwrapOr('failed')}`);
+
+// Recovery also throws, automatically caught
+const failed2: Result<string, Error> = Err(new Error('primary failed'));
+const recovered2 = await failed2.orTryAsync(async _e => {
+    return await fetchFromBackup('missing');
+});
+console.log(`Recovery failed: ${recovered2.isErr() ? 'Caught error' : 'Unexpected success'}`);
+recovered2.inspectErr(e => console.log(`  Error: ${(e as Error).message}`));
+
+// Ok case: recovery fn is not called
+const okResult: Result<string, Error> = Ok('already ok');
+const notRecovered = await okResult.orTryAsync(async _e => {
+    console.log('This should not be printed');
+    return await fetchFromBackup('any');
+});
+console.log(`Ok case preserved: ${notRecovered.unwrap()}`);

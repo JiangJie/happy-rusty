@@ -179,6 +179,49 @@ describe('Result', () => {
                 expect(result.eq(Ok('11'))).toBe(true);
             });
 
+            it('andTryAsync() should convert resolved value to Ok', async () => {
+                const result = await ok.andTryAsync(async x => {
+                    return x + await Promise.resolve(10);
+                });
+                expect(result.isOk()).toBe(true);
+                expect(result.unwrap()).toBe(11);
+            });
+
+            it('andTryAsync() should convert rejection to Err', async () => {
+                const result = await ok.andTryAsync(async () => {
+                    throw new Error('async error');
+                });
+                expect(result.isErr()).toBe(true);
+                expect(result.unwrapErr()).toBeInstanceOf(Error);
+                expect((result.unwrapErr() as Error).message).toBe('async error');
+            });
+
+            it('andTryAsync() should convert sync throw to Err', async () => {
+                const result = await ok.andTryAsync(() => {
+                    throw new Error('sync error');
+                });
+                expect(result.isErr()).toBe(true);
+                expect((result.unwrapErr() as Error).message).toBe('sync error');
+            });
+
+            it('andTryAsync() should work with sync return value', async () => {
+                const result = await ok.andTryAsync(x => x * 2);
+                expect(result.isOk()).toBe(true);
+                expect(result.unwrap()).toBe(2);
+            });
+
+            it('andTryAsync() should flatten nested Promise (Awaited<U>)', async () => {
+                // When fn returns Promise<Promise<number>>, Promise.resolve() flattens it
+                // So result is Ok<number>, not Ok<Promise<number>>
+                const { promise, resolve } = Promise.withResolvers<Promise<number>>();
+                resolve(Promise.resolve(42));
+                const result = await ok.andTryAsync(() => promise);
+
+                expect(result.isOk()).toBe(true);
+                // Runtime: Promise.resolve(Promise.resolve(42)) flattens to 42
+                expect(result.unwrap()).toBe(42);
+            });
+
             it('orElse() should return self, not calling fn', () => {
                 const fn = vi.fn(() => other);
                 expect(ok.orElse(fn)).toBe(ok);
@@ -190,6 +233,13 @@ describe('Result', () => {
                     return Err(x.message + await Promise.resolve(10));
                 });
                 expect(result).toBe(ok.asOk());
+            });
+
+            it('orTryAsync() should return self without calling fn', async () => {
+                const fn = vi.fn(async (e: Error) => e.message.length);
+                const result = await ok.orTryAsync(fn);
+                expect(result.unwrap()).toBe(1);
+                expect(fn).not.toHaveBeenCalled();
             });
         });
 
@@ -453,6 +503,13 @@ describe('Result', () => {
                 expect(result).toBe(err);
             });
 
+            it('andTryAsync() should return self without calling fn', async () => {
+                const fn = vi.fn(async (x: number) => x * 2);
+                const result = await err.andTryAsync(fn);
+                expect(result).toBe(err);
+                expect(fn).not.toHaveBeenCalled();
+            });
+
             it('orElse() should call fn and return its result', () => {
                 expect(err.orElse(_e => other)).toBe(other);
             });
@@ -462,6 +519,42 @@ describe('Result', () => {
                     return Err(e.message + await Promise.resolve(10));
                 });
                 expect(result.eq(Err('lose10'))).toBe(true);
+            });
+
+            it('orTryAsync() should convert resolved value to Ok', async () => {
+                const result = await err.orTryAsync(async e => {
+                    return e.message.length + await Promise.resolve(10);
+                });
+                expect(result.isOk()).toBe(true);
+                expect(result.unwrap()).toBe(14); // 'lose'.length + 10
+            });
+
+            it('orTryAsync() should convert rejection to Err', async () => {
+                const result = await err.orTryAsync(async () => {
+                    throw new Error('recovery failed');
+                });
+                expect(result.isErr()).toBe(true);
+                expect((result.unwrapErr() as Error).message).toBe('recovery failed');
+            });
+
+            it('orTryAsync() should convert sync throw to Err', async () => {
+                const result = await err.orTryAsync(() => {
+                    throw new Error('sync recovery error');
+                });
+                expect(result.isErr()).toBe(true);
+                expect((result.unwrapErr() as Error).message).toBe('sync recovery error');
+            });
+
+            it('orTryAsync() should work with sync return value', async () => {
+                const result = await err.orTryAsync(e => e.message.length);
+                expect(result.isOk()).toBe(true);
+                expect(result.unwrap()).toBe(4); // 'lose'.length
+            });
+
+            it('orTryAsync() should work with async fn', async () => {
+                const result = await err.orTryAsync(async () => 42);
+                expect(result.isOk()).toBe(true);
+                expect(result.unwrap()).toBe(42);
             });
         });
 
