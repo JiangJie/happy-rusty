@@ -127,6 +127,25 @@ The codebase is organized into two main modules mirroring Rust's structure:
 
 5. **Concurrent-Safe Async Primitives**: `OnceAsync`, `LazyAsync`, `Mutex`, `RwLock`, and `Channel` handle concurrent async calls correctly - only one initialization runs, others wait for it
 
+### Non-Standard Extensions
+
+The codebase includes some methods not present in Rust's standard library, placed in `// #region Try extensions` at the end of the `Result<T, E>` interface:
+
+- **`andTryAsync<U>`** - Like `andThenAsync`, but auto-catches exceptions/Promise rejections and converts them to `Err`
+- **`orTryAsync<F>`** - Like `orElseAsync`, but auto-catches exceptions in recovery logic
+
+These are useful for chaining operations that may throw without wrapping in `tryAsyncResult`.
+
+### Examples
+
+Example files are located in `examples/` directory, mirroring `src/` structure:
+- `examples/core/option/` - Option usage examples
+- `examples/core/result/` - Result usage examples (including async with Try extensions)
+- `examples/std/sync/` - Sync primitives examples (Once, Lazy, Mutex, RwLock, Channel)
+- `examples/std/ops/` - ControlFlow and FnOnce examples
+
+Run examples with: `pnpm run eg`
+
 ### Toolchain
 
 This project uses **pnpm** for all development tasks:
