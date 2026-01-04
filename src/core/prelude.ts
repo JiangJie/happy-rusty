@@ -521,7 +521,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
             return Ok(fn(value as T));
         },
         mapErr<F>(_fn: (error: E) => F): Result<T, F> {
-            return Ok(value as T);
+            return ok as unknown as Result<T, F>;
         },
         mapOr<U>(_defaultValue: U, fn: (value: T) => U): U {
             return fn(value as T);
@@ -667,7 +667,7 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
         },
 
         map<U>(_fn: (value: T) => U): Result<U, E> {
-            return Err(error);
+            return err as unknown as Result<U, E>;
         },
         mapErr<F>(fn: (error: E) => F): Result<T, F> {
             return Err(fn(error));
