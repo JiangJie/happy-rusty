@@ -127,12 +127,21 @@ The codebase is organized into two main modules mirroring Rust's structure:
 
 5. **Concurrent-Safe Async Primitives**: `OnceAsync`, `LazyAsync`, `Mutex`, `RwLock`, and `Channel` handle concurrent async calls correctly - only one initialization runs, others wait for it
 
+### Performance Optimizations
+
+- **Result.map()/mapErr()**: When the Result variant doesn't match (e.g., calling `map()` on `Err`), the methods now return `this` instead of creating a new instance. This reduces object allocations in transformation chains where operations might short-circuit.
+
 ### Non-Standard Extensions
 
 The codebase includes some methods not present in Rust's standard library, placed in `// #region Try extensions` at the end of the `Result<T, E>` interface:
 
-- **`andTryAsync<U>`** - Like `andThenAsync`, but auto-catches exceptions/Promise rejections and converts them to `Err`
-- **`orTryAsync<F>`** - Like `orElseAsync`, but auto-catches exceptions in recovery logic
+- **`andTryAsync<U>(fn: (value: T) => PromiseLike<U>): Promise<Result<U, E | unknown>>`** 
+  - Like `andThenAsync`, but auto-catches exceptions/Promise rejections and converts them to `Err`
+  - Useful when chaining async operations that may throw without wrapping each call in `tryAsyncResult`
+  
+- **`orTryAsync<F>(fn: (error: E) => PromiseLike<F>): Promise<Result<T, F | unknown>>`**
+  - Like `orElseAsync`, but auto-catches exceptions in recovery logic
+  - Handles cases where recovery logic itself might fail
 
 These are useful for chaining operations that may throw without wrapping in `tryAsyncResult`.
 
@@ -215,8 +224,16 @@ pnpm update --latest
 ## Code Style
 
 - ESLint with TypeScript strict and stylistic configs, plus `@stylistic/eslint-plugin`
-- Semicolons required (enforced by `@stylistic/semi`)
-- Trailing commas required in multiline (enforced by `@stylistic/comma-dangle`)
+  - Extended with error prevention and ES6+ style rules:
+    - `eqeqeq` (with `{ 'null': 'ignore' }` to allow `== null` checks)
+    - `no-cond-assign` (prevents `if (a = 1)` typos)
+    - `no-self-compare`, `no-template-curly-in-string`
+    - `default-case-last`, `no-new-wrappers`, `radix`
+    - `prefer-template`, `object-shorthand`
+  - Stylistic rules:
+    - Semicolons required (enforced by `@stylistic/semi`)
+    - Trailing commas required in multiline (enforced by `@stylistic/comma-dangle`)
+    - Member delimiter style for interfaces
 - Strict TypeScript settings: `noUnusedLocals`, `noUnusedParameters`, `strictNullChecks`
 - File extensions required in imports (`.ts` suffix)
 - Use `@internal` JSDoc tag for exported functions/types that should not appear in public API docs
@@ -237,3 +254,7 @@ pnpm update --latest
 3. Commit: `git commit -m "chore(release): bump version to vX.Y.Z"`
 4. Create and push tag: `git tag vX.Y.Z && git push origin main --tags`
 5. CI automatically publishes to npm, GitHub Packages, and JSR
+
+## Removed APIs (v1.9.0+)
+
+- **`promiseToAsyncResult()`**: Use `tryAsyncResult()` instead (same functionality, deprecated since v1.7.0)
