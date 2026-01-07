@@ -261,7 +261,7 @@ describe('FnOnceAsync', () => {
             const fetchUser = FnOnceAsync(async (id: number) => {
                 // Simulate async fetch
                 await new Promise(resolve => setTimeout(resolve, 1));
-                return { id, name: 'User' + id };
+                return { id, name: `User${ id }` };
             });
 
             const user = await fetchUser.call(1);
