@@ -690,7 +690,7 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
         throw new RangeError('Channel capacity must be a non-negative integer or Infinity');
     }
 
-    const buffer: T[] = [];
+    const buffer = new Queue<T>();
     let closed = false;
 
     // Senders waiting for space (or for a receiver in rendezvous mode)
@@ -999,3 +999,48 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
         close,
     } as const);
 }
+
+
+// #region Internal helpers
+
+/**
+ * A fast FIFO queue implementation using an array and an offset pointer.
+ * This avoids the O(n) overhead of Array.shift() by simply incrementing the offset.
+ *
+ * When the offset exceeds a threshold (1024) and more than half the array is empty,
+ * the array is compacted by slicing. The threshold 1024 was chosen empirically:
+ * - Too small: frequent compaction overhead
+ * - Too large: excessive memory waste
+ * - 1024 balances compaction frequency and memory usage across typical workloads
+ *
+ * Benchmark results show minimal performance difference between thresholds (64-16384),
+ * so 1024 is a reasonable default that works well for most Channel use cases.
+ */
+class Queue<T> {
+    private data: (T | undefined)[] = [];
+    private offset = 0;
+
+    get length(): number {
+        return this.data.length - this.offset;
+    }
+
+    push(item: T): void {
+        this.data.push(item);
+    }
+
+    shift(): T | undefined {
+        const item = this.data[this.offset];
+        this.data[this.offset] = undefined;
+        this.offset++;
+
+        // Compact the array if the empty space is too large
+        if (this.offset > 1024 && this.offset * 2 > this.data.length) {
+            this.data = this.data.slice(this.offset);
+            this.offset = 0;
+        }
+
+        return item as T;
+    }
+}
+
+// #endregion
