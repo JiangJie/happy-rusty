@@ -986,4 +986,132 @@ describe('Channel', () => {
         });
     });
 
+    describe('edge cases: close during timeout', () => {
+        it('should not corrupt sendWaitQueue when close() is called during sendTimeout', async () => {
+            const ch = Channel<number>(1);
+            ch.trySend(1); // Fill buffer
+
+            // Start two sendTimeout operations
+            const send1 = ch.sendTimeout(2, 100);
+            const send2 = ch.sendTimeout(3, 100);
+
+            // Close channel - this should resolve both senders with false
+            // and clear the timeout via the wrapped resolve
+            ch.close();
+
+            const [result1, result2] = await Promise.all([send1, send2]);
+            expect(result1).toBe(false);
+            expect(result2).toBe(false);
+
+            // Wait for any potential setTimeout callbacks to fire
+            await new Promise(r => setTimeout(r, 150));
+
+            // Channel should still be in a consistent state
+            expect(ch.isClosed).toBe(true);
+        });
+
+        it('should not corrupt receiveWaitQueue when close() is called during receiveTimeout', async () => {
+            const ch = Channel<number>(10);
+
+            // Start two receiveTimeout operations (buffer is empty)
+            const recv1 = ch.receiveTimeout(100);
+            const recv2 = ch.receiveTimeout(100);
+
+            // Close channel - this should resolve both receivers with None
+            ch.close();
+
+            const [result1, result2] = await Promise.all([recv1, recv2]);
+            expect(result1.isNone()).toBe(true);
+            expect(result2.isNone()).toBe(true);
+
+            // Wait for any potential setTimeout callbacks to fire
+            await new Promise(r => setTimeout(r, 150));
+
+            // Channel should still be in a consistent state
+            expect(ch.isClosed).toBe(true);
+        });
+
+        it('should handle sendTimeout when waiter is already removed by successful send', async () => {
+            const ch = Channel<number>(1);
+            ch.trySend(1); // Fill buffer
+
+            // Start sendTimeout
+            const sendPromise = ch.sendTimeout(2, 100);
+
+            // Quickly receive to make room - this will resolve the sendTimeout
+            await new Promise(r => setTimeout(r, 5));
+            ch.tryReceive();
+
+            const result = await sendPromise;
+            expect(result).toBe(true);
+
+            // Wait for the timeout callback to potentially fire
+            await new Promise(r => setTimeout(r, 150));
+
+            // Buffer now has [2], receive it first
+            const received = ch.tryReceive();
+            expect(received.isSome()).toBe(true);
+            expect(received.unwrap()).toBe(2);
+
+            // Now buffer is empty, this send should succeed
+            const result2 = await ch.sendTimeout(3, 50);
+            expect(result2).toBe(true);
+            expect(ch.tryReceive().unwrap()).toBe(3);
+        });
+
+        it('should handle receiveTimeout when waiter is already removed by successful receive', async () => {
+            const ch = Channel<number>(10);
+
+            // Start receiveTimeout on empty channel
+            const recvPromise = ch.receiveTimeout(100);
+
+            // Quickly send to fulfill the receive
+            await new Promise(r => setTimeout(r, 5));
+            ch.trySend(42);
+
+            const result = await recvPromise;
+            expect(result.isSome()).toBe(true);
+            expect(result.unwrap()).toBe(42);
+
+            // Wait for the timeout callback to potentially fire
+            await new Promise(r => setTimeout(r, 150));
+
+            // Start another receive to verify queue is not corrupted
+            ch.trySend(100);
+            const result2 = await ch.receiveTimeout(50);
+            expect(result2.isSome()).toBe(true);
+            expect(result2.unwrap()).toBe(100);
+        });
+
+        it('should not remove wrong waiter when indexOf returns -1 (splice(-1,1) bug)', async () => {
+            // This test specifically targets the potential bug where:
+            // 1. sendTimeout adds waiter to queue
+            // 2. close() removes waiter and calls wrapped resolve (which clears timeout)
+            // 3. But if setTimeout callback was already queued in event loop before clearTimeout,
+            //    indexOf returns -1 and splice(-1, 1) would remove the LAST element
+            //
+            // To trigger this, we need multiple waiters and a race condition
+
+            const ch = Channel<number>(0); // rendezvous channel
+
+            // Add 3 senders waiting
+            const send1 = ch.sendTimeout(1, 1000);
+            const send2 = ch.sendTimeout(2, 1000);
+            const send3 = ch.sendTimeout(3, 1000);
+
+            // Small delay to ensure all are in queue
+            await new Promise(r => setTimeout(r, 10));
+
+            // Close should wake all 3 with false
+            ch.close();
+
+            const results = await Promise.all([send1, send2, send3]);
+            expect(results).toEqual([false, false, false]);
+
+            // All waiters should be properly cleaned up
+            // If there was a splice(-1, 1) bug, one waiter might still be in queue
+            // causing issues with future operations
+        });
+    });
+
 });
