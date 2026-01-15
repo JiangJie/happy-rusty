@@ -296,13 +296,15 @@ export interface OnceAsync<T> {
 export function OnceAsync<T>(): OnceAsync<T> {
     /** Internal alias to reduce repetition of `Awaited<T>` */
     type Value = Awaited<T>;
+    /** Callback type for waiters waiting for initialization */
+    type Waiter = (value: Value) => void;
 
     let value: Value | undefined;
     let initialized = false;
     let pendingPromise: Promise<Value> | undefined;
     let resolvedPromise: Promise<Value> | undefined;
     let resolvedResultPromise: AsyncResult<Value, unknown> | undefined;
-    let waiters: ((value: Value) => void)[] = [];
+    let waiters: Waiter[] = [];
 
     /**
      * Sets the value, marks as initialized, and notifies all waiters.
