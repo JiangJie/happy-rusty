@@ -24,9 +24,8 @@ import { Err, None, Ok, RESULT_VOID, Some, type AsyncLikeResult, type AsyncResul
  * - `OnceAsync<T>` always stores `Awaited<T>` (flattened value)
  *
  * @typeParam T - The type parameter. The actual stored type is `Awaited<T>`.
- *
+ * @since 1.8.0
  * @see {@link Once} for sync-only one-time initialization
- *
  * @example
  * ```ts
  * const db = OnceAsync<Database>();
@@ -77,7 +76,6 @@ export interface OnceAsync<T> {
      * Gets the reference to the underlying value.
      *
      * @returns `Some(value)` if initialized, `None` otherwise.
-     *
      * @example
      * ```ts
      * const once = OnceAsync<number>();
@@ -94,7 +92,6 @@ export interface OnceAsync<T> {
      *
      * @param value - The value to store.
      * @returns `Ok(undefined)` if empty, `Err(value)` if already initialized.
-     *
      * @example
      * ```ts
      * const once = OnceAsync<number>();
@@ -114,7 +111,6 @@ export interface OnceAsync<T> {
      *
      * @param value - The value to store.
      * @returns `Ok(value)` if empty, `Err([currentValue, passedValue])` if already initialized.
-     *
      * @example
      * ```ts
      * const once = OnceAsync<number>();
@@ -138,7 +134,6 @@ export interface OnceAsync<T> {
      *
      * @param fn - A function that returns `PromiseLike<Awaited<T>>` or `Awaited<T>` to initialize.
      * @returns A promise that resolves to the stored value (`Awaited<T>`).
-     *
      * @example
      * ```ts
      * const db = OnceAsync<Database>();
@@ -164,7 +159,6 @@ export interface OnceAsync<T> {
      * @typeParam E - The error type.
      * @param fn - A function that returns `PromiseLike<Result<Awaited<T>, E>>` or `Result<Awaited<T>, E>`.
      * @returns A promise that resolves to `Ok(value)` or `Err(error)`.
-     *
      * @example
      * ```ts
      * const config = OnceAsync<Config>();
@@ -185,7 +179,6 @@ export interface OnceAsync<T> {
      * Takes the value out, leaving it uninitialized.
      *
      * @returns `Some(value)` if initialized, `None` otherwise.
-     *
      * @example
      * ```ts
      * const once = OnceAsync<number>();
@@ -221,7 +214,6 @@ export interface OnceAsync<T> {
      * the returned promise will resolve when another caller initializes the cell.
      *
      * @returns A promise that resolves to the stored value once initialized.
-     *
      * @example
      * ```ts
      * const once = OnceAsync<number>();
@@ -247,7 +239,6 @@ export interface OnceAsync<T> {
  *
  * @typeParam T - The type parameter. The actual stored type is `Awaited<T>`.
  * @returns A new uninitialized `OnceAsync`.
- *
  * @example
  * ```ts
  * // Basic usage

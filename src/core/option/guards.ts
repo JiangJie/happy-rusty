@@ -13,6 +13,7 @@ import { OptionKindSymbol } from './symbols.ts';
  * @typeParam T - The expected type of the value contained within the `Option`.
  * @param o - The value to be checked as an `Option`.
  * @returns `true` if the value is an `Option`, otherwise `false`.
+ * @since 1.2.0
  * @example
  * ```ts
  * const x = Some(5);

@@ -19,7 +19,6 @@ const ASYNC_FALSE = Promise.resolve(false);
  * Created by calling `channel.sender()`. Shares state with the parent channel.
  *
  * @typeParam T - The type of values that can be sent.
- *
  * @see https://doc.rust-lang.org/std/sync/mpmc/struct.Sender.html
  */
 export interface Sender<T> {
@@ -87,9 +86,7 @@ export interface Sender<T> {
      *
      * @param value - The value to send.
      * @returns A promise that resolves to `true` if sent successfully, `false` if the channel is closed.
-     *
      * @see {@link Channel.send}
-     *
      * @example
      * ```ts
      * const success = await sender.send(42);
@@ -109,9 +106,7 @@ export interface Sender<T> {
      *
      * @param value - The value to send.
      * @returns `true` if sent successfully, `false` if full or closed.
-     *
      * @see {@link Channel.trySend}
-     *
      * @example
      * ```ts
      * if (!sender.trySend(42)) {
@@ -133,7 +128,6 @@ export interface Sender<T> {
      *          `false` if timed out, channel is full, or closed.
      *
      * @see {@link Channel.sendTimeout}
-     *
      * @example
      * ```ts
      * const success = await sender.sendTimeout(42, 1000);
@@ -152,7 +146,6 @@ export interface Sender<T> {
  * Implements `AsyncIterable` for use with `for await...of`.
  *
  * @typeParam T - The type of values that can be received.
- *
  * @see https://doc.rust-lang.org/std/sync/mpmc/struct.Receiver.html
  */
 export interface Receiver<T> {
@@ -232,9 +225,7 @@ export interface Receiver<T> {
      * - If the channel is closed and empty, returns `None`.
      *
      * @returns A promise that resolves to `Some(value)` or `None` if closed and empty.
-     *
      * @see {@link Channel.receive}
-     *
      * @example
      * ```ts
      * const result = await receiver.receive();
@@ -255,9 +246,7 @@ export interface Receiver<T> {
      * - Otherwise returns `None`.
      *
      * @returns `Some(value)` if available, `None` if empty.
-     *
      * @see {@link Channel.tryReceive}
-     *
      * @example
      * ```ts
      * const result = receiver.tryReceive();
@@ -277,7 +266,6 @@ export interface Receiver<T> {
      *          empty, or closed.
      *
      * @see {@link Channel.receiveTimeout}
-     *
      * @example
      * ```ts
      * const result = await receiver.receiveTimeout(1000);
@@ -296,8 +284,8 @@ export interface Receiver<T> {
  * typed values. Values are delivered in FIFO order.
  *
  * @typeParam T - The type of values that can be sent through the channel.
+ * @since 1.8.0
  * @see https://doc.rust-lang.org/std/sync/mpmc/fn.channel.html
- *
  * @example
  * ```ts
  * // Create a bounded channel with capacity 10
@@ -484,7 +472,6 @@ export interface Channel<T> {
      *
      * @param value - The value to send.
      * @returns A promise that resolves to `true` if sent successfully, `false` if the channel is closed.
-     *
      * @example
      * ```ts
      * const ch = Channel<number>(1);
@@ -505,7 +492,6 @@ export interface Channel<T> {
      *
      * @param value - The value to send.
      * @returns `true` if sent successfully, `false` if full or closed.
-     *
      * @example
      * ```ts
      * const ch = Channel<number>(0);
@@ -546,7 +532,6 @@ export interface Channel<T> {
      * - If the channel is closed and empty, returns `None`.
      *
      * @returns A promise that resolves to `Some(value)` or `None` if closed and empty.
-     *
      * @example
      * ```ts
      * const ch = Channel<number>(10);
@@ -567,7 +552,6 @@ export interface Channel<T> {
      * - Otherwise returns `None`.
      *
      * @returns `Some(value)` if available, `None` if empty.
-     *
      * @example
      * ```ts
      * const ch = Channel<number>(10);
@@ -629,7 +613,7 @@ export interface Channel<T> {
  * @param capacity - Maximum buffer size. Defaults to `Infinity` (unbounded).
  *                   Use `0` for a rendezvous channel (direct handoff).
  * @returns A new `Channel<T>` instance.
- *
+ * @throws {RangeError} If capacity is negative or not an integer (except Infinity).
  * @example
  * ```ts
  * // Unbounded channel (default)

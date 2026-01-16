@@ -18,6 +18,7 @@ pub enum Option<T> {
 }
 ```
  * @typeParam T - The type of the value contained in the `Some` variant.
+ * @since 1.0.0
  * @see https://doc.rust-lang.org/std/option/enum.Option.html
  */
 export interface Option<T> {
@@ -694,6 +695,7 @@ export interface Option<T> {
  * and return an `Option` as the result.
  *
  * @typeParam T - The type of the value that may be contained in the `Some` variant.
+ * @since 1.5.0
  * @example
  * ```ts
  * async function fetchUser(id: number): AsyncOption<User> {
@@ -713,6 +715,7 @@ export type AsyncOption<T> = Promise<Option<T>>;
  * allowing compatibility with any thenable object.
  *
  * @typeParam T - The type of the value that may be contained in the `Some` variant.
+ * @since 1.8.0
  * @example
  * ```ts
  * // Works with any PromiseLike, not just Promise

@@ -14,6 +14,7 @@ import type { Result } from './result.ts';
 /**
  * Result constant for `true`.
  * Can be used anywhere due to immutability.
+ * @since 1.3.0
  * @example
  * ```ts
  * function validate(): Result<boolean, Error> {
@@ -29,6 +30,7 @@ export const RESULT_TRUE: Result<boolean, never> = Ok(true);
 /**
  * Result constant for `false`.
  * Can be used anywhere due to immutability.
+ * @since 1.3.0
  * @example
  * ```ts
  * function validate(): Result<boolean, Error> {
@@ -44,6 +46,7 @@ export const RESULT_FALSE: Result<boolean, never> = Ok(false);
 /**
  * Result constant for `0`.
  * Can be used anywhere due to immutability.
+ * @since 1.3.0
  * @example
  * ```ts
  * function count(): Result<number, Error> {
@@ -59,6 +62,7 @@ export const RESULT_ZERO: Result<number, never> = Ok(0);
 /**
  * Result constant for `void` or `()`.
  * Can be used anywhere due to immutability.
+ * @since 1.4.0
  * @example
  * ```ts
  * function doSomething(): Result<void, Error> {

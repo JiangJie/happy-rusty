@@ -15,6 +15,7 @@ import type { AsyncResult, Result } from './result.ts';
  * Similar to Rust's `Result<(), E>`.
  *
  * @typeParam E - The type of the error that may be produced by a failed operation.
+ * @since 1.4.0
  * @example
  * ```ts
  * function saveData(data: string): VoidResult<Error> {
@@ -32,6 +33,7 @@ export type VoidResult<E> = Result<void, E>;
  * `VoidResult<E>` wrapped by `Promise`.
  *
  * @typeParam E - The type of the error that may be produced by a failed operation.
+ * @since 1.4.0
  * @example
  * ```ts
  * async function deleteFile(path: string): AsyncVoidResult<Error> {
@@ -51,6 +53,7 @@ export type AsyncVoidResult<E> = Promise<VoidResult<E>>;
  * This is a result that is either `Ok(T)` if the operation was successful, or `Err(Error)` if there was an error.
  *
  * @typeParam T - The type of the value that is produced by a successful operation.
+ * @since 1.0.0
  * @example
  * ```ts
  * function parseJSON<T>(json: string): IOResult<T> {
@@ -69,6 +72,7 @@ export type IOResult<T> = Result<T, Error>;
  * This is a promise that resolves to `Ok(T)` if the I/O operation was successful, or `Err(Error)` if there was an error.
  *
  * @typeParam T - The type of the value that is produced by a successful I/O operation.
+ * @since 1.0.0
  * @example
  * ```ts
  * async function readFile(path: string): AsyncIOResult<string> {
@@ -85,6 +89,7 @@ export type AsyncIOResult<T> = AsyncResult<T, Error>;
 
 /**
  * Similar to Rust's `Result<(), Error>`.
+ * @since 1.4.0
  * @example
  * ```ts
  * function logMessage(msg: string): VoidIOResult {
@@ -101,6 +106,7 @@ export type VoidIOResult = IOResult<void>;
 
 /**
  * `VoidIOResult` wrapped by `Promise`.
+ * @since 1.4.0
  * @example
  * ```ts
  * async function sendEmail(to: string, body: string): AsyncVoidIOResult {
@@ -124,6 +130,7 @@ export type AsyncVoidIOResult = AsyncIOResult<void>;
  * - Safe extraction via `intoOk()` without runtime checks
  *
  * @typeParam T - The type of the value that is always produced.
+ * @since 1.8.0
  * @see {@link Result.intoOk}
  * @example
  * ```ts
@@ -140,6 +147,7 @@ export type SafeResult<T> = Result<T, never>;
  * `SafeResult<T>` wrapped by `Promise`.
  *
  * @typeParam T - The type of the value that is always produced.
+ * @since 1.8.0
  * @example
  * ```ts
  * async function loadCachedData(): AsyncSafeResult<Data> {

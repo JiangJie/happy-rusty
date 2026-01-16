@@ -23,10 +23,9 @@ import { None, Some, type Option } from '../../core/mod.ts';
  *
  * @typeParam A - Tuple type of the function arguments.
  * @typeParam R - Return type of the function.
- *
+ * @since 1.8.0
  * @see {@link FnOnceAsync} for async one-time callable functions
  * @see https://doc.rust-lang.org/std/ops/trait.FnOnce.html
- *
  * @example
  * ```ts
  * // Basic usage
@@ -99,7 +98,6 @@ export interface FnOnce<A extends unknown[], R> {
      * @param args - The arguments to pass to the function.
      * @returns The return value of the function.
      * @throws {Error} If the function has already been called.
-     *
      * @example
      * ```ts
      * const add = FnOnce((a: number, b: number) => a + b);
@@ -117,7 +115,6 @@ export interface FnOnce<A extends unknown[], R> {
      *
      * @param args - The arguments to pass to the function.
      * @returns `Some(result)` if the function was called, `None` if already consumed.
-     *
      * @example
      * ```ts
      * const greet = FnOnce((name: string) => `Hi, ${name}`);
@@ -148,7 +145,6 @@ export interface FnOnce<A extends unknown[], R> {
  * @typeParam R - Return type of the function.
  * @param fn - The function to wrap.
  * @returns A `FnOnce` instance that wraps the function.
- *
  * @example
  * ```ts
  * const initialize = FnOnce(() => {

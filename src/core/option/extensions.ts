@@ -22,7 +22,7 @@ import type { AsyncOption, Option } from './option.ts';
  * @param fn - A function that may throw an exception.
  * @param args - Arguments to pass to the function.
  * @returns `Some<T>` if the function succeeds, or `None` if it throws.
- *
+ * @since 1.7.0
  * @example
  * ```ts
  * // Parse JSON, ignore error details
@@ -60,7 +60,7 @@ export function tryOption<T, Args extends unknown[]>(fn: (...args: Args) => T, .
  * @typeParam T - The type of the value that the promise resolves to.
  * @param task - A promise or promise-like object to await.
  * @returns A promise that resolves to `Some<T>` if successful, or `None` if rejected.
- *
+ * @since 1.7.0
  * @example
  * ```ts
  * // Fetch data, ignore error details
@@ -88,7 +88,7 @@ export function tryAsyncOption<T>(task: PromiseLike<T>): AsyncOption<Awaited<T>>
  * @param task - A function that returns a value or promise-like object.
  * @param args - Arguments to pass to the function.
  * @returns A promise that resolves to `Some<T>` if successful, or `None` if thrown or rejected.
- *
+ * @since 1.7.0
  * @example
  * ```ts
  * // Function with arguments

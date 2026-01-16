@@ -14,6 +14,7 @@ import { ControlFlowKindSymbol } from './symbols.ts';
  * @typeParam C - The expected type of the continue value contained within the `ControlFlow`.
  * @param cf - The value to be checked as a `ControlFlow`.
  * @returns `true` if the value is a `ControlFlow`, otherwise `false`.
+ * @since 1.6.0
  * @example
  * ```ts
  * const x = Break(5);

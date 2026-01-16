@@ -19,8 +19,8 @@ import { ControlFlowKindSymbol } from './symbols.ts';
  *
  * @typeParam B - The type of the value returned on `Break` (early exit).
  * @typeParam C - The type of the value returned on `Continue` (default: `void`).
+ * @since 1.6.0
  * @see https://doc.rust-lang.org/std/ops/enum.ControlFlow.html
- *
  * @example
  * ```ts
  * // Using ControlFlow to short-circuit a search
@@ -127,7 +127,6 @@ export interface ControlFlow<B, C = void> {
      * `ControlFlow` was `Break` and `None` otherwise.
      *
      * @returns `Some(value)` if `Break`, `None` if `Continue`.
-     *
      * @example
      * ```ts
      * console.log(Break(3).breakValue()); // Some(3)
@@ -141,7 +140,6 @@ export interface ControlFlow<B, C = void> {
      * `ControlFlow` was `Continue` and `None` otherwise.
      *
      * @returns `Some(value)` if `Continue`, `None` if `Break`.
-     *
      * @example
      * ```ts
      * console.log(Continue(5).continueValue()); // Some(5)
@@ -157,7 +155,6 @@ export interface ControlFlow<B, C = void> {
      * @typeParam T - The type of the new break value.
      * @param fn - A function to apply to the break value.
      * @returns A new `ControlFlow` with the mapped break value.
-     *
      * @example
      * ```ts
      * const flow = Break(3);
@@ -173,7 +170,6 @@ export interface ControlFlow<B, C = void> {
      * @typeParam T - The type of the new continue value.
      * @param fn - A function to apply to the continue value.
      * @returns A new `ControlFlow` with the mapped continue value.
-     *
      * @example
      * ```ts
      * const flow = Continue(5);
@@ -187,7 +183,6 @@ export interface ControlFlow<B, C = void> {
      * `ControlFlow` was `Break` and `Err` otherwise.
      *
      * @returns `Ok(breakValue)` if `Break`, `Err(continueValue)` if `Continue`.
-     *
      * @example
      * ```ts
      * console.log(Break(3).breakOk()); // Ok(3)
@@ -201,7 +196,6 @@ export interface ControlFlow<B, C = void> {
      * `ControlFlow` was `Continue` and `Err` otherwise.
      *
      * @returns `Ok(continueValue)` if `Continue`, `Err(breakValue)` if `Break`.
-     *
      * @example
      * ```ts
      * console.log(Continue(5).continueOk()); // Ok(5)
@@ -217,7 +211,6 @@ export interface ControlFlow<B, C = void> {
      * It returns the contained value regardless of whether this is a `Break` or `Continue`.
      *
      * @returns The contained value.
-     *
      * @example
      * ```ts
      * const breakFlow: ControlFlow<number, number> = Break(5);
@@ -239,7 +232,6 @@ export interface ControlFlow<B, C = void> {
  * @typeParam C - The type of the continue value (defaults to `void` when a value is provided).
  * @param value - The value to return on break.
  * @returns A `ControlFlow` in the `Break` state.
- *
  * @example
  * ```ts
  * const flow = Break('found it');
@@ -257,7 +249,6 @@ export function Break<B, C = never>(value: B): ControlFlow<B, C>;
  *
  * @typeParam C - The type of the continue value (allows type specification when chaining with Continue).
  * @returns A `ControlFlow<void, C>` in the `Break` state.
- *
  * @example
  * ```ts
  * const voidFlow = Break();
@@ -319,7 +310,6 @@ export function Break<B, C>(value?: B): ControlFlow<B, C> {
  * @typeParam C - The type of the continue value.
  * @param value - The value to carry forward (optional, defaults to `undefined`).
  * @returns A `ControlFlow` in the `Continue` state.
- *
  * @example
  * ```ts
  * const flow = Continue();
@@ -336,7 +326,6 @@ export function Continue<B = never, C = void>(value: C): ControlFlow<B, C>;
  *
  * @typeParam B - The type of the break value (allows type specification when chaining with Break).
  * @returns A `ControlFlow<B, void>` in the `Continue` state.
- *
  * @example
  * ```ts
  * const voidFlow = Continue();

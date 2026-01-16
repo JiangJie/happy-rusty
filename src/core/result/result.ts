@@ -20,6 +20,7 @@ pub enum Result<T, E> {
 ```
  * @typeParam T - The type of the value contained in a successful `Result`.
  * @typeParam E - The type of the error contained in an unsuccessful `Result`.
+ * @since 1.0.0
  * @see https://doc.rust-lang.org/std/result/enum.Result.html
  */
 export interface Result<T, E> {
@@ -722,6 +723,8 @@ export interface Result<T, E> {
     // #region Try extensions
 
     /**
+     * **Non-standard extension**: This method is not part of Rust's standard library.
+     *
      * Like `andThenAsync`, but automatically catches any thrown exceptions or Promise rejections
      * and converts them to `Err`.
      *
@@ -735,6 +738,7 @@ export interface Result<T, E> {
      * @typeParam U - The type of the value returned by the function.
      * @param fn - A function that takes the `Ok` value and returns `PromiseLike<U>` or `U`. May throw or reject.
      * @returns A promise that resolves to `Ok(U)` if successful, or `Err(E)` if `this` is `Err` or if `fn` throws/rejects.
+     * @since 1.9.0
      * @see andThenAsync
      * @see tryAsyncResult
      * @example
@@ -763,6 +767,8 @@ export interface Result<T, E> {
     andTryAsync<U>(fn: (value: T) => PromiseLike<U> | U): AsyncResult<Awaited<U>, E>;
 
     /**
+     * **Non-standard extension**: This method is not part of Rust's standard library.
+     *
      * Like `orElseAsync`, but automatically catches any thrown exceptions or Promise rejections
      * and converts them to `Err`.
      *
@@ -776,6 +782,7 @@ export interface Result<T, E> {
      * @typeParam F - The type of the error returned by the function.
      * @param fn - A function that takes the `Err` value and returns `PromiseLike<T>` or `T`. May throw or reject.
      * @returns A promise that resolves to `Ok(T)` if `this` is `Ok` or if `fn` succeeds, or `Err(F)` if `fn` throws/rejects.
+     * @since 1.9.0
      * @see orElseAsync
      * @see tryAsyncResult
      * @example
@@ -812,6 +819,7 @@ export interface Result<T, E> {
  *
  * @typeParam T - The type of the value that is produced by a successful operation.
  * @typeParam E - The type of the error that may be produced by a failed operation.
+ * @since 1.5.0
  * @example
  * ```ts
  * async function fetchUser(id: number): AsyncResult<User, Error> {
@@ -836,6 +844,7 @@ export type AsyncResult<T, E> = Promise<Result<T, E>>;
  *
  * @typeParam T - The type of the value that is produced by a successful operation.
  * @typeParam E - The type of the error that may be produced by a failed operation.
+ * @since 1.8.0
  * @example
  * ```ts
  * // Works with any PromiseLike, not just Promise

@@ -40,7 +40,6 @@ export interface MutexGuard<T> {
      * Custom `toString` implementation.
      *
      * @returns A string representation of the guard.
-     *
      * @example
      * ```ts
      * const guard = await mutex.lock();
@@ -79,8 +78,8 @@ export interface MutexGuard<T> {
  * serializes async operations in the single-threaded event loop.
  *
  * @typeParam T - The type of the protected value.
+ * @since 1.6.0
  * @see https://doc.rust-lang.org/std/sync/struct.Mutex.html
- *
  * @example
  * ```ts
  * const mutex = Mutex({ balance: 100 });
@@ -125,7 +124,6 @@ export interface Mutex<T> {
      * @typeParam U - The return type of the callback.
      * @param fn - The callback that receives the protected value.
      * @returns A promise that resolves to the callback's return value.
-     *
      * @example
      * ```ts
      * const mutex = Mutex<number[]>([]);
@@ -144,7 +142,6 @@ export interface Mutex<T> {
      * **Important:** Always release the lock in a `finally` block to prevent deadlocks.
      *
      * @returns A promise that resolves to a guard providing access to the value.
-     *
      * @example
      * ```ts
      * const guard = await mutex.lock();
@@ -166,7 +163,6 @@ export interface Mutex<T> {
      * or `None` if it's currently held by another operation.
      *
      * @returns `Some(guard)` if acquired, `None` if locked.
-     *
      * @example
      * ```ts
      * const maybeGuard = mutex.tryLock();
@@ -206,7 +202,6 @@ export interface Mutex<T> {
      * This is a convenience method equivalent to `withLock(v => v)`.
      *
      * @returns A promise that resolves to a copy of the value.
-     *
      * @example
      * ```ts
      * const mutex = Mutex(42);
@@ -223,7 +218,6 @@ export interface Mutex<T> {
      *
      * @param value - The new value to set.
      * @returns A promise that resolves when the value has been set.
-     *
      * @example
      * ```ts
      * const mutex = Mutex(42);
@@ -243,7 +237,6 @@ export interface Mutex<T> {
      *
      * @param value - The new value to set.
      * @returns A promise that resolves to the old value.
-     *
      * @example
      * ```ts
      * const mutex = Mutex(42);
@@ -261,7 +254,6 @@ export interface Mutex<T> {
  * @typeParam T - The type of the protected value.
  * @param value - The initial value to protect.
  * @returns A new `Mutex<T>` instance.
- *
  * @example
  * ```ts
  * // Protect a simple value

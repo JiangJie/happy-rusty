@@ -17,9 +17,8 @@ import { None, Some, type Option } from '../../core/mod.ts';
  * completes, only one initialization will run.
  *
  * @typeParam T - The type of the value stored.
- *
+ * @since 1.6.0
  * @see {@link Lazy} for sync-only lazy initialization
- *
  * @example
  * ```ts
  * const db = LazyAsync(async () => {
@@ -63,7 +62,7 @@ export interface LazyAsync<T> {
      * Otherwise, starts initialization.
      *
      * @returns A promise that resolves to the initialized value.
-     *
+     * @throws Rejects with any error thrown or rejected by the initialization function.
      * @example
      * ```ts
      * const lazy = LazyAsync(async () => {
@@ -81,7 +80,6 @@ export interface LazyAsync<T> {
      * Unlike `force()`, this does not trigger initialization.
      *
      * @returns `Some(value)` if initialized, `None` otherwise.
-     *
      * @example
      * ```ts
      * const lazy = LazyAsync(async () => 42);
@@ -120,7 +118,6 @@ export interface LazyAsync<T> {
  * @typeParam T - The type of value to store.
  * @param fn - A function that returns `PromiseLike<T>` or `T` to initialize.
  * @returns A new `LazyAsync<T>` instance.
- *
  * @example
  * ```ts
  * // Basic usage

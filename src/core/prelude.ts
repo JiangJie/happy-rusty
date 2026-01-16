@@ -78,7 +78,7 @@ export interface None extends Option<never> {
  * @typeParam T - The type of the value to be wrapped in a `Some`.
  * @param value - The value to wrap as a `Some` option.
  * @returns An `Option<T>` that contains the provided value, representing the `Some` case.
- *
+ * @since 1.0.0
  * @example
  * ```ts
  * const maybeValue = Some(1); // Option<number> with a value
@@ -228,6 +228,7 @@ export function Some<T>(value: T): Option<T> {
  * A constant representing the `None` case of an `Option`, indicating the absence of a value.
  * This constant is frozen to ensure it is immutable and cannot be altered, preserving the integrity of `None` throughout the application.
  *
+ * @since 1.0.0
  * @example
  * ```ts
  * // Use None to represent absence of a value
@@ -375,6 +376,7 @@ export const None: None = Object.freeze<None>({
  * Since `None extends Option<never>`, this constant can be assigned to any
  * `AsyncOption<T>` (i.e., `Promise<Option<T>>`) due to TypeScript's covariance.
  *
+ * @since 1.8.0
  * @example
  * ```ts
  * async function findUser(id: number): AsyncOption<User> {
@@ -407,7 +409,7 @@ export const ASYNC_NONE: Promise<None> = Promise.resolve(None);
  * @typeParam E - The type of the error that the result could potentially contain (not used in this case).
  * @param value - The value to wrap as an `Ok` result.
  * @returns A `Result<T, E>` that contains the provided value, representing the `Ok` case.
- *
+ * @since 1.0.0
  * @example
  * ```ts
  * const goodResult = Ok<number, Error>(1); // Result<number, Error> with a value
@@ -426,7 +428,7 @@ export function Ok<T, E = never>(value: T): Result<T, E>;
  *
  * @typeParam E - The type of the error that the result could potentially contain.
  * @returns A `Result<void, E>` representing a successful operation with no value.
- *
+ * @since 1.4.0
  * @example
  * ```ts
  * function saveToFile(path: string): Result<void, Error> {
@@ -601,7 +603,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
  * @typeParam E - The type of the error to be wrapped in the `Err` result.
  * @param error - The error to wrap as an `Err` result.
  * @returns A `Result<T, E>` that contains the provided error, representing the `Err` case.
- *
+ * @since 1.0.0
  * @example
  * ```ts
  * const badResult = Err<number, Error>(new Error('Something went wrong'));

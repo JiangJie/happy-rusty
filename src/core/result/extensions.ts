@@ -23,7 +23,7 @@ import type { AsyncResult, Result } from './result.ts';
  * @param fn - A function that may throw an exception.
  * @param args - Arguments to pass to the function.
  * @returns `Ok<T>` if the function succeeds, or `Err<E>` if it throws.
- *
+ * @since 1.7.0
  * @example
  * ```ts
  * // Parse JSON safely with arguments
@@ -66,7 +66,7 @@ export function tryResult<T, E = Error, Args extends unknown[] = []>(fn: (...arg
  * @typeParam E - The type of the error that may be rejected, defaults to `Error`.
  * @param task - A promise or promise-like object to await.
  * @returns A promise that resolves to `Ok<T>` if successful, or `Err<E>` if rejected.
- *
+ * @since 1.7.0
  * @example
  * ```ts
  * // Fetch data safely
@@ -97,7 +97,7 @@ export function tryAsyncResult<T, E = Error>(task: PromiseLike<T>): AsyncResult<
  * @param task - A function that returns a value or promise-like object.
  * @param args - Arguments to pass to the function.
  * @returns A promise that resolves to `Ok<T>` if successful, or `Err<E>` if thrown or rejected.
- *
+ * @since 1.7.0
  * @example
  * ```ts
  * // Function with arguments

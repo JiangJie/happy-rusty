@@ -23,9 +23,8 @@ import { ASYNC_NONE, Some, type AsyncOption } from '../../core/mod.ts';
  *
  * @typeParam A - Tuple type of the function arguments.
  * @typeParam R - The resolved type of the Promise returned by the async function.
- *
+ * @since 1.8.0
  * @see {@link FnOnce} for sync one-time callable functions
- *
  * @example
  * ```ts
  * // Basic usage
@@ -91,7 +90,6 @@ export interface FnOnceAsync<A extends unknown[], R> {
      * @param args - The arguments to pass to the function.
      * @returns A Promise that resolves to the return value of the function.
      * @throws {Error} If the function has already been called.
-     *
      * @example
      * ```ts
      * const fetchUser = FnOnceAsync(async (id: number) => {
@@ -114,7 +112,6 @@ export interface FnOnceAsync<A extends unknown[], R> {
      *
      * @param args - The arguments to pass to the function.
      * @returns A Promise that resolves to `Some(result)` if the function was called, `None` if already consumed.
-     *
      * @example
      * ```ts
      * const fetchData = FnOnceAsync(async (id: number) => {
@@ -149,7 +146,6 @@ export interface FnOnceAsync<A extends unknown[], R> {
  * @typeParam R - The resolved type of the Promise returned by the async function.
  * @param fn - A function that returns `PromiseLike<R>` or `R`.
  * @returns A `FnOnceAsync` instance that wraps the function.
- *
  * @example
  * ```ts
  * const initialize = FnOnceAsync(async () => {

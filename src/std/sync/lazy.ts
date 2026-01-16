@@ -19,10 +19,9 @@ import { None, Some, type Option } from '../../core/mod.ts';
  * on first access. Subsequent accesses return the cached value.
  *
  * @typeParam T - The type of the value stored.
- *
+ * @since 1.6.0
  * @see {@link LazyAsync} for async lazy initialization
  * @see https://doc.rust-lang.org/std/sync/struct.LazyLock.html
- *
  * @example
  * ```ts
  * const expensive = Lazy(() => {
@@ -68,7 +67,7 @@ export interface Lazy<T> {
      * and returns it.
      *
      * @returns The initialized value.
-     *
+     * @throws Rethrows any exception thrown by the initialization function.
      * @example
      * ```ts
      * const lazy = Lazy(() => 42);
@@ -84,7 +83,6 @@ export interface Lazy<T> {
      * Unlike `force()`, this does not trigger initialization.
      *
      * @returns `Some(value)` if initialized, `None` otherwise.
-     *
      * @example
      * ```ts
      * const lazy = Lazy(() => 42);
@@ -119,7 +117,6 @@ export interface Lazy<T> {
  * @typeParam T - The type of value to store.
  * @param fn - The initialization function that produces the value.
  * @returns A new `Lazy<T>` instance.
- *
  * @example
  * ```ts
  * // Basic usage

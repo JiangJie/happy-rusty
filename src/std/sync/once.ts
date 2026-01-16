@@ -19,10 +19,9 @@ import { Err, None, Ok, RESULT_VOID, Some, type Option, type Result, type VoidRe
  * that should only happen once.
  *
  * @typeParam T - The type of the value stored.
- *
+ * @since 1.6.0
  * @see {@link OnceAsync} for async one-time initialization
  * @see https://doc.rust-lang.org/std/sync/struct.OnceLock.html
- *
  * @example
  * ```ts
  * const once = Once<number>();
@@ -66,7 +65,6 @@ export interface Once<T> {
      * Gets the reference to the underlying value.
      *
      * @returns `Some(value)` if initialized, `None` otherwise.
-     *
      * @example
      * ```ts
      * const once = Once<number>();
@@ -83,7 +81,6 @@ export interface Once<T> {
      *
      * @param value - The value to store.
      * @returns `Ok(undefined)` if empty, `Err(value)` if already initialized.
-     *
      * @example
      * ```ts
      * const once = Once<number>();
@@ -103,7 +100,6 @@ export interface Once<T> {
      *
      * @param value - The value to store.
      * @returns `Ok(value)` if empty, `Err([currentValue, passedValue])` if already initialized.
-     *
      * @example
      * ```ts
      * const once = Once<number>();
@@ -124,7 +120,6 @@ export interface Once<T> {
      *
      * @param fn - The synchronous initialization function, called only if empty.
      * @returns The stored value.
-     *
      * @example
      * ```ts
      * const once = Once<number>();
@@ -149,7 +144,6 @@ export interface Once<T> {
      * @typeParam E - The error type.
      * @param fn - The initialization function that may fail.
      * @returns `Ok(value)` if initialized, `Err(error)` if initialization failed.
-     *
      * @example
      * ```ts
      * const once = Once<Config>();
@@ -170,7 +164,6 @@ export interface Once<T> {
      * Takes the value out, leaving it uninitialized.
      *
      * @returns `Some(value)` if initialized, `None` otherwise.
-     *
      * @example
      * ```ts
      * const once = Once<number>();
@@ -203,7 +196,6 @@ export interface Once<T> {
  *
  * @typeParam T - The type of value to store.
  * @returns A new uninitialized `Once`.
- *
  * @example
  * ```ts
  * // Basic usage

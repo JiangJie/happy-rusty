@@ -49,7 +49,6 @@ export interface RwLockReadGuard<T> {
      * Custom `toString` implementation.
      *
      * @returns A string representation of the guard.
-     *
      * @example
      * ```ts
      * const guard = await rwlock.read();
@@ -107,7 +106,6 @@ export interface RwLockWriteGuard<T> {
      * Custom `toString` implementation.
      *
      * @returns A string representation of the guard.
-     *
      * @example
      * ```ts
      * const guard = await rwlock.write();
@@ -141,8 +139,8 @@ export interface RwLockWriteGuard<T> {
  * Writers are given priority to prevent writer starvation.
  *
  * @typeParam T - The type of the protected value.
+ * @since 1.8.0
  * @see https://doc.rust-lang.org/std/sync/struct.RwLock.html
- *
  * @example
  * ```ts
  * const config = RwLock({ apiUrl: 'https://api.example.com', timeout: 5000 });
@@ -193,7 +191,6 @@ export interface RwLock<T> {
      * @typeParam U - The return type of the callback.
      * @param fn - The callback that receives the protected value (read-only).
      * @returns A promise that resolves to the callback's return value.
-     *
      * @example
      * ```ts
      * const data = await rwlock.withRead(async (value) => {
@@ -211,7 +208,6 @@ export interface RwLock<T> {
      * @typeParam U - The return type of the callback.
      * @param fn - The callback that receives the protected value (read-write).
      * @returns A promise that resolves to the callback's return value.
-     *
      * @example
      * ```ts
      * await rwlock.withWrite(async (value) => {
@@ -225,7 +221,6 @@ export interface RwLock<T> {
      * Acquires a read lock and returns a guard for manual control.
      *
      * @returns A promise that resolves to a read guard.
-     *
      * @example
      * ```ts
      * const guard = await rwlock.read();
@@ -242,7 +237,6 @@ export interface RwLock<T> {
      * Acquires a write lock and returns a guard for manual control.
      *
      * @returns A promise that resolves to a write guard.
-     *
      * @example
      * ```ts
      * const guard = await rwlock.write();
@@ -261,7 +255,6 @@ export interface RwLock<T> {
      * Returns `None` if a write lock is currently held.
      *
      * @returns `Some(guard)` if acquired, `None` if a writer holds the lock.
-     *
      * @example
      * ```ts
      * const maybeGuard = rwlock.tryRead();
@@ -283,7 +276,6 @@ export interface RwLock<T> {
      * Returns `None` if any read or write lock is currently held.
      *
      * @returns `Some(guard)` if acquired, `None` if any lock is held.
-     *
      * @example
      * ```ts
      * const maybeGuard = rwlock.tryWrite();
@@ -327,7 +319,6 @@ export interface RwLock<T> {
      * Acquires a read lock and returns a copy of the protected value.
      *
      * @returns A promise that resolves to a copy of the value.
-     *
      * @example
      * ```ts
      * const value = await rwlock.get();
@@ -340,7 +331,6 @@ export interface RwLock<T> {
      *
      * @param value - The new value to set.
      * @returns A promise that resolves when the value has been set.
-     *
      * @example
      * ```ts
      * await rwlock.set(newValue);
@@ -353,7 +343,6 @@ export interface RwLock<T> {
      *
      * @param value - The new value to set.
      * @returns A promise that resolves to the old value.
-     *
      * @example
      * ```ts
      * const rwlock = RwLock(42);
@@ -371,7 +360,6 @@ export interface RwLock<T> {
  * @typeParam T - The type of the protected value.
  * @param value - The initial value to protect.
  * @returns A new `RwLock<T>` instance.
- *
  * @example
  * ```ts
  * // Basic usage

@@ -14,6 +14,7 @@ import { ResultKindSymbol } from './symbols.ts';
  * @typeParam E - The expected type of the error value contained within the `Result`.
  * @param r - The value to be checked as a `Result`.
  * @returns `true` if the value is a `Result`, otherwise `false`.
+ * @since 1.2.0
  * @example
  * ```ts
  * const x = Ok(5);
