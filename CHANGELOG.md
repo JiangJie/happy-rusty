@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.1] - 2026-01-16
+
+### Changed
+- **Performance**: `Channel` buffer replaced `Array` with `Queue` for O(1) shift operations
+
+### Documentation
+- Added `@since` tags to all public APIs
+- Improved JSDoc consistency and formatting
+
+### CI
+- Changed JSR publish to trigger on release instead of push to main
+
 ## [1.9.0] - 2026-01-04
 
 ### Added
@@ -270,6 +282,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full TypeScript support
 - Comprehensive API matching Rust's Option and Result
 
+[1.9.1]: https://github.com/JiangJie/happy-rusty/compare/v1.9.0...v1.9.1
 [1.9.0]: https://github.com/JiangJie/happy-rusty/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/JiangJie/happy-rusty/compare/v1.7.1...v1.8.0
 [1.7.1]: https://github.com/JiangJie/happy-rusty/compare/v1.7.0...v1.7.1
