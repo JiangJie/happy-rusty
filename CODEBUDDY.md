@@ -131,6 +131,8 @@ The codebase is organized into two main modules mirroring Rust's structure:
 
 - **Result.map()/mapErr()**: When the Result variant doesn't match (e.g., calling `map()` on `Err`), the methods now return `this` instead of creating a new instance. This reduces object allocations in transformation chains where operations might short-circuit.
 
+- **Channel buffer**: Uses internal `Queue` data structure instead of `Array` for O(1) shift operations when consuming messages.
+
 ### Non-Standard Extensions
 
 The codebase includes some methods not present in Rust's standard library, placed in `// #region Try extensions` at the end of the `Result<T, E>` interface:
@@ -238,6 +240,8 @@ pnpm update --latest
 - File extensions required in imports (`.ts` suffix)
 - Use `@internal` JSDoc tag for exported functions/types that should not appear in public API docs
 - Non-exported functions (like `safeStringify`, `assertOption`, `assertResult` in `prelude.ts`) are automatically excluded from TypeDoc output
+- All public APIs should have `@since` tags indicating the version they were introduced
+- `@example` tags should directly follow the previous `@` tag without blank lines
 
 ## CI/CD
 
