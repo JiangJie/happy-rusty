@@ -261,9 +261,7 @@ describe('Option', () => {
 
         describe('inspect', () => {
             it('should call fn with the contained value', () => {
-                const fn = vi.fn((value: number) => {
-                    console.log(`value is ${ value }`);
-                });
+                const fn = vi.fn((_value: number) => {});
                 some.inspect(fn);
                 expect(fn).toHaveBeenCalledTimes(1);
                 expect(fn).toHaveBeenCalledWith(10);
@@ -537,9 +535,7 @@ describe('Option', () => {
 
         describe('inspect', () => {
             it('should not call fn', () => {
-                const fn = vi.fn((value: number) => {
-                    console.log(`value is ${ value }`);
-                });
+                const fn = vi.fn((_value: number) => {});
                 none.inspect(fn);
                 expect(fn).not.toHaveBeenCalled();
             });

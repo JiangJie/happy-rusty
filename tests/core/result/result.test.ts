@@ -245,18 +245,14 @@ describe('Result', () => {
 
         describe('inspect', () => {
             it('inspect() should call fn with the contained value', () => {
-                const fn = vi.fn((value: number) => {
-                    console.log(`value is ${ value }`);
-                });
+                const fn = vi.fn((_value: number) => {});
                 ok.inspect(fn);
                 expect(fn).toHaveBeenCalledTimes(1);
                 expect(fn).toHaveBeenCalledWith(1);
             });
 
             it('inspectErr() should not call fn', () => {
-                const fn = vi.fn((error: Error) => {
-                    console.log(`error is ${ error.message }`);
-                });
+                const fn = vi.fn((_error: Error) => {});
                 ok.inspectErr(fn);
                 expect(fn).not.toHaveBeenCalled();
             });
@@ -560,17 +556,13 @@ describe('Result', () => {
 
         describe('inspect', () => {
             it('inspect() should not call fn', () => {
-                const fn = vi.fn((value: number) => {
-                    console.log(`value is ${ value }`);
-                });
+                const fn = vi.fn((_value: number) => {});
                 err.inspect(fn);
                 expect(fn).not.toHaveBeenCalled();
             });
 
             it('inspectErr() should call fn with the contained error', () => {
-                const fn = vi.fn((error: Error) => {
-                    console.log(`error is ${ error.message }`);
-                });
+                const fn = vi.fn((_error: Error) => {});
                 err.inspectErr(fn);
                 expect(fn).toHaveBeenCalledTimes(1);
                 expect(fn).toHaveBeenCalledWith(err.unwrapErr());
