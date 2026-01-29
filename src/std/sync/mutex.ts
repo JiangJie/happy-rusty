@@ -348,7 +348,7 @@ export function Mutex<T>(value: T): Mutex<T> {
                 if (released) {
                     return 'MutexGuard(<released>)';
                 }
-                return `MutexGuard(${ currentValue })`;
+                return `MutexGuard(${currentValue})`;
             },
 
             get value(): T {

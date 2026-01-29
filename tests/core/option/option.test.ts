@@ -12,7 +12,7 @@ describe('Option', () => {
 
             it('should stringify as Some(value)', () => {
                 expect(some.toString()).toBe('Some(10)');
-                expect(`${ some }`).toBe('Some(10)');
+                expect(`${some}`).toBe('Some(10)');
             });
         });
 
@@ -207,7 +207,7 @@ describe('Option', () => {
             it('should allow fn to return a different type R', () => {
                 const a = Some(42);
                 const b = Some({ value: 42 });
-                const result = a.reduce(b, (s, n) => `${ s }-${ n.value }`);
+                const result = a.reduce(b, (s, n) => `${s}-${n.value}`);
                 expect(result.eq(Some('42-42'))).toBe(true);
             });
 
@@ -261,14 +261,14 @@ describe('Option', () => {
 
         describe('inspect', () => {
             it('should call fn with the contained value', () => {
-                const fn = vi.fn((_value: number) => {});
+                const fn = vi.fn((_value: number) => { });
                 some.inspect(fn);
                 expect(fn).toHaveBeenCalledTimes(1);
                 expect(fn).toHaveBeenCalledWith(10);
             });
 
             it('should return self for chaining', () => {
-                expect(some.inspect(() => {}).eq(some)).toBe(true);
+                expect(some.inspect(() => { }).eq(some)).toBe(true);
             });
         });
 
@@ -347,7 +347,7 @@ describe('Option', () => {
 
             it('should stringify as None', () => {
                 expect(none.toString()).toBe('None');
-                expect(`${ none }`).toBe('None');
+                expect(`${none}`).toBe('None');
             });
         });
 
@@ -535,13 +535,13 @@ describe('Option', () => {
 
         describe('inspect', () => {
             it('should not call fn', () => {
-                const fn = vi.fn((_value: number) => {});
+                const fn = vi.fn((_value: number) => { });
                 none.inspect(fn);
                 expect(fn).not.toHaveBeenCalled();
             });
 
             it('should return self for chaining', () => {
-                expect(none.inspect(() => {})).toBe(None);
+                expect(none.inspect(() => { })).toBe(None);
             });
         });
 

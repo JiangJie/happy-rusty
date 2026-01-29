@@ -163,7 +163,7 @@ export function FnOnce<A extends unknown[], R>(fn: (...args: A) => R): FnOnce<A,
         [Symbol.toStringTag]: 'FnOnce',
 
         toString(): string {
-            return `FnOnce(${ consumed ? 'consumed' : 'pending' })`;
+            return `FnOnce(${consumed ? 'consumed' : 'pending'})`;
         },
 
         call(...args: A): R {

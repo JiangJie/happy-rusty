@@ -266,7 +266,7 @@ export function Break<B, C>(value?: B): ControlFlow<B, C> {
         [ControlFlowKindSymbol]: 'Break',
 
         toString(): string {
-            return `Break(${ value })`;
+            return `Break(${value})`;
         },
 
         isBreak(): true {
@@ -343,7 +343,7 @@ export function Continue<B, C>(value?: C): ControlFlow<B, C> {
         [ControlFlowKindSymbol]: 'Continue',
 
         toString(): string {
-            return `Continue(${ value })`;
+            return `Continue(${value})`;
         },
 
         isBreak(): false {

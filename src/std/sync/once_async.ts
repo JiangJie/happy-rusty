@@ -358,7 +358,7 @@ export function OnceAsync<T>(): OnceAsync<T> {
         [Symbol.toStringTag]: 'OnceAsync',
 
         toString(): string {
-            return initialized ? `OnceAsync(${ value })` : 'OnceAsync(<uninitialized>)';
+            return initialized ? `OnceAsync(${value})` : 'OnceAsync(<uninitialized>)';
         },
 
         get(): Option<Value> {

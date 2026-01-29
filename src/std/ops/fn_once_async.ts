@@ -165,7 +165,7 @@ export function FnOnceAsync<A extends unknown[], R>(fn: (...args: A) => PromiseL
         [Symbol.toStringTag]: 'FnOnceAsync',
 
         toString(): string {
-            return `FnOnceAsync(${ consumed ? 'consumed' : 'pending' })`;
+            return `FnOnceAsync(${consumed ? 'consumed' : 'pending'})`;
         },
 
         call(...args: A): Promise<Awaited<R>> {

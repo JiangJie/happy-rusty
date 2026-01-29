@@ -136,7 +136,7 @@ for (let i = 0; i < 3; i++) {
     console.log(
         result
             .map(msg => `Success: ${msg}`)
-            .unwrapOr(`Failed: ${ result.err().map(e => e.message).unwrapOr('Unknown') }`),
+            .unwrapOr(`Failed: ${result.err().map(e => e.message).unwrapOr('Unknown')}`),
     );
 }
 

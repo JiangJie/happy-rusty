@@ -11,7 +11,7 @@ describe('ControlFlow', () => {
         it('toString() should return Break(value)', () => {
             expect(Break(42).toString()).toBe('Break(42)');
             expect(Break('error').toString()).toBe('Break(error)');
-            expect(`${ Break('test') }`).toBe('Break(test)');
+            expect(`${Break('test')}`).toBe('Break(test)');
         });
 
         it('should support void Break()', () => {
@@ -93,7 +93,7 @@ describe('ControlFlow', () => {
         it('toString() should return Continue(value)', () => {
             expect(Continue(42).toString()).toBe('Continue(42)');
             expect(Continue('ok').toString()).toBe('Continue(ok)');
-            expect(`${ Continue('test') }`).toBe('Continue(test)');
+            expect(`${Continue('test')}`).toBe('Continue(test)');
         });
 
         it('isContinue() should return true', () => {

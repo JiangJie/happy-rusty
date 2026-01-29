@@ -173,7 +173,7 @@ export function LazyAsync<T>(fn: () => PromiseLike<T> | T): LazyAsync<T> {
         [Symbol.toStringTag]: 'LazyAsync',
 
         toString(): string {
-            return initialized ? `LazyAsync(${ value })` : 'LazyAsync(<uninitialized>)';
+            return initialized ? `LazyAsync(${value})` : 'LazyAsync(<uninitialized>)';
         },
 
         // Use `Promise.resolve(fn())` instead of `async` to preserve sync error behavior:

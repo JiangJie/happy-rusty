@@ -96,7 +96,7 @@ export function Some<T>(value: T): Option<T> {
             yield value;
         },
         toString(): string {
-            return `Some(${ value })`;
+            return `Some(${value})`;
         },
 
         isSome(): true {
@@ -175,7 +175,7 @@ export function Some<T>(value: T): Option<T> {
             const tuple = value as [U, R];
 
             if (!Array.isArray(tuple) || tuple.length !== 2) {
-                throw new TypeError(`Option::unzip() requires a 2-element tuple, received ${ Array.isArray(tuple) ? `array with ${ tuple.length } elements` : typeof tuple }`);
+                throw new TypeError(`Option::unzip() requires a 2-element tuple, received ${Array.isArray(tuple) ? `array with ${tuple.length} elements` : typeof tuple}`);
             }
 
             const [a, b] = tuple;
@@ -456,7 +456,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
             yield value as T;
         },
         toString(): string {
-            return `Ok(${ value })`;
+            return `Ok(${value})`;
         },
 
         isOk(): true {
@@ -495,7 +495,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
         },
 
         expectErr(msg: string): never {
-            throw new TypeError(`${ msg }: ${ value }`);
+            throw new TypeError(`${msg}: ${value}`);
         },
         unwrapErr(): never {
             throw new TypeError('Result::unwrapErr() called on an `Ok` value');
@@ -621,7 +621,7 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
             // Empty iterator - yields nothing for Err
         },
         toString(): string {
-            return `Err(${ error })`;
+            return `Err(${error})`;
         },
 
         isOk(): false {
@@ -644,7 +644,7 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
         },
 
         expect(msg: string): never {
-            throw new TypeError(`${ msg }: ${ error }`);
+            throw new TypeError(`${msg}: ${error}`);
         },
         unwrap(): never {
             throw new TypeError('Result::unwrap() called on an `Err` value');
@@ -792,7 +792,7 @@ function safeStringify(value: unknown): string {
  */
 function assertOption<T>(o: unknown): asserts o is Option<T> {
     if (!isOption(o)) {
-        throw new TypeError(`Expected an Option, but received: ${ safeStringify(o) }`);
+        throw new TypeError(`Expected an Option, but received: ${safeStringify(o)}`);
     }
 }
 
@@ -807,6 +807,6 @@ function assertOption<T>(o: unknown): asserts o is Option<T> {
  */
 function assertResult<T, E>(r: unknown): asserts r is Result<T, E> {
     if (!isResult(r)) {
-        throw new TypeError(`Expected a Result, but received: ${ safeStringify(r) }`);
+        throw new TypeError(`Expected a Result, but received: ${safeStringify(r)}`);
     }
 }

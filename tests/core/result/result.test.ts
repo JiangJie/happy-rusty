@@ -23,11 +23,11 @@ describe('Result', () => {
 
             it('should stringify as Ok(value)', () => {
                 expect(ok.toString()).toBe('Ok(1)');
-                expect(`${ ok }`).toBe('Ok(1)');
+                expect(`${ok}`).toBe('Ok(1)');
             });
 
             it('should stringify Ok() as Ok(undefined)', () => {
-                expect(`${ Ok() }`).toBe('Ok(undefined)');
+                expect(`${Ok()}`).toBe('Ok(undefined)');
             });
         });
 
@@ -245,21 +245,21 @@ describe('Result', () => {
 
         describe('inspect', () => {
             it('inspect() should call fn with the contained value', () => {
-                const fn = vi.fn((_value: number) => {});
+                const fn = vi.fn((_value: number) => { });
                 ok.inspect(fn);
                 expect(fn).toHaveBeenCalledTimes(1);
                 expect(fn).toHaveBeenCalledWith(1);
             });
 
             it('inspectErr() should not call fn', () => {
-                const fn = vi.fn((_error: Error) => {});
+                const fn = vi.fn((_error: Error) => { });
                 ok.inspectErr(fn);
                 expect(fn).not.toHaveBeenCalled();
             });
 
             it('should return self for chaining', () => {
-                expect(ok.inspect(() => {})).toBe(ok);
-                expect(ok.inspectErr(() => {})).toBe(ok);
+                expect(ok.inspect(() => { })).toBe(ok);
+                expect(ok.inspectErr(() => { })).toBe(ok);
             });
         });
 
@@ -343,7 +343,7 @@ describe('Result', () => {
 
             it('should stringify as Err(error)', () => {
                 expect(err.toString()).toBe('Err(Error: lose)');
-                expect(`${ err }`).toBe('Err(Error: lose)');
+                expect(`${err}`).toBe('Err(Error: lose)');
             });
         });
 
@@ -556,21 +556,21 @@ describe('Result', () => {
 
         describe('inspect', () => {
             it('inspect() should not call fn', () => {
-                const fn = vi.fn((_value: number) => {});
+                const fn = vi.fn((_value: number) => { });
                 err.inspect(fn);
                 expect(fn).not.toHaveBeenCalled();
             });
 
             it('inspectErr() should call fn with the contained error', () => {
-                const fn = vi.fn((_error: Error) => {});
+                const fn = vi.fn((_error: Error) => { });
                 err.inspectErr(fn);
                 expect(fn).toHaveBeenCalledTimes(1);
                 expect(fn).toHaveBeenCalledWith(err.unwrapErr());
             });
 
             it('should return self for chaining', () => {
-                expect(err.inspect(() => {})).toBe(err);
-                expect(err.inspectErr(() => {})).toBe(err);
+                expect(err.inspect(() => { })).toBe(err);
+                expect(err.inspectErr(() => { })).toBe(err);
             });
         });
 

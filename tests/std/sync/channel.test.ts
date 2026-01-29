@@ -573,17 +573,17 @@ describe('Channel', () => {
             await Promise.all([
                 (async () => {
                     for (let i = 0; i < 10; i++) {
-                        await sender.send(`a${ i }`);
+                        await sender.send(`a${i}`);
                     }
                 })(),
                 (async () => {
                     for (let i = 0; i < 10; i++) {
-                        await sender.send(`b${ i }`);
+                        await sender.send(`b${i}`);
                     }
                 })(),
                 (async () => {
                     for (let i = 0; i < 10; i++) {
-                        await sender.send(`c${ i }`);
+                        await sender.send(`c${i}`);
                     }
                 })(),
             ]);

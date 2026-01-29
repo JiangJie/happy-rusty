@@ -155,5 +155,5 @@ const apiResult = validateEmail('bad-email')
 console.log(
     apiResult
         .map(email => `Success: ${email}`)
-        .unwrapOr(`API Error ${ apiResult.err().map(e => e.code).unwrapOr(0) }`),
+        .unwrapOr(`API Error ${apiResult.err().map(e => e.code).unwrapOr(0)}`),
 );

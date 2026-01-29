@@ -113,7 +113,7 @@ describe('FnOnceAsync', () => {
         });
 
         it('should pass arguments to the async function', async () => {
-            const fn = FnOnceAsync(async (name: string) => `Hello, ${ name }!`);
+            const fn = FnOnceAsync(async (name: string) => `Hello, ${name}!`);
             const result = await fn.tryCall('World');
             expect(result.unwrap()).toBe('Hello, World!');
         });
@@ -164,18 +164,18 @@ describe('FnOnceAsync', () => {
 
     describe('isConsumed', () => {
         it('should return false before call', () => {
-            const fn = FnOnceAsync(async () => {});
+            const fn = FnOnceAsync(async () => { });
             expect(fn.isConsumed()).toBe(false);
         });
 
         it('should return true after call()', async () => {
-            const fn = FnOnceAsync(async () => {});
+            const fn = FnOnceAsync(async () => { });
             await fn.call();
             expect(fn.isConsumed()).toBe(true);
         });
 
         it('should return true after tryCall()', async () => {
-            const fn = FnOnceAsync(async () => {});
+            const fn = FnOnceAsync(async () => { });
             await fn.tryCall();
             expect(fn.isConsumed()).toBe(true);
         });
@@ -261,7 +261,7 @@ describe('FnOnceAsync', () => {
             const fetchUser = FnOnceAsync(async (id: number) => {
                 // Simulate async fetch
                 await new Promise(resolve => setTimeout(resolve, 1));
-                return { id, name: `User${ id }` };
+                return { id, name: `User${id}` };
             });
 
             const user = await fetchUser.call(1);

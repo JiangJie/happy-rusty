@@ -300,10 +300,10 @@ function createQueryBuilder<T>(table: string): QueryBuilder<T> {
         },
         then(resolve, reject) {
             // Build and execute the query when awaited
-            const sql = `SELECT ${ fields.join(', ') } FROM ${ table }${ conditions.length ? ` WHERE ${ conditions.join(' AND ') }` : ''
-                }${ limitValue ? ` LIMIT ${ limitValue }` : '' }`;
+            const sql = `SELECT ${fields.join(', ')} FROM ${table}${conditions.length ? ` WHERE ${conditions.join(' AND ')}` : ''
+                }${limitValue ? ` LIMIT ${limitValue}` : ''}`;
 
-            console.log(`Executing: ${ sql }`);
+            console.log(`Executing: ${sql}`);
 
             // Simulate async query execution
             return new Promise<T>((res) => {
@@ -327,11 +327,11 @@ const fetchUsers = FnOnceAsync(() =>
 
 // Query is built and executed only once when called
 const queryResult = await fetchUsers.call();
-console.log(`Query result: ${ JSON.stringify(queryResult) }`);
+console.log(`Query result: ${JSON.stringify(queryResult)}`);
 
 // Second call fails - ensures query runs exactly once
 const secondQuery = await fetchUsers.tryCall();
-console.log(`Second query attempt: ${ secondQuery.isNone() ? 'blocked (already executed)' : 'executed' }`);
+console.log(`Second query attempt: ${secondQuery.isNone() ? 'blocked (already executed)' : 'executed'}`);
 
 // ============================================================================
 // Example 9: Error Handling

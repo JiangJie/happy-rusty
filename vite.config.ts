@@ -8,7 +8,7 @@ export default defineConfig({
         outDir: 'dist',
         lib: {
             entry: 'src/mod.ts',
-            fileName: format => `main.${ format === 'esm' ? 'mjs' : 'cjs' }`,
+            fileName: format => `main.${format === 'esm' ? 'mjs' : 'cjs'}`,
         },
         rollupOptions: {
             output: [

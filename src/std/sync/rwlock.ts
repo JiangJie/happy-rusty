@@ -486,7 +486,7 @@ export function RwLock<T>(value: T): RwLock<T> {
                 if (released) {
                     return 'RwLockReadGuard(<released>)';
                 }
-                return `RwLockReadGuard(${ currentValue })`;
+                return `RwLockReadGuard(${currentValue})`;
             },
 
             get value(): T {
@@ -516,7 +516,7 @@ export function RwLock<T>(value: T): RwLock<T> {
                 if (released) {
                     return 'RwLockWriteGuard(<released>)';
                 }
-                return `RwLockWriteGuard(${ currentValue })`;
+                return `RwLockWriteGuard(${currentValue})`;
             },
 
             get value(): T {
@@ -576,7 +576,7 @@ export function RwLock<T>(value: T): RwLock<T> {
                 return 'RwLock(<write-locked>)';
             }
             if (readers > 0) {
-                return `RwLock(<read-locked:${ readers }>)`;
+                return `RwLock(<read-locked:${readers}>)`;
             }
             return 'RwLock(<unlocked>)';
         },

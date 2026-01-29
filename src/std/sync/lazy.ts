@@ -161,7 +161,7 @@ export function Lazy<T>(fn: () => T): Lazy<T> {
         [Symbol.toStringTag]: 'Lazy',
 
         toString(): string {
-            return initialized ? `Lazy(${ value })` : 'Lazy(<uninitialized>)';
+            return initialized ? `Lazy(${value})` : 'Lazy(<uninitialized>)';
         },
 
         force(): T {

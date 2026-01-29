@@ -652,9 +652,9 @@ export interface Channel<T> {
  * // Multiple producers
  * async function logFromService(name: string) {
  *     const sender = logs.sender();
- *     await sender.send(`[${ name }] Started`);
+ *     await sender.send(`[${name}] Started`);
  *     // ... do work ...
- *     await sender.send(`[${ name }] Finished`);
+ *     await sender.send(`[${name}] Finished`);
  * }
  *
  * // Single consumer writing to file
@@ -860,9 +860,9 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
                     return 'Sender(<closed>)';
                 }
                 if (capacity === Infinity) {
-                    return `Sender(${ buffer.length }/∞)`;
+                    return `Sender(${buffer.length}/∞)`;
                 }
-                return `Sender(${ buffer.length }/${ capacity })`;
+                return `Sender(${buffer.length}/${capacity})`;
             },
 
             get capacity(): number {
@@ -901,9 +901,9 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
                     return 'Receiver(<closed>)';
                 }
                 if (capacity === Infinity) {
-                    return `Receiver(${ buffer.length }/∞)`;
+                    return `Receiver(${buffer.length}/∞)`;
                 }
-                return `Receiver(${ buffer.length }/${ capacity })`;
+                return `Receiver(${buffer.length}/${capacity})`;
             },
 
             get capacity(): number {
@@ -941,9 +941,9 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
                 return 'Channel(<closed>)';
             }
             if (capacity === Infinity) {
-                return `Channel(${ buffer.length }/∞)`;
+                return `Channel(${buffer.length}/∞)`;
             }
-            return `Channel(${ buffer.length }/${ capacity })`;
+            return `Channel(${buffer.length}/${capacity})`;
         },
 
         get capacity(): number {

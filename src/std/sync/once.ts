@@ -243,7 +243,7 @@ export function Once<T>(): Once<T> {
         [Symbol.toStringTag]: 'Once',
 
         toString(): string {
-            return initialized ? `Once(${ value })` : 'Once(<uninitialized>)';
+            return initialized ? `Once(${value})` : 'Once(<uninitialized>)';
         },
 
         get(): Option<T> {
