@@ -67,6 +67,8 @@ The build process is split into two separate steps:
 pnpm run docs
 ```
 
+Online API documentation: https://jiangjie.github.io/happy-rusty/
+
 ## Architecture
 
 ### Core Structure
@@ -146,6 +148,34 @@ The codebase includes some methods not present in Rust's standard library, place
   - Handles cases where recovery logic itself might fail
 
 These are useful for chaining operations that may throw without wrapping in `tryAsyncResult`.
+
+### Type Aliases
+
+Common type aliases for convenience:
+
+```ts
+// Async variants
+import type { AsyncOption, AsyncResult } from 'happy-rusty';
+type AsyncOption<T> = Promise<Option<T>>;
+type AsyncResult<T, E> = Promise<Result<T, E>>;
+
+// I/O operations (Error as failure type)
+import type { IOResult, AsyncIOResult } from 'happy-rusty';
+type IOResult<T> = Result<T, Error>;
+type AsyncIOResult<T> = Promise<IOResult<T>>;
+
+// Void operations (no value on success)
+import type { VoidResult, AsyncVoidResult } from 'happy-rusty';
+type VoidResult<E> = Result<void, E>;
+type AsyncVoidResult<E> = Promise<VoidResult<E>>;
+type VoidIOResult = IOResult<void>;
+type AsyncVoidIOResult = AsyncIOResult<void>;
+
+// Infallible operations (never fail)
+import type { SafeResult, AsyncSafeResult } from 'happy-rusty';
+type SafeResult<T> = Result<T, never>;
+type AsyncSafeResult<T> = Promise<SafeResult<T>>;
+```
 
 ### Examples
 
@@ -236,6 +266,7 @@ pnpm update --latest
     - Semicolons required (enforced by `@stylistic/semi`)
     - Trailing commas required in multiline (enforced by `@stylistic/comma-dangle`)
     - Member delimiter style for interfaces
+    - Template literal spacing: Use `${value}` not `${ value }`
 - Strict TypeScript settings: `noUnusedLocals`, `noUnusedParameters`, `strictNullChecks`
 - File extensions required in imports (`.ts` suffix)
 - Use `@internal` JSDoc tag for exported functions/types that should not appear in public API docs
