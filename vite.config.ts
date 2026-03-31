@@ -14,12 +14,17 @@ export default defineConfig({
             output: [
                 {
                     format: 'cjs',
+                    topLevelVar: false,
                 },
                 {
                     format: 'esm',
+                    topLevelVar: false,
                 },
             ],
-            treeshake: 'smallest',
+            treeshake: {
+                moduleSideEffects: false,
+                propertyReadSideEffects: false,
+            },
         },
     },
     test: {
