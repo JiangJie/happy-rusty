@@ -294,6 +294,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full TypeScript support
 - Comprehensive API matching Rust's Option and Result
 
+[1.9.2]: https://github.com/JiangJie/happy-rusty/compare/v1.9.1...v1.9.2
 [1.9.1]: https://github.com/JiangJie/happy-rusty/compare/v1.9.0...v1.9.1
 [1.9.0]: https://github.com/JiangJie/happy-rusty/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/JiangJie/happy-rusty/compare/v1.7.1...v1.8.0
