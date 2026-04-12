@@ -135,6 +135,8 @@ The codebase is organized into two main modules mirroring Rust's structure:
 
 - **Channel buffer**: Uses internal `Queue` data structure instead of `Array` for O(1) shift operations when consuming messages.
 
+- **Tree-shaking annotations**: All module-level function call expressions are annotated with `/*#__PURE__*/` to help bundlers safely remove unused code. This includes `Symbol()`, `Promise.resolve()`, `Object.freeze()`, `Ok()`, etc. When adding new top-level constants, always include the `/*#__PURE__*/` annotation before the function call.
+
 ### Non-Standard Extensions
 
 The codebase includes some methods not present in Rust's standard library, placed in `// #region Try extensions` at the end of the `Result<T, E>` interface:
