@@ -21,4 +21,4 @@
  *
  * @internal
  */
-export const ControlFlowKindSymbol = Symbol('ControlFlow kind');
+export const ControlFlowKindSymbol = /*#__PURE__*/ Symbol('ControlFlow kind');

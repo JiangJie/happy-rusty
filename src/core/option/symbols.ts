@@ -21,4 +21,4 @@
  *
  * @internal
  */
-export const OptionKindSymbol = Symbol('Option kind');
+export const OptionKindSymbol = /*#__PURE__*/ Symbol('Option kind');

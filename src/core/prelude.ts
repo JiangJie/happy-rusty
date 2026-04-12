@@ -17,8 +17,8 @@ import type { AsyncLikeResult, AsyncResult, Result } from './result/result.ts';
 import { ResultKindSymbol } from './result/symbols.ts';
 
 // Internal cached Promise constants for runtime optimization
-const ASYNC_TRUE: Promise<true> = Promise.resolve(true);
-const ASYNC_FALSE: Promise<false> = Promise.resolve(false);
+const ASYNC_TRUE: Promise<true> = /*#__PURE__*/ Promise.resolve(true);
+const ASYNC_FALSE: Promise<false> = /*#__PURE__*/ Promise.resolve(false);
 
 /**
  * Represents the absence of a value, as a specialized `Option` type.
@@ -247,7 +247,7 @@ export function Some<T>(value: T): Option<T> {
  * const name = None.unwrapOr('Anonymous'); // 'Anonymous'
  * ```
  */
-export const None: None = Object.freeze<None>({
+export const None: None = /*#__PURE__*/ Object.freeze<None>({
     [Symbol.toStringTag]: 'Option',
     [OptionKindSymbol]: 'None',
 
@@ -399,7 +399,7 @@ export const None: None = Object.freeze<None>({
  * }
  * ```
  */
-export const ASYNC_NONE: Promise<None> = Promise.resolve(None);
+export const ASYNC_NONE: Promise<None> = /*#__PURE__*/ Promise.resolve(None);
 
 /**
  * Creates a `Result<T, E>` representing a successful outcome containing a value.

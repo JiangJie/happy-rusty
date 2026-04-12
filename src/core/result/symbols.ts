@@ -21,4 +21,4 @@
  *
  * @internal
  */
-export const ResultKindSymbol = Symbol('Result kind');
+export const ResultKindSymbol = /*#__PURE__*/ Symbol('Result kind');

@@ -10,8 +10,8 @@
 import { ASYNC_NONE, None, Some, type AsyncOption, type Option } from '../../core/mod.ts';
 
 // Internal cached Promise constants for runtime optimization
-const ASYNC_TRUE = Promise.resolve(true);
-const ASYNC_FALSE = Promise.resolve(false);
+const ASYNC_TRUE = /*#__PURE__*/ Promise.resolve(true);
+const ASYNC_FALSE = /*#__PURE__*/ Promise.resolve(false);
 
 /**
  * A sender view of a channel that can only send values.

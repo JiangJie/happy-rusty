@@ -25,7 +25,7 @@ import type { Result } from './result.ts';
  * const value: boolean = RESULT_TRUE.intoOk(); // Safe extraction
  * ```
  */
-export const RESULT_TRUE: Result<boolean, never> = Ok(true);
+export const RESULT_TRUE: Result<boolean, never> = /*#__PURE__*/ Ok(true);
 
 /**
  * Result constant for `false`.
@@ -41,7 +41,7 @@ export const RESULT_TRUE: Result<boolean, never> = Ok(true);
  * const value: boolean = RESULT_FALSE.intoOk(); // Safe extraction
  * ```
  */
-export const RESULT_FALSE: Result<boolean, never> = Ok(false);
+export const RESULT_FALSE: Result<boolean, never> = /*#__PURE__*/ Ok(false);
 
 /**
  * Result constant for `0`.
@@ -57,7 +57,7 @@ export const RESULT_FALSE: Result<boolean, never> = Ok(false);
  * const value: number = RESULT_ZERO.intoOk(); // Safe extraction
  * ```
  */
-export const RESULT_ZERO: Result<number, never> = Ok(0);
+export const RESULT_ZERO: Result<number, never> = /*#__PURE__*/ Ok(0);
 
 /**
  * Result constant for `void` or `()`.
@@ -73,4 +73,4 @@ export const RESULT_ZERO: Result<number, never> = Ok(0);
  * RESULT_VOID.intoOk(); // Safe extraction (returns undefined)
  * ```
  */
-export const RESULT_VOID: Result<void, never> = Ok();
+export const RESULT_VOID: Result<void, never> = /*#__PURE__*/ Ok();
