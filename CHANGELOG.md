@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.2] - 2026-04-12
+
+### Changed
+- **Performance**: Added `/*#__PURE__*/` annotations to all top-level function call expressions for better tree-shaking support in consumer bundlers
+
+### Fixed
+- **Build**: Migrated `treeshake` config from deprecated `'smallest'` string to object form for Vite 8 (Rolldown) compatibility
+- **Build**: Added `topLevelVar: false` to output options to preserve `const` declarations in bundled output
+
+### Chores
+- Upgraded devDependencies: vite, vitest, eslint, typedoc, typescript-eslint
+
 ## [1.9.1] - 2026-01-16
 
 ### Changed
