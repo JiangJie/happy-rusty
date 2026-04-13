@@ -1,6 +1,6 @@
-# CODEBUDDY.md
+# AGENTS.md
 
-This file provides guidance to CodeBuddy Code when working with code in this repository.
+This file provides guidance to AI coding agents when working with code in this repository.
 
 ## Project Overview
 
@@ -59,7 +59,12 @@ The build process is split into two separate steps:
 
 - **rollup-plugin-dts** preserves source order and correctly handles interface inheritance, producing clean `.d.ts` output without renaming artifacts.
 
-- **Vite** provides fast, optimized JavaScript bundling with esbuild under the hood, while Rollup with `rollup-plugin-dts` specializes in type declaration bundling.
+- **Vite 8+** uses Rolldown (Rust-based bundler) under the hood for fast JavaScript bundling, while Rollup with `rollup-plugin-dts` specializes in type declaration bundling.
+
+**Vite 8 migration notes** (Rolldown replaces esbuild/Rollup as Vite's internal bundler):
+- `treeshake` no longer accepts string presets like `'smallest'`; use object form `{ moduleSideEffects: false, propertyReadSideEffects: false }`
+- `topLevelVar` defaults to `true` in Rolldown (converts `const` to `var`); set `topLevelVar: false` in output options to preserve `const`
+- `treeshake` is an input-level option; `topLevelVar` is an output-level option
 
 ### Documentation
 ```bash
@@ -136,6 +141,8 @@ The codebase is organized into two main modules mirroring Rust's structure:
 - **Channel buffer**: Uses internal `Queue` data structure instead of `Array` for O(1) shift operations when consuming messages.
 
 - **Tree-shaking annotations**: All module-level function call expressions are annotated with `/*#__PURE__*/` to help bundlers safely remove unused code. This includes `Symbol()`, `Promise.resolve()`, `Object.freeze()`, `Ok()`, etc. When adding new top-level constants, always include the `/*#__PURE__*/` annotation before the function call.
+
+- **Tree-shaking limitations**: Option and Result are coupled through `prelude.ts` — importing any single constructor (e.g., `None`) pulls in `Some`, `Ok`, `Err`, `OptionKindSymbol`, `ResultKindSymbol`, `isOption`, and `isResult`. This is because `None`'s method closures reference `Ok`/`Err` (e.g., `okOr`, `transpose`). The `std/` modules (Channel, Mutex, etc.) are independently tree-shakeable.
 
 ### Non-Standard Extensions
 
@@ -286,11 +293,13 @@ pnpm update --latest
 
 ## Releasing
 
+Use the `/release` skill which automates:
 1. Update version in `package.json` and `jsr.json`
-2. Update `CHANGELOG.md` (follow [Keep a Changelog](https://keepachangelog.com/) format)
-3. Commit: `git commit -m "chore(release): bump version to vX.Y.Z"`
-4. Create and push tag: `git tag vX.Y.Z && git push origin main --tags`
-5. CI automatically publishes to npm, GitHub Packages, and JSR
+2. Update `CHANGELOG.md` (follow [Keep a Changelog](https://keepachangelog.com/) format), including comparison link at bottom
+3. Commit: `git commit -m "release: vX.Y.Z"`
+4. Create tag: `git tag vX.Y.Z`
+5. Push: `git push && git push --tags`
+6. CI automatically publishes to npm, GitHub Packages, and JSR
 
 ## Removed APIs (v1.9.0+)
 
