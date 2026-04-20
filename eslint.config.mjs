@@ -37,6 +37,8 @@ export default defineConfig([
             // Stylistic
             '@stylistic/semi': ['error', 'always'],
             '@stylistic/comma-dangle': ['error', 'always-multiline'],
+            '@stylistic/object-curly-spacing': ['error', 'always'],
+            '@stylistic/template-curly-spacing': ['error', 'never'],
             '@stylistic/member-delimiter-style': ['error', {
                 multiline: {
                     delimiter: 'semi',
