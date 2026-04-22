@@ -2,6 +2,9 @@
 
 name: JSR Package
 
+permissions:
+  contents: read
+
 on:
   release:
     types: [created]
