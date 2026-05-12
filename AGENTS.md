@@ -69,10 +69,20 @@ The build process is split into two separate steps:
 ### Documentation
 ```bash
 # Generate TypeDoc HTML documentation (deployed to GitHub Pages)
+# TypeDoc cleans the `docs/` output dir automatically; no separate cleanup step.
 pnpm run docs
 ```
 
 Online API documentation: https://jiangjie.github.io/happy-rusty/
+
+### Running Examples
+```bash
+# Runs examples/main.ts via Deno (requires Deno installed; not part of the npm test pipeline)
+pnpm run eg
+```
+
+### Publish Hook
+`prepublishOnly` runs the full `build` automatically before `npm publish`, so local publishes also produce a fresh `dist/`. CI handles publishing on tags — see Releasing below.
 
 ## Architecture
 
@@ -194,7 +204,7 @@ Example files are located in `examples/` directory, mirroring `src/` structure:
 - `examples/std/sync/` - Sync primitives examples (Once, Lazy, Mutex, RwLock, Channel)
 - `examples/std/ops/` - ControlFlow and FnOnce examples
 
-Run examples with: `pnpm run eg`
+See "Running Examples" above for the run command.
 
 ### Toolchain
 
@@ -255,13 +265,6 @@ pnpm exec vitest run -t "Option:Some"
 pnpm exec vitest tests/core/option/option.test.ts
 ```
 
-### Updating Dependencies
-
-```bash
-# Update pnpm dependencies
-pnpm update --latest
-```
-
 ## Code Style
 
 - ESLint with TypeScript strict and stylistic configs, plus `@stylistic/eslint-plugin`
@@ -301,6 +304,4 @@ Use the `/release` skill which automates:
 5. Push: `git push && git push --tags`
 6. CI automatically publishes to npm, GitHub Packages, and JSR
 
-## Removed APIs (v1.9.0+)
-
-- **`promiseToAsyncResult()`**: Use `tryAsyncResult()` instead (same functionality, deprecated since v1.7.0)
+Removed/deprecated APIs are tracked in `CHANGELOG.md`.
