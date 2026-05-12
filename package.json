@@ -32,7 +32,6 @@
     "test": "pnpm exec vitest run --coverage",
     "test:watch": "pnpm exec vitest",
     "test:ui": "pnpm exec vitest --ui",
-    "predocs": "pnpm dlx rimraf docs",
     "docs": "pnpm exec typedoc",
     "eg": "deno run -A examples/main.ts",
     "prepublishOnly": "pnpm run build"
