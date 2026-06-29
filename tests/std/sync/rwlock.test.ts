@@ -755,4 +755,83 @@ describe('RwLock', () => {
             expect(result).toBe(42);
         });
     });
+
+    describe('downgrade', () => {
+        it('should convert write guard to read guard', async () => {
+            const rwlock = RwLock(42);
+            const guard = await rwlock.write();
+            guard.value = 100;
+
+            expect(rwlock.isWriteLocked()).toBe(true);
+            const readGuard = guard.downgrade();
+            expect(rwlock.isWriteLocked()).toBe(false);
+            expect(rwlock.readerCount()).toBe(1);
+            expect(readGuard.value).toBe(100);
+
+            readGuard.unlock();
+            expect(rwlock.readerCount()).toBe(0);
+        });
+
+        it('should invalidate the write guard after downgrade', async () => {
+            const rwlock = RwLock(42);
+            const guard = await rwlock.write();
+            guard.downgrade();
+
+            expect(() => guard.value).toThrow('has been released');
+            expect(() => guard.downgrade()).toThrow('has been released');
+        });
+
+        it('should throw when calling downgrade on a released guard', async () => {
+            const rwlock = RwLock(42);
+            const guard = await rwlock.write();
+            guard.unlock();
+
+            expect(() => guard.downgrade()).toThrow('has been released');
+        });
+
+        it('should release waiting readers but keep writers waiting', async () => {
+            const rwlock = RwLock(42);
+            const writeGuard = await rwlock.write();
+
+            let readerAcquired = false;
+            const readPromise = rwlock.read().then((g) => {
+                readerAcquired = true;
+                return g;
+            });
+
+            let writerAcquired = false;
+            const write2Promise = rwlock.write().then((g) => {
+                writerAcquired = true;
+                return g;
+            });
+
+            await new Promise(r => setTimeout(r, 10));
+            expect(readerAcquired).toBe(false);
+            expect(writerAcquired).toBe(false);
+
+            // downgrade: release waiting readers, writers keep waiting
+            const readGuard = writeGuard.downgrade();
+
+            const waitingRead = await readPromise;
+            expect(readerAcquired).toBe(true);
+            expect(rwlock.readerCount()).toBe(2); // self + released reader
+            expect(writerAcquired).toBe(false); // writer still waiting
+
+            waitingRead.unlock();
+            readGuard.unlock();
+
+            // all readers released, writer woken up
+            const write2Guard = await write2Promise;
+            expect(writerAcquired).toBe(true);
+            write2Guard.unlock();
+        });
+
+        it('should freeze the downgraded read guard', async () => {
+            const rwlock = RwLock(42);
+            const guard = await rwlock.write();
+            const readGuard = guard.downgrade();
+            expect(Object.isFrozen(readGuard)).toBe(true);
+            readGuard.unlock();
+        });
+    });
 });

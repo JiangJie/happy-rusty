@@ -381,4 +381,61 @@ writeGuard.unlock();
 console.log(`\nAfter releasing write lock:`);
 console.log(`  ${status.toString()}`);
 
+// ============================================================================
+// Example 10: Downgrade (Write → Read Transition)
+// ============================================================================
+//
+// `downgrade()` atomically converts a write guard to a read guard without
+// releasing the lock. Waiting readers are released immediately; pending
+// writers keep waiting until all readers release.
+//
+// Use case: after writing, you want to continue reading the data AND let
+// other readers proceed — without risking a pending writer sneaking in and
+// modifying the data between unlock and re-acquire.
+
+console.log('\n=== Example 10: Downgrade (Write → Read Transition) ===\n');
+
+const store = RwLock({ version: 0, payload: '' });
+
+// Writer A: writes, then downgrades to read
+async function writerA() {
+    const guard = await store.write();
+    console.log('Writer A: acquired write lock');
+    guard.value.version = 1;
+    guard.value.payload = 'v1-data';
+    console.log('Writer A: wrote version=1, downgrading...');
+
+    // Atomically downgrade: write → read
+    const readGuard = guard.downgrade();
+    console.log('Writer A: downgraded to read lock, other readers can now join');
+
+    // Hold read lock briefly to read alongside Reader B
+    await new Promise(r => setTimeout(r, 50));
+    console.log(`Writer A: reads version=${readGuard.value.version}`);
+    readGuard.unlock();
+    console.log('Writer A: released read lock');
+}
+
+// Reader B: waits while A writes, released when A downgrades
+async function readerB() {
+    const guard = await store.read();
+    console.log("Reader B: acquired read lock (released by A's downgrade)");
+    console.log(`Reader B: reads version=${guard.value.version}`);
+    guard.unlock();
+}
+
+// Writer D: waits because readers exist after downgrade
+async function writerD() {
+    const guard = await store.write();
+    console.log('Writer D: acquired write lock (after all readers released)');
+    guard.value.version = 2;
+    console.log('Writer D: wrote version=2');
+    guard.unlock();
+}
+
+await Promise.all([writerA(), readerB(), writerD()]);
+
+console.log('\nWithout downgrade, Writer D would go before Reader B (writer priority).');
+console.log("Downgrade let Reader B proceed first, reading the data A just wrote.");
+
 console.log('\n=== RwLock Examples Complete ===');

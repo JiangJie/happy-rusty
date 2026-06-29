@@ -130,6 +130,38 @@ export interface RwLockWriteGuard<T> {
      * ```
      */
     unlock(): void;
+
+    /**
+     * Downgrades this write guard to a read guard atomically.
+     *
+     * The write lock is converted to a read lock without releasing it,
+     * allowing other waiting readers to proceed concurrently. Pending
+     * writers continue to wait until all readers (including this one)
+     * release their locks.
+     *
+     * After calling `downgrade()`, this guard is invalidated and must not
+     * be used — accessing `value` or calling `unlock()` will throw.
+     *
+     * Equivalent to Rust's `RwLockWriteGuard::downgrade` (stabilized in
+     * Rust 1.92.0).
+     *
+     * @returns A new `RwLockReadGuard<T>` providing shared read access.
+     * @since unreleased
+     * @see https://doc.rust-lang.org/std/sync/struct.RwLockWriteGuard.html#method.downgrade
+     * @example
+     * ```ts
+     * const guard = await rwlock.write();
+     * guard.value = newValue;
+     * // Downgrade to a read lock, releasing waiting readers
+     * const readGuard = guard.downgrade();
+     * try {
+     *     console.log(readGuard.value); // other readers can proceed concurrently
+     * } finally {
+     *     readGuard.unlock();
+     * }
+     * ```
+     */
+    downgrade(): RwLockReadGuard<T>;
 }
 
 /**
@@ -539,6 +571,23 @@ export function RwLock<T>(value: T): RwLock<T> {
                 }
                 released = true;
                 releaseWrite();
+            },
+
+            downgrade(): RwLockReadGuard<T> {
+                if (released) {
+                    throw new Error('RwLockWriteGuard has been released');
+                }
+                released = true;
+                // Downgrade: exclusive write becomes shared read
+                writer = false;
+                readers = 1; // self becomes the first reader
+                // Wake all waiting readers (writers keep waiting while readers exist)
+                while (readWaitQueue.length > 0) {
+                    readers++;
+                    const next = readWaitQueue.shift() as () => void;
+                    next();
+                }
+                return createReadGuard();
             },
         } as const);
     }
