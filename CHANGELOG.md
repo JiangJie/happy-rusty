@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **New Sync Primitive**: `Semaphore` - Counting semaphore for limiting async concurrency, with `acquire`/`tryAcquire`/`withPermit`/`availablePermits`. Inspired by tokio's `Semaphore` (Rust std does not include one). Useful for fetch rate limiting, connection pools, and task queues.
 - **New Method**: `RwLockWriteGuard.downgrade()` - Atomically converts a write guard to a read guard, releasing waiting readers while keeping pending writers waiting. Equivalent to Rust 1.92's `RwLockWriteGuard::downgrade`
 
 ## [1.9.2] - 2026-04-12

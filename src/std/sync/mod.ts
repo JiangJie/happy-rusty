@@ -10,3 +10,4 @@ export * from './mutex.ts';
 export * from './once.ts';
 export * from './once_async.ts';
 export * from './rwlock.ts';
+export * from './semaphore.ts';
