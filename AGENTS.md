@@ -44,6 +44,10 @@ pnpm run check
 pnpm run lint
 ```
 
+`pnpm run build` is gated by a `prebuild` hook (`pnpm run check && pnpm run lint`), so it always type-checks and lints first — a "build" failure is often actually a type or lint error.
+
+Build (JS bundling + Vitest) config both live in a single `vite.config.ts` (it imports from `vitest/config`); coverage is scoped to `src/**/*.ts`. The `.d.ts` step is configured separately in `rollup.config.ts`.
+
 ### Build Architecture
 
 The build process is split into two separate steps:
@@ -74,6 +78,8 @@ pnpm run docs
 ```
 
 Online API documentation: https://jiangjie.github.io/happy-rusty/
+
+The repo ships a bilingual README: `README.md` (English) and `README.cn.md` (Chinese). When editing one, keep the other in sync.
 
 ### Running Examples
 ```bash
@@ -200,10 +206,11 @@ type AsyncSafeResult<T> = Promise<SafeResult<T>>;
 ### Examples
 
 Example files are located in `examples/` directory, mirroring `src/` structure:
-- `examples/core/option/` - Option usage examples
-- `examples/core/result/` - Result usage examples (including async with Try extensions)
-- `examples/std/sync/` - Sync primitives examples (Once, Lazy, Mutex, RwLock, Channel)
-- `examples/std/ops/` - ControlFlow and FnOnce examples
+- `examples/core/option/` - Option usage examples (sync `option.ts` + `option.async.ts`)
+- `examples/core/result/` - Result usage examples (sync `result.ts` + `result.async.ts`, including async with Try extensions)
+- `examples/std/sync/` - Sync primitives examples (Once, OnceAsync, Lazy, LazyAsync, Mutex, RwLock, Semaphore, Channel)
+- `examples/std/ops/` - ControlFlow, FnOnce, and FnOnceAsync examples
+- `examples/main.ts` - Aggregates and runs all examples (entry for `pnpm run eg`)
 
 See "Running Examples" above for the run command.
 
