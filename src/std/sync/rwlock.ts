@@ -146,7 +146,7 @@ export interface RwLockWriteGuard<T> {
      * Rust 1.92.0).
      *
      * @returns A new `RwLockReadGuard<T>` providing shared read access.
-     * @since unreleased
+     * @since 1.10.0
      * @see https://doc.rust-lang.org/std/sync/struct.RwLockWriteGuard.html#method.downgrade
      * @example
      * ```ts

@@ -30,7 +30,7 @@ import { None, Some, type Option } from '../../core/mod.ts';
  * `try/finally` semantics. Manual `acquire()`/`release()` requires a
  * `try/finally` block to avoid leaking permits on exceptions.
  *
- * @since unreleased
+ * @since 1.10.0
  * @see {@link Semaphore}
  * @example
  * ```ts
@@ -94,7 +94,7 @@ export interface SemaphorePermit {
  * Unlike `Mutex<T>`, `Semaphore` does not protect a value — it is a pure
  * concurrency counter. For exclusive access to a value, use `Mutex<T>`.
  *
- * @since unreleased
+ * @since 1.10.0
  * @see https://docs.rs/tokio/latest/tokio/sync/struct.Semaphore.html
  * @example
  * ```ts

@@ -5,11 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.10.0] - 2026-06-30
 
 ### Added
 - **New Sync Primitive**: `Semaphore` - Counting semaphore for limiting async concurrency, with `acquire`/`tryAcquire`/`withPermit`/`availablePermits`. Inspired by tokio's `Semaphore` (Rust std does not include one). Useful for fetch rate limiting, connection pools, and task queues.
 - **New Method**: `RwLockWriteGuard.downgrade()` - Atomically converts a write guard to a read guard, releasing waiting readers while keeping pending writers waiting. Equivalent to Rust 1.92's `RwLockWriteGuard::downgrade`
+
+### Chores
+- Upgraded devDependencies: vite, vitest, @vitest/coverage-v8, @vitest/ui, eslint, rollup, typescript-eslint
 
 ## [1.9.2] - 2026-04-12
 
@@ -300,6 +303,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full TypeScript support
 - Comprehensive API matching Rust's Option and Result
 
+[1.10.0]: https://github.com/JiangJie/happy-rusty/compare/v1.9.2...v1.10.0
 [1.9.2]: https://github.com/JiangJie/happy-rusty/compare/v1.9.1...v1.9.2
 [1.9.1]: https://github.com/JiangJie/happy-rusty/compare/v1.9.0...v1.9.1
 [1.9.0]: https://github.com/JiangJie/happy-rusty/compare/v1.8.0...v1.9.0
