@@ -7,11 +7,8 @@
  *
  */
 
+import { ASYNC_FALSE, ASYNC_TRUE } from '../../internal/constants.ts';
 import { ASYNC_NONE, None, Some, type AsyncOption, type Option } from '../../core/mod.ts';
-
-// Internal cached Promise constants for runtime optimization
-const ASYNC_TRUE = /*#__PURE__*/ Promise.resolve(true);
-const ASYNC_FALSE = /*#__PURE__*/ Promise.resolve(false);
 
 /**
  * A sender view of a channel that can only send values.
@@ -20,6 +17,7 @@ const ASYNC_FALSE = /*#__PURE__*/ Promise.resolve(false);
  *
  * @typeParam T - The type of values that can be sent.
  * @see https://doc.rust-lang.org/std/sync/mpmc/struct.Sender.html
+ * @since 1.8.0
  */
 export interface Sender<T> {
     /**
@@ -147,6 +145,7 @@ export interface Sender<T> {
  *
  * @typeParam T - The type of values that can be received.
  * @see https://doc.rust-lang.org/std/sync/mpmc/struct.Receiver.html
+ * @since 1.8.0
  */
 export interface Receiver<T> {
     /**
@@ -651,7 +650,7 @@ export interface Channel<T> {
  *
  * // Multiple producers
  * async function logFromService(name: string) {
- *     const sender = logs.sender();
+ *     const sender = logs.sender;
  *     await sender.send(`[${name}] Started`);
  *     // ... do work ...
  *     await sender.send(`[${name}] Finished`);
@@ -659,7 +658,7 @@ export interface Channel<T> {
  *
  * // Single consumer writing to file
  * async function writeLogsToFile() {
- *     const receiver = logs.receiver();
+ *     const receiver = logs.receiver;
  *     for await (const log of receiver) {
  *         await fs.appendFile('app.log', log + '\n');
  *     }

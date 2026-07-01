@@ -37,6 +37,12 @@ describe('Option', () => {
                 expect(result).toBe(true);
             });
 
+            it('isSomeAndAsync() should work with sync predicates returning boolean', async () => {
+                // Exercises the typeof r === 'boolean' fast path (reuses cached ASYNC_TRUE/ASYNC_FALSE)
+                expect(await some.isSomeAndAsync(v => v === 10)).toBe(true);
+                expect(await some.isSomeAndAsync(v => v === 20)).toBe(false);
+            });
+
             it('isNoneOr() should return true when predicate matches', () => {
                 expect(some.isNoneOr(v => v === 10)).toBe(true);
                 expect(some.isNoneOr(v => v === 20)).toBe(false);
@@ -50,6 +56,12 @@ describe('Option', () => {
 
                 const result2 = await some.isNoneOrAsync(async v => v === 20);
                 expect(result2).toBe(false);
+            });
+
+            it('isNoneOrAsync() should work with sync predicates returning boolean', async () => {
+                // Exercises the typeof r === 'boolean' fast path (reuses cached ASYNC_TRUE/ASYNC_FALSE)
+                expect(await some.isNoneOrAsync(v => v === 10)).toBe(true);
+                expect(await some.isNoneOrAsync(v => v === 20)).toBe(false);
             });
         });
 

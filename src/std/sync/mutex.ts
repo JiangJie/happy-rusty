@@ -15,6 +15,7 @@ import { None, Some, type Option } from '../../core/mod.ts';
  * Failure to unlock will cause deadlock for subsequent lock attempts.
  *
  * @typeParam T - The type of the protected value.
+ * @since 1.6.0
  */
 export interface MutexGuard<T> {
     /**

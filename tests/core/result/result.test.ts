@@ -52,6 +52,12 @@ describe('Result', () => {
                 expect(result).toBe(true);
             });
 
+            it('isOkAndAsync() should work with sync predicates returning boolean', async () => {
+                // Exercises the typeof r === 'boolean' fast path (reuses cached ASYNC_TRUE/ASYNC_FALSE)
+                expect(await ok.isOkAndAsync(x => x === 1)).toBe(true);
+                expect(await ok.isOkAndAsync(x => x === 2)).toBe(false);
+            });
+
             it('isErrAnd() should return false without calling predicate', () => {
                 const fn = vi.fn(() => true);
                 expect(ok.isErrAnd(fn)).toBe(false);
@@ -378,6 +384,12 @@ describe('Result', () => {
                     return e.message === await Promise.resolve('lose');
                 });
                 expect(result).toBe(true);
+            });
+
+            it('isErrAndAsync() should work with sync predicates returning boolean', async () => {
+                // Exercises the typeof r === 'boolean' fast path (reuses cached ASYNC_TRUE/ASYNC_FALSE)
+                expect(await err.isErrAndAsync(e => e.message === 'lose')).toBe(true);
+                expect(await err.isErrAndAsync(e => e.message === 'win')).toBe(false);
             });
         });
 

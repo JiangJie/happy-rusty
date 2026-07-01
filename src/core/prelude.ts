@@ -15,10 +15,7 @@ import { OptionKindSymbol } from './option/symbols.ts';
 import { isResult } from './result/guards.ts';
 import type { AsyncLikeResult, AsyncResult, Result } from './result/result.ts';
 import { ResultKindSymbol } from './result/symbols.ts';
-
-// Internal cached Promise constants for runtime optimization
-const ASYNC_TRUE: Promise<true> = /*#__PURE__*/ Promise.resolve(true);
-const ASYNC_FALSE: Promise<false> = /*#__PURE__*/ Promise.resolve(false);
+import { ASYNC_FALSE, ASYNC_TRUE } from '../internal/constants.ts';
 
 /**
  * Represents the absence of a value, as a specialized `Option` type.
@@ -109,13 +106,15 @@ export function Some<T>(value: T): Option<T> {
             return predicate(value);
         },
         isSomeAndAsync(predicate: (value: T) => PromiseLike<boolean> | boolean): Promise<boolean> {
-            return Promise.resolve(predicate(value));
+            const r = predicate(value);
+            return typeof r === 'boolean' ? (r ? ASYNC_TRUE : ASYNC_FALSE) : Promise.resolve(r);
         },
         isNoneOr(predicate: (value: T) => boolean): boolean {
             return predicate(value);
         },
         isNoneOrAsync(predicate: (value: T) => PromiseLike<boolean> | boolean): Promise<boolean> {
-            return Promise.resolve(predicate(value));
+            const r = predicate(value);
+            return typeof r === 'boolean' ? (r ? ASYNC_TRUE : ASYNC_FALSE) : Promise.resolve(r);
         },
 
         expect(_msg: string): T {
@@ -469,7 +468,8 @@ export function Ok<T, E>(value?: T): Result<T, E> {
             return predicate(value as T);
         },
         isOkAndAsync(predicate: (value: T) => PromiseLike<boolean> | boolean): Promise<boolean> {
-            return Promise.resolve(predicate(value as T));
+            const r = predicate(value as T);
+            return typeof r === 'boolean' ? (r ? ASYNC_TRUE : ASYNC_FALSE) : Promise.resolve(r);
         },
         isErrAnd(_predicate: (error: E) => boolean): false {
             return false;
@@ -640,7 +640,8 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
             return predicate(error);
         },
         isErrAndAsync(predicate: (error: E) => PromiseLike<boolean> | boolean): Promise<boolean> {
-            return Promise.resolve(predicate(error));
+            const r = predicate(error);
+            return typeof r === 'boolean' ? (r ? ASYNC_TRUE : ASYNC_FALSE) : Promise.resolve(r);
         },
 
         expect(msg: string): never {

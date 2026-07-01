@@ -26,6 +26,7 @@ import { None, Some, type Option } from '../../core/mod.ts';
  * can be acquired while any read guard is held.
  *
  * @typeParam T - The type of the protected value.
+ * @since 1.8.0
  */
 export interface RwLockReadGuard<T> {
     /**
@@ -82,6 +83,7 @@ export interface RwLockReadGuard<T> {
  * acquired while a write guard is held.
  *
  * @typeParam T - The type of the protected value.
+ * @since 1.8.0
  */
 export interface RwLockWriteGuard<T> {
     /**

@@ -738,9 +738,9 @@ export interface Result<T, E> {
      * @typeParam U - The type of the value returned by the function.
      * @param fn - A function that takes the `Ok` value and returns `PromiseLike<U>` or `U`. May throw or reject.
      * @returns A promise that resolves to `Ok(U)` if successful, or `Err(E)` if `this` is `Err` or if `fn` throws/rejects.
-     * @since 1.9.0
      * @see andThenAsync
      * @see tryAsyncResult
+     * @since 1.9.0
      * @example
      * ```ts
      * const x: Result<number, Error> = Ok(2);
@@ -782,9 +782,9 @@ export interface Result<T, E> {
      * @typeParam F - The type of the error returned by the function.
      * @param fn - A function that takes the `Err` value and returns `PromiseLike<T>` or `T`. May throw or reject.
      * @returns A promise that resolves to `Ok(T)` if `this` is `Ok` or if `fn` succeeds, or `Err(F)` if `fn` throws/rejects.
-     * @since 1.9.0
      * @see orElseAsync
      * @see tryAsyncResult
+     * @since 1.9.0
      * @example
      * ```ts
      * const x: Result<number, Error> = Err(new Error('primary failed'));

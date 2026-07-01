@@ -67,7 +67,7 @@ export interface Lazy<T> {
      * and returns it.
      *
      * @returns The initialized value.
-     * @throws Rethrows any exception thrown by the initialization function.
+     * @throws {Error} Rethrows any exception thrown by the initialization function.
      * @example
      * ```ts
      * const lazy = Lazy(() => 42);
