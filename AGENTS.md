@@ -134,6 +134,9 @@ The codebase is organized into two main modules mirroring Rust's structure:
     - `mod.ts` - Re-exports all ops types
   - `mod.ts` - Re-exports all std public APIs
 
+- **`src/internal/`** - Internal shared modules, NOT re-exported by `src/mod.ts`
+  - `constants.ts` - Internal cached Promise constants (`ASYNC_TRUE`, `ASYNC_FALSE`) shared by `core/prelude.ts` and `std/sync/channel.ts` to avoid duplicate allocations. Placing these in a separate module under `src/internal/` (rather than `export const` in a file that `src/mod.ts` re-exports) prevents the symbols from leaking into the public API surface (`dist/types.d.ts`). `@internal` JSDoc alone does NOT prevent `export *` from physically re-exporting a symbol — use a module not covered by `export *` for true isolation.
+
 - **`src/mod.ts`** - Main entry point, re-exports everything from core/ and std/
 
 ### Key Design Patterns
@@ -288,6 +291,7 @@ pnpm exec vitest tests/core/option/option.test.ts
     - Trailing commas required in multiline (enforced by `@stylistic/comma-dangle`)
     - Member delimiter style for interfaces
     - Template literal spacing: Use `${value}` not `${ value }`
+  - No non-null assertions: `@typescript-eslint/no-non-null-assertion` is `error` (from `tseslint.configs.strict`). Do not use the `!` operator — use `??=`, `?? fallback`, or explicit `if (x !== null)` guards instead.
 - Strict TypeScript settings: `noUnusedLocals`, `noUnusedParameters`, `strictNullChecks`
 - File extensions required in imports (`.ts` suffix)
 - Use `@internal` JSDoc tag for exported functions/types that should not appear in public API docs
