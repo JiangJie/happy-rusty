@@ -263,6 +263,7 @@ Dual publishing to:
 - Uses Vitest with `@vitest/coverage-v8` for coverage
 - Tests import from `../../../src/mod.ts` using relative paths
 - Run with: `pnpm run test`
+- **Branch coverage**: any new branch (a new `toString` state, a `typeof` fast path, conditional logic, etc.) must be accompanied by tests covering that branch. New code should reach 100% branch coverage; never leave a newly introduced branch untested
 
 ### Running a Single Test
 
@@ -279,7 +280,8 @@ pnpm exec vitest tests/core/option/option.test.ts
 
 ## Code Style
 
-- ESLint with TypeScript strict and stylistic configs, plus `@stylistic/eslint-plugin`
+- ESLint config lives in `eslint.config.mjs`: `@eslint/js` recommended + `typescript-eslint` strict/stylistic + `@stylistic/eslint-plugin`
+- TypeScript config (`tsconfig.json`) enables: `strict`, `strictNullChecks`, `noUnusedLocals`, `noUnusedParameters`, `noPropertyAccessFromIndexSignature` (access index-signature properties via bracket notation `obj['key']`, not `obj.key`), `verbatimModuleSyntax`, `bundler` module resolution with `.ts` import extensions required
   - Extended with error prevention and ES6+ style rules:
     - `eqeqeq` (with `{ 'null': 'ignore' }` to allow `== null` checks)
     - `no-cond-assign` (prevents `if (a = 1)` typos)
@@ -298,6 +300,8 @@ pnpm exec vitest tests/core/option/option.test.ts
 - Non-exported functions (like `safeStringify`, `assertOption`, `assertResult` in `prelude.ts`) are automatically excluded from TypeDoc output
 - All public APIs should have `@since` tags indicating the version they were introduced
 - `@example` tags should directly follow the previous `@` tag without blank lines
+- JSDoc, inline comments, and `@example` blocks are written in **English**
+- Do not use TypeScript `namespace` declarations — attach static helpers via direct assignment (`Func.prop = fn`). TS 6 infers the shape and cross-file visibility works; the generated `.d.ts` emits the expected `declare namespace` automatically
 
 ## CI/CD
 
