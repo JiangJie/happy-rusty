@@ -34,41 +34,37 @@ pnpm run test:ui
 
 ### Building
 ```bash
-# Full build (includes type check, lint, vite build, and rollup dts)
+# Full build (gated by vp check, then vp pack: JS + d.ts in one pass)
 pnpm run build
 
-# Type checking only
+# Format + lint + type-aware type check in one command (tsgo-powered)
+pnpm exec vp check
+
+# Type checking only (local tsc, editor-consistent reference)
 pnpm run check
 
-# Linting only
+# Linting / formatting
 pnpm run lint
+pnpm run fmt
 ```
 
-`pnpm run build` is gated by a `prebuild` hook (`pnpm run check && pnpm run lint`), so it always type-checks and lints first — a "build" failure is often actually a type or lint error.
+`pnpm run build` is gated by a `prebuild` hook (`pnpm exec vp check`), so it always runs format check, lint, and type check first — a "build" failure is often actually a format/lint/type error.
 
-Build (JS bundling + Vitest) config both live in a single `vite.config.ts` (it imports from `vitest/config`); coverage is scoped to `src/**/*.ts`. The `.d.ts` step is configured separately in `rollup.config.ts`.
+All tooling config lives in a single `vite.config.ts` (imported from `vite-plus`): `test` (Vitest), `lint` (oxlint + tsgolint), `fmt` (oxfmt), and `pack` (tsdown) blocks. Coverage is scoped to `src/**/*.ts`.
 
 ### Build Architecture
 
-The build process is split into two separate steps:
+The project uses **Vite+** (VoidZero's unified toolchain) as a single devDependency that bundles Vite, Vitest, oxlint, tsgolint, oxfmt, and tsdown:
 
-1. **Vite** - Compiles TypeScript to JavaScript (CJS + ESM)
-2. **Rollup + rollup-plugin-dts** - Generates bundled `.d.ts` type declarations
+1. **`vp pack`** (tsdown, powered by Rolldown) - Compiles TypeScript to JavaScript (`dist/mod.mjs` + `dist/mod.cjs`) AND bundles type declarations (`dist/mod.d.mts` + `dist/mod.d.cts`) in one pass
+2. **`vp check`** - Format check (oxfmt) + lint (oxlint) + type-aware linting and type checking (tsgolint, powered by tsgo — the TypeScript 7 Go compiler)
 
-**Why not use a single tool?**
+**Declaration bundling notes:**
 
-- **api-extractor issue**: When using `@microsoft/api-extractor` to generate `.d.ts` files, it sorts exports alphabetically. This causes issues when `None extends Option<never>` because `None` (N) is processed before `Option` (O), resulting in internal renaming like `Option_2`. See [rushstack#3017](https://github.com/microsoft/rushstack/issues/3017).
-
-- **vite-plugin-dts issue**: The popular `vite-plugin-dts` uses `@microsoft/api-extractor` internally for bundling declarations, so it produces the same `Option_2` renaming artifact.
-
-- **rollup-plugin-dts** preserves source order and correctly handles interface inheritance, producing clean `.d.ts` output without renaming artifacts.
-
-- **Vite 8+** uses Rolldown (Rust-based bundler) under the hood for fast JavaScript bundling, while Rollup with `rollup-plugin-dts` specializes in type declaration bundling.
-
-**Vite 8 migration notes** (Rolldown replaces esbuild/Rollup as Vite's internal bundler):
-- `treeshake` no longer accepts string presets like `'smallest'`; use object form `{ moduleSideEffects: false, propertyReadSideEffects: false }`
-- `topLevelVar` defaults to `true` in Rolldown (converts `const` to `var`); set `topLevelVar: false` in output options to preserve `const`
-- `treeshake` is an input-level option; `topLevelVar` is an output-level option
+- `.d.ts` bundling goes through `rolldown-plugin-dts` (the Rolldown port of `rollup-plugin-dts`, same author). It preserves source order and correctly handles interface inheritance like `None extends Option<never>` without renaming artifacts.
+- **Never use api-extractor-based tools** (`@microsoft/api-extractor`, `vite-plugin-dts`): they sort exports alphabetically, which renames `Option` to `Option_2` when `None extends Option<never>` is processed first. See [rushstack#3017](https://github.com/microsoft/rushstack/issues/3017).
+- Dual `mod.d.mts`/`mod.d.cts` declaration files are emitted (one per module format) — the `exports` map in `package.json` points `import`/`require` at their respective files.
+- Treeshake is configured via object form `{ moduleSideEffects: false, propertyReadSideEffects: false }` (Rolldown does not accept string presets like `'smallest'`); `topLevelVar: false` is set in `outputOptions` to preserve top-level `const` (Rolldown defaults to `var`).
 
 ### Documentation
 ```bash
@@ -135,7 +131,7 @@ The codebase is organized into two main modules mirroring Rust's structure:
   - `mod.ts` - Re-exports all std public APIs
 
 - **`src/internal/`** - Internal shared modules, NOT re-exported by `src/mod.ts`
-  - `constants.ts` - Internal cached Promise constants (`ASYNC_TRUE`, `ASYNC_FALSE`) shared by `core/prelude.ts` and `std/sync/channel.ts` to avoid duplicate allocations. Placing these in a separate module under `src/internal/` (rather than `export const` in a file that `src/mod.ts` re-exports) prevents the symbols from leaking into the public API surface (`dist/types.d.ts`). `@internal` JSDoc alone does NOT prevent `export *` from physically re-exporting a symbol — use a module not covered by `export *` for true isolation.
+  - `constants.ts` - Internal cached Promise constants (`ASYNC_TRUE`, `ASYNC_FALSE`) shared by `core/prelude.ts` and `std/sync/channel.ts` to avoid duplicate allocations. Placing these in a separate module under `src/internal/` (rather than `export const` in a file that `src/mod.ts` re-exports) prevents the symbols from leaking into the public API surface (`dist/mod.d.mts`). `@internal` JSDoc alone does NOT prevent `export *` from physically re-exporting a symbol — use a module not covered by `export *` for true isolation.
 
 - **`src/mod.ts`** - Main entry point, re-exports everything from core/ and std/
 
@@ -222,24 +218,30 @@ See "Running Examples" above for the run command.
 This project uses **pnpm** for all development tasks:
 
 #### pnpm (Build, Test & Development Tools)
-- **Purpose**: Manages Node.js build toolchain and testing
-- **Dependencies**: TypeScript, ESLint, Vite, Vitest, Rollup, TypeDoc
+- **Purpose**: Manages the Node.js toolchain (`vite-plus` CLI) and testing
+- **Dependencies**: `vite-plus` (+ `@voidzero-dev/vite-plus-core`), Vitest coverage/UI addons, TypeScript, TypeDoc
 - **Location**: `node_modules/` (from npm registry)
-- **Used for**: Building npm packages, testing, linting, type checking, documentation
+- **Used for**: Building npm packages, testing, linting, formatting, type checking, documentation
+
+**Dependency version management with Vite+:**
+- `vite` is aliased to `npm:@voidzero-dev/vite-plus-core` via `overrides` in `pnpm-workspace.yaml`; `vitest` is pinned to the version bundled by Vite+ (`4.1.10`). `@vitest/coverage-v8` and `@vitest/ui` are NOT bundled and must stay pinned to the same Vitest version.
+- Upgrading the toolchain means bumping `vite-plus` + `@voidzero-dev/vite-plus-core` and syncing the `vite` override version and the `vitest` pin — NOT running a blanket devDeps upgrade. Check the Vite+ changelog for breaking changes first (pre-1.0).
+- The direct `vite` devDependency must stay declared: without it, pnpm auto-installs upstream vite for vitest's peer dependency, splitting vite into two instances.
+- `typescript` stays pinned to `^6.0.3` — do NOT upgrade to TS 7. TypeDoc and the dts bundling path consume the TypeScript JS API, which TS 7 removed (7.0 ships CLI/LSP only). Type checking in `vp check` already runs on tsgo (the TS 7 compiler), so upgrading the local package adds no value.
 
 **Key Point**: Test code (`tests/`) is NEVER bundled into `dist/`.
 
 ### Runtime vs Build Environments
 
 - **Runtime**: Supports Deno, Node.js (CommonJS/ESM), browsers, and Bun
-- **Build**: Uses pnpm for dependency management, Vite for JS bundling, Rollup for `.d.ts` generation
+- **Build**: Uses pnpm for dependency management, `vp pack` (tsdown/Rolldown) for JS bundling and `.d.ts` generation
 - **Testing**: Uses Vitest test runner with V8 coverage
 - **Types**: Strict TypeScript with `bundler` module resolution
 
 ### Publishing
 
 Dual publishing to:
-- **npm**: Via `dist/` built with Vite (CJS + ESM) and Rollup (`.d.ts`)
+- **npm**: Via `dist/` built with `vp pack` (CJS + ESM + dual `.d.ts`)
 - **JSR**: Directly from `src/mod.ts` source (Deno-native)
 
 ## Testing
@@ -269,31 +271,28 @@ Dual publishing to:
 
 ```bash
 # Run specific test file
-pnpm exec vitest run tests/core/option/option.test.ts
+pnpm exec vp test run tests/core/option/option.test.ts
 
 # Run tests matching a pattern
-pnpm exec vitest run -t "Option:Some"
+pnpm exec vp test run -t "Option:Some"
 
 # Run in watch mode for a specific file
-pnpm exec vitest tests/core/option/option.test.ts
+pnpm exec vp test tests/core/option/option.test.ts
 ```
 
 ## Code Style
 
-- ESLint config lives in `eslint.config.mjs`: `@eslint/js` recommended + `typescript-eslint` strict/stylistic + `@stylistic/eslint-plugin`
+- Lint and format config lives in `vite.config.ts` (`lint` block = oxlint + tsgolint schema, `fmt` block = oxfmt schema). Do NOT create standalone `oxlint.config.ts` / `.oxlintrc.json` files — Vite+ requires centralized config.
 - TypeScript config (`tsconfig.json`) enables: `strict`, `strictNullChecks`, `noUnusedLocals`, `noUnusedParameters`, `noPropertyAccessFromIndexSignature` (access index-signature properties via bracket notation `obj['key']`, not `obj.key`), `verbatimModuleSyntax`, `bundler` module resolution with `.ts` import extensions required
-  - Extended with error prevention and ES6+ style rules:
-    - `eqeqeq` (with `{ 'null': 'ignore' }` to allow `== null` checks)
+  - Lint: oxlint `correctness` category (error) + `suspicious` category (warn) + type-aware tsgolint rules, plus explicit rules:
+    - `eqeqeq` (with `{ null: 'ignore' }` to allow `== null` checks)
     - `no-cond-assign` (prevents `if (a = 1)` typos)
     - `no-self-compare`, `no-template-curly-in-string`
     - `default-case-last`, `no-new-wrappers`, `radix`
     - `prefer-template`, `object-shorthand`
-  - Stylistic rules:
-    - Semicolons required (enforced by `@stylistic/semi`)
-    - Trailing commas required in multiline (enforced by `@stylistic/comma-dangle`)
-    - Member delimiter style for interfaces
-    - Template literal spacing: Use `${value}` not `${ value }`
-  - No non-null assertions: `@typescript-eslint/no-non-null-assertion` is `error` (from `tseslint.configs.strict`). Do not use the `!` operator — use `??=`, `?? fallback`, or explicit `if (x !== null)` guards instead.
+  - Formatting (oxfmt): 4-space indent, single quotes, `arrowParens: 'avoid'` (keeps single-arg arrows parenthesis-free), semicolons, trailing commas, JSON files 2-space via override; md/yml/lockfiles are excluded via `ignorePatterns`
+  - Type-aware rules explicitly OFF (conflict with core design patterns — see comments in `vite.config.ts`): `typescript/no-unsafe-type-assertion` (frozen-literal construction `Object.freeze({...}) as Option<T>`), `typescript/restrict-template-expressions` (intentional generic stringification in `toString`), `typescript/no-unnecessary-type-parameters` (phantom generics like `None.map<U>` required for inference)
+  - No non-null assertions: `typescript/no-non-null-assertion` is `error`. Do not use the `!` operator — use `??=`, `?? fallback`, or explicit `if (x !== null)` guards instead.
 - Strict TypeScript settings: `noUnusedLocals`, `noUnusedParameters`, `strictNullChecks`
 - File extensions required in imports (`.ts` suffix)
 - Use `@internal` JSDoc tag for exported functions/types that should not appear in public API docs

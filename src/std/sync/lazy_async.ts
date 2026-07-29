@@ -181,24 +181,24 @@ export function LazyAsync<T>(fn: () => PromiseLike<T> | T): LazyAsync<T> {
         force(): Promise<Awaited<T>> {
             if (initialized) {
                 // Reuse cached promise to avoid creating new Promise on each call
-                return pendingPromise ??= Promise.resolve(value as Awaited<T>);
+                return (pendingPromise ??= Promise.resolve(value as Awaited<T>));
             }
 
             if (pendingPromise) {
                 return pendingPromise;
             }
 
-            pendingPromise = Promise.resolve(fn()).then(
-                (result) => {
+            pendingPromise = Promise.resolve(fn())
+                .then(result => {
                     value = result;
                     initialized = true;
                     return result;
-                },
-            ).catch((err) => {
-                // Only clear on failure to allow retry
-                pendingPromise = undefined;
-                throw err;
-            });
+                })
+                .catch(err => {
+                    // Only clear on failure to allow retry
+                    pendingPromise = undefined;
+                    throw err;
+                });
 
             return pendingPromise;
         },

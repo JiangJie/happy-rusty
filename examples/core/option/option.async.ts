@@ -79,10 +79,12 @@ console.log('=== Example 2: Check product availability ===');
 
 const availableProduct = await getFromCache(1)
     .orElseAsync(() => fetchFromRemote(1))
-    .then(opt => opt.andThenAsync(async p => {
-        const available = await checkAvailability(p);
-        return available ? Some(p) : None;
-    }));
+    .then(opt =>
+        opt.andThenAsync(async p => {
+            const available = await checkAvailability(p);
+            return available ? Some(p) : None;
+        }),
+    );
 
 console.log(
     availableProduct

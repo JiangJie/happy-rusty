@@ -15,7 +15,7 @@ const counter = Mutex({ count: 0 });
 
 // Without mutex, this would cause race conditions
 async function incrementCounter() {
-    await counter.withLock(async (state) => {
+    await counter.withLock(async state => {
         const current = state.count;
         // Simulate some async work
         await new Promise(r => setTimeout(r, 10));
@@ -26,7 +26,7 @@ async function incrementCounter() {
 console.log('Starting 10 concurrent increments...');
 await Promise.all(Array.from({ length: 10 }, incrementCounter));
 
-await counter.withLock((state) => {
+await counter.withLock(state => {
     console.log(`Final count: ${state.count} (expected: 10)`);
 });
 
@@ -47,7 +47,7 @@ const authState = Mutex<AuthState>({
 
 let refreshCount = 0;
 
-async function refreshToken(): Promise<{ token: string; expiresIn: number; }> {
+async function refreshToken(): Promise<{ token: string; expiresIn: number }> {
     refreshCount++;
     console.log(`  [Auth] Refreshing token (call #${refreshCount})...`);
     await new Promise(r => setTimeout(r, 50));
@@ -55,7 +55,7 @@ async function refreshToken(): Promise<{ token: string; expiresIn: number; }> {
 }
 
 async function getValidToken(): Promise<string> {
-    return await authState.withLock(async (state) => {
+    return await authState.withLock(async state => {
         if (Date.now() >= state.expiresAt) {
             const { token, expiresIn } = await refreshToken();
             state.token = token;
@@ -100,7 +100,7 @@ const db = Mutex<Database>({
 });
 
 async function transfer(from: string, to: string, amount: number): Promise<boolean> {
-    return await db.withLock(async (database) => {
+    return await db.withLock(async database => {
         const fromAccount = database.accounts.get(from);
         const toAccount = database.accounts.get(to);
 
@@ -125,7 +125,7 @@ async function transfer(from: string, to: string, amount: number): Promise<boole
 }
 
 console.log('Initial balances:');
-await db.withLock((database) => {
+await db.withLock(database => {
     for (const [id, account] of database.accounts) {
         console.log(`  ${id}: $${account.balance}`);
     }
@@ -139,7 +139,7 @@ await Promise.all([
 ]);
 
 console.log('\nFinal balances:');
-await db.withLock((database) => {
+await db.withLock(database => {
     for (const [id, account] of database.accounts) {
         console.log(`  ${id}: $${account.balance}`);
     }
@@ -162,7 +162,7 @@ guard.value = { data: 'modified' };
 console.log('Releasing lock...');
 guard.unlock();
 
-await resource.withLock((value) => {
+await resource.withLock(value => {
     console.log(`After release: ${value.data}`);
 });
 
@@ -209,7 +209,7 @@ interface FileContent {
 const fileContent = Mutex<FileContent>({ lines: [] });
 
 async function appendLine(line: string) {
-    await fileContent.withLock(async (file) => {
+    await fileContent.withLock(async file => {
         console.log(`  Writing: "${line}"`);
         // Simulate disk I/O
         await new Promise(r => setTimeout(r, 20));
@@ -218,14 +218,10 @@ async function appendLine(line: string) {
 }
 
 console.log('Writing lines concurrently...');
-await Promise.all([
-    appendLine('First line'),
-    appendLine('Second line'),
-    appendLine('Third line'),
-]);
+await Promise.all([appendLine('First line'), appendLine('Second line'), appendLine('Third line')]);
 
 console.log('\nFile contents (in order):');
-await fileContent.withLock((file) => {
+await fileContent.withLock(file => {
     file.lines.forEach((line, i) => console.log(`  ${i + 1}. ${line}`));
 });
 
@@ -245,7 +241,7 @@ const queue = Mutex<MessageQueue>({
 });
 
 async function processNext(): Promise<boolean> {
-    return await queue.withLock(async (q) => {
+    return await queue.withLock(async q => {
         const msg = q.messages.shift();
         if (!msg) {
             return false;
@@ -268,13 +264,9 @@ async function consumer(id: string) {
     console.log(`  Consumer ${id} finished`);
 }
 
-await Promise.all([
-    consumer('A'),
-    consumer('B'),
-    consumer('C'),
-]);
+await Promise.all([consumer('A'), consumer('B'), consumer('C')]);
 
-await queue.withLock((q) => {
+await queue.withLock(q => {
     console.log(`\nTotal processed: ${q.processed.length}`);
     console.log(`Remaining in queue: ${q.messages.length}`);
 });

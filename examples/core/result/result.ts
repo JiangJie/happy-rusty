@@ -114,7 +114,9 @@ const result2 = validateRegistration(invalidForm)
     .inspectErr(err => console.log(`Validation failed: ${err.field} - ${err.message}`))
     .mapErr(err => `Error in ${err.field}: ${err.message}`);
 
-console.log(`Result: ${result2.unwrapOr({ email: '', passwordHash: '', age: 0 })}\n`);
+console.log(
+    `Result: ${JSON.stringify(result2.unwrapOr({ email: '', passwordHash: '', age: 0 }))}\n`,
+);
 
 // Example 3: Error recovery with orElse
 console.log('=== Example 3: Error recovery ===');
@@ -124,18 +126,17 @@ const formWithBadAge: RegistrationForm = {
     age: 'twenty-five',
 };
 
-const result3 = validateRegistration(formWithBadAge)
-    .orElse(err => {
-        if (err.field === 'age') {
-            console.log('Age parsing failed, using default age 18');
-            return Ok({
-                email: formWithBadAge.email.toLowerCase(),
-                passwordHash: hashPassword(formWithBadAge.password),
-                age: 18,
-            });
-        }
-        return Err(err);
-    });
+const result3 = validateRegistration(formWithBadAge).orElse(err => {
+    if (err.field === 'age') {
+        console.log('Age parsing failed, using default age 18');
+        return Ok({
+            email: formWithBadAge.email.toLowerCase(),
+            passwordHash: hashPassword(formWithBadAge.password),
+            age: 18,
+        });
+    }
+    return Err(err);
+});
 
 console.log(`Recovered user age: ${result3.map(u => u.age).unwrapOr(-1)}\n`);
 
@@ -146,14 +147,20 @@ interface ApiError {
     message: string;
 }
 
-const apiResult = validateEmail('bad-email')
-    .mapErr((err): ApiError => ({
+const apiResult = validateEmail('bad-email').mapErr(
+    (err): ApiError => ({
         code: 400,
         message: `Validation error: ${err.message}`,
-    }));
+    }),
+);
 
 console.log(
     apiResult
         .map(email => `Success: ${email}`)
-        .unwrapOr(`API Error ${apiResult.err().map(e => e.code).unwrapOr(0)}`),
+        .unwrapOr(
+            `API Error ${apiResult
+                .err()
+                .map(e => e.code)
+                .unwrapOr(0)}`,
+        ),
 );

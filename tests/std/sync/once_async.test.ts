@@ -349,7 +349,7 @@ describe('OnceAsync', () => {
 
             // promise1 and promise2 should be different instances
             expect(promise1).not.toBe(promise2);
-            expect(await promise1).toBe(42);  // Original value
+            expect(await promise1).toBe(42); // Original value
             expect(await promise2).toBe(200); // New value after take
         });
     });

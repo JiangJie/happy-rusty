@@ -47,7 +47,7 @@ describe('Result', () => {
 
             it('isOkAndAsync() should work with async predicates', async () => {
                 const result = await ok.isOkAndAsync(async x => {
-                    return x === await Promise.resolve(1);
+                    return x === (await Promise.resolve(1));
                 });
                 expect(result).toBe(true);
             });
@@ -66,7 +66,7 @@ describe('Result', () => {
 
             it('isErrAndAsync() should return false', async () => {
                 const result = await ok.isErrAndAsync(async err => {
-                    return err.message === await Promise.resolve('lose');
+                    return err.message === (await Promise.resolve('lose'));
                 });
                 expect(result).toBe(false);
             });
@@ -101,7 +101,7 @@ describe('Result', () => {
 
             it('unwrapOrElseAsync() should return the value', async () => {
                 const result = await ok.unwrapOrElseAsync(async err => {
-                    return err.message === await Promise.resolve('lose') ? 0 : -1;
+                    return err.message === (await Promise.resolve('lose')) ? 0 : -1;
                 });
                 expect(result).toBe(1);
             });
@@ -151,7 +151,12 @@ describe('Result', () => {
             });
 
             it('mapOrElse() should apply fn to the value', () => {
-                expect(ok.mapOrElse(_err => 0, v => v * 2)).toBe(2);
+                expect(
+                    ok.mapOrElse(
+                        _err => 0,
+                        v => v * 2,
+                    ),
+                ).toBe(2);
             });
 
             it('flatten() should unwrap nested Result', () => {
@@ -180,14 +185,14 @@ describe('Result', () => {
 
             it('andThenAsync() should work with async fn', async () => {
                 const result = await ok.andThenAsync(async x => {
-                    return Ok(String(x + await Promise.resolve(10)));
+                    return Ok(String(x + (await Promise.resolve(10))));
                 });
                 expect(result.eq(Ok('11'))).toBe(true);
             });
 
             it('andTryAsync() should convert resolved value to Ok', async () => {
                 const result = await ok.andTryAsync(async x => {
-                    return x + await Promise.resolve(10);
+                    return x + (await Promise.resolve(10));
                 });
                 expect(result.isOk()).toBe(true);
                 expect(result.unwrap()).toBe(11);
@@ -199,7 +204,7 @@ describe('Result', () => {
                 });
                 expect(result.isErr()).toBe(true);
                 expect(result.unwrapErr()).toBeInstanceOf(Error);
-                expect((result.unwrapErr() as Error).message).toBe('async error');
+                expect(result.unwrapErr().message).toBe('async error');
             });
 
             it('andTryAsync() should convert sync throw to Err', async () => {
@@ -207,7 +212,7 @@ describe('Result', () => {
                     throw new Error('sync error');
                 });
                 expect(result.isErr()).toBe(true);
-                expect((result.unwrapErr() as Error).message).toBe('sync error');
+                expect(result.unwrapErr().message).toBe('sync error');
             });
 
             it('andTryAsync() should work with sync return value', async () => {
@@ -236,7 +241,7 @@ describe('Result', () => {
 
             it('orElseAsync() should return self', async () => {
                 const result = await ok.orElseAsync(async x => {
-                    return Err(x.message + await Promise.resolve(10));
+                    return Err(x.message + (await Promise.resolve(10)));
                 });
                 expect(result).toBe(ok.asOk());
             });
@@ -251,21 +256,21 @@ describe('Result', () => {
 
         describe('inspect', () => {
             it('inspect() should call fn with the contained value', () => {
-                const fn = vi.fn((_value: number) => { });
+                const fn = vi.fn((_value: number) => {});
                 ok.inspect(fn);
                 expect(fn).toHaveBeenCalledTimes(1);
                 expect(fn).toHaveBeenCalledWith(1);
             });
 
             it('inspectErr() should not call fn', () => {
-                const fn = vi.fn((_error: Error) => { });
+                const fn = vi.fn((_error: Error) => {});
                 ok.inspectErr(fn);
                 expect(fn).not.toHaveBeenCalled();
             });
 
             it('should return self for chaining', () => {
-                expect(ok.inspect(() => { })).toBe(ok);
-                expect(ok.inspectErr(() => { })).toBe(ok);
+                expect(ok.inspect(() => {})).toBe(ok);
+                expect(ok.inspectErr(() => {})).toBe(ok);
             });
         });
 
@@ -370,7 +375,7 @@ describe('Result', () => {
 
             it('isOkAndAsync() should return false', async () => {
                 const result = await err.isOkAndAsync(async x => {
-                    return x === await Promise.resolve(1);
+                    return x === (await Promise.resolve(1));
                 });
                 expect(result).toBe(false);
             });
@@ -381,7 +386,7 @@ describe('Result', () => {
 
             it('isErrAndAsync() should work with async predicates', async () => {
                 const result = await err.isErrAndAsync(async e => {
-                    return e.message === await Promise.resolve('lose');
+                    return e.message === (await Promise.resolve('lose'));
                 });
                 expect(result).toBe(true);
             });
@@ -420,7 +425,7 @@ describe('Result', () => {
 
             it('unwrapOrElseAsync() should return async fn result', async () => {
                 const result = await err.unwrapOrElseAsync(async e => {
-                    return e.message === await Promise.resolve('lose') ? 0 : -1;
+                    return e.message === (await Promise.resolve('lose')) ? 0 : -1;
                 });
                 expect(result).toBe(0);
             });
@@ -429,7 +434,9 @@ describe('Result', () => {
                 // When T is Promise<number>, the callback returns Promise<Promise<number>>
                 // But Promise.resolve() flattens it to Promise<number>, so we only need one await
                 const errPromise: Result<Promise<number>, Error> = Err(new Error('test'));
-                const result = await errPromise.unwrapOrElseAsync(() => Promise.resolve(Promise.resolve(42)));
+                const result = await errPromise.unwrapOrElseAsync(() =>
+                    Promise.resolve(Promise.resolve(42)),
+                );
                 // Runtime: Promise.resolve(Promise.resolve(42)) flattens to Promise<42>
                 // So result is 42, not Promise<42>
                 expect(result).toBe(42);
@@ -475,7 +482,12 @@ describe('Result', () => {
             });
 
             it('mapOrElse() should call defaultFn with error', () => {
-                expect(err.mapOrElse(e => e.message.length, v => v * 2)).toBe(4);
+                expect(
+                    err.mapOrElse(
+                        e => e.message.length,
+                        v => v * 2,
+                    ),
+                ).toBe(4);
             });
 
             it('flatten() should return self', () => {
@@ -506,7 +518,7 @@ describe('Result', () => {
 
             it('andThenAsync() should return self', async () => {
                 const result = await err.andThenAsync(async x => {
-                    return Ok(x + await Promise.resolve(10));
+                    return Ok(x + (await Promise.resolve(10)));
                 });
                 expect(result).toBe(err);
             });
@@ -524,14 +536,14 @@ describe('Result', () => {
 
             it('orElseAsync() should return async fn result', async () => {
                 const result = await err.orElseAsync(async e => {
-                    return Err(e.message + await Promise.resolve(10));
+                    return Err(e.message + (await Promise.resolve(10)));
                 });
                 expect(result.eq(Err('lose10'))).toBe(true);
             });
 
             it('orTryAsync() should convert resolved value to Ok', async () => {
                 const result = await err.orTryAsync(async e => {
-                    return e.message.length + await Promise.resolve(10);
+                    return e.message.length + (await Promise.resolve(10));
                 });
                 expect(result.isOk()).toBe(true);
                 expect(result.unwrap()).toBe(14); // 'lose'.length + 10
@@ -568,21 +580,21 @@ describe('Result', () => {
 
         describe('inspect', () => {
             it('inspect() should not call fn', () => {
-                const fn = vi.fn((_value: number) => { });
+                const fn = vi.fn((_value: number) => {});
                 err.inspect(fn);
                 expect(fn).not.toHaveBeenCalled();
             });
 
             it('inspectErr() should call fn with the contained error', () => {
-                const fn = vi.fn((_error: Error) => { });
+                const fn = vi.fn((_error: Error) => {});
                 err.inspectErr(fn);
                 expect(fn).toHaveBeenCalledTimes(1);
                 expect(fn).toHaveBeenCalledWith(err.unwrapErr());
             });
 
             it('should return self for chaining', () => {
-                expect(err.inspect(() => { })).toBe(err);
-                expect(err.inspectErr(() => { })).toBe(err);
+                expect(err.inspect(() => {})).toBe(err);
+                expect(err.inspectErr(() => {})).toBe(err);
             });
         });
 
@@ -695,7 +707,7 @@ describe('tryResult', () => {
         });
         expect(result.isErr()).toBe(true);
         expect(result.unwrapErr()).toBeInstanceOf(Error);
-        expect((result.unwrapErr() as Error).message).toBe('test error');
+        expect(result.unwrapErr().message).toBe('test error');
     });
 
     it('should capture JSON.parse errors', () => {
@@ -863,11 +875,11 @@ describe('tryAsyncResult', () => {
     it('should handle function returning rejected Promise', async () => {
         const result = await tryAsyncResult(() => Promise.reject(new Error('rejected')));
         expect(result.isErr()).toBe(true);
-        expect((result.unwrapErr() as Error).message).toBe('rejected');
+        expect(result.unwrapErr().message).toBe('rejected');
     });
 
     it('should capture synchronous exceptions in function', async () => {
-        const result = await tryAsyncResult<number, Error>(() => {
+        const result = await tryAsyncResult<number>(() => {
             throw new Error('sync throw');
         });
         expect(result.isErr()).toBe(true);
@@ -875,8 +887,8 @@ describe('tryAsyncResult', () => {
     });
 
     it('should capture sync exceptions before promise creation', async () => {
-        const result = await tryAsyncResult<number, Error>(() => {
-            JSON.parse('invalid');  // Throws before returning promise
+        const result = await tryAsyncResult<number>(() => {
+            JSON.parse('invalid'); // Throws before returning promise
             return Promise.resolve(42);
         });
         expect(result.isErr()).toBe(true);
@@ -892,7 +904,7 @@ describe('tryAsyncResult', () => {
     });
 
     it('should capture errors in async functions', async () => {
-        const result = await tryAsyncResult<number, Error>(async () => {
+        const result = await tryAsyncResult<number>(async () => {
             throw new Error('async throw');
         });
         expect(result.isErr()).toBe(true);
@@ -926,11 +938,11 @@ describe('tryAsyncResult', () => {
         };
         const result = await tryAsyncResult(asyncFail, 'test error');
         expect(result.isErr()).toBe(true);
-        expect((result.unwrapErr() as Error).message).toBe('test error');
+        expect(result.unwrapErr().message).toBe('test error');
     });
 
     it('should work with fetch-like function and arguments', async () => {
-        const mockFetch = async (url: string, options: { method: string; }) => {
+        const mockFetch = async (url: string, options: { method: string }) => {
             return { url, method: options.method };
         };
         const result = await tryAsyncResult(mockFetch, '/api/data', { method: 'POST' });
@@ -950,8 +962,8 @@ describe('tryAsyncResult', () => {
         const cache = new Map<string, number>([['cached', 100]]);
         const getData = (key: string): number | Promise<number> => {
             const cached = cache.get(key);
-            if (cached !== undefined) return cached;  // sync
-            return Promise.resolve(200);              // async
+            if (cached !== undefined) return cached; // sync
+            return Promise.resolve(200); // async
         };
 
         const cachedResult = await tryAsyncResult(getData, 'cached');
@@ -1035,7 +1047,7 @@ describe('tryAsyncOption', () => {
 
     it('should capture sync exceptions before promise creation', async () => {
         const option = await tryAsyncOption(() => {
-            JSON.parse('invalid');  // Throws before returning promise
+            JSON.parse('invalid'); // Throws before returning promise
             return Promise.resolve(42);
         });
         expect(option.isNone()).toBe(true);
@@ -1106,8 +1118,8 @@ describe('tryAsyncOption', () => {
         const cache = new Map<string, string>([['cached', 'hit']]);
         const getData = (key: string): string | Promise<string> => {
             const cached = cache.get(key);
-            if (cached !== undefined) return cached;  // sync
-            return Promise.resolve('miss');           // async
+            if (cached !== undefined) return cached; // sync
+            return Promise.resolve('miss'); // async
         };
 
         const cachedOption = await tryAsyncOption(getData, 'cached');
@@ -1146,14 +1158,14 @@ describe('Awaited<T> type behavior', () => {
         it('Ok.andThenAsync should work with async fn returning Result', async () => {
             const ok: Result<number, string> = Ok(10);
             // fn returns Promise<Result<number, string>>, result should be Result<number, string>
-            const result = await ok.andThenAsync(async (v) => Ok<number, string>(v * 2));
+            const result = await ok.andThenAsync(async v => Ok<number, string>(v * 2));
             expect(result.isOk()).toBe(true);
             expect(result.unwrap()).toBe(20);
         });
 
         it('Ok.andThenAsync should handle sync Result return', async () => {
             const ok = Ok(10);
-            const result = await ok.andThenAsync((v) => Ok(v * 2));
+            const result = await ok.andThenAsync(v => Ok(v * 2));
             expect(result.unwrap()).toBe(20);
         });
 
@@ -1171,14 +1183,14 @@ describe('Awaited<T> type behavior', () => {
         it('Err.orElseAsync should work with async fn returning Result', async () => {
             const err = Err<number, string>('error');
             // fn returns Promise<Result<number, number>>, result should be Result<number, number>
-            const result = await err.orElseAsync(async (e) => Ok<number, number>(e.length));
+            const result = await err.orElseAsync(async e => Ok<number, number>(e.length));
             expect(result.isOk()).toBe(true);
             expect(result.unwrap()).toBe(5); // 'error'.length
         });
 
         it('Err.orElseAsync should handle sync Result return', async () => {
             const err = Err<number, string>('error');
-            const result = await err.orElseAsync((e) => Ok<number, number>(e.length));
+            const result = await err.orElseAsync(e => Ok<number, number>(e.length));
             expect(result.unwrap()).toBe(5);
         });
 

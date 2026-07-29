@@ -320,7 +320,7 @@ export function Semaphore(permits: number): Semaphore {
             return Promise.resolve(createPermit());
         }
 
-        return new Promise<SemaphorePermit>((resolve) => {
+        return new Promise<SemaphorePermit>(resolve => {
             waitQueue.push(() => {
                 resolve(createPermit());
             });

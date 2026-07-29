@@ -26,7 +26,7 @@ console.log('=== Example 1: Basic Read/Write Operations ===\n');
 const counter = RwLock(0);
 
 // Read the value
-const value = await counter.withRead((v) => {
+const value = await counter.withRead(v => {
     console.log(`Current value: ${v}`);
     return v;
 });
@@ -37,7 +37,7 @@ console.log(`After increment: ${await counter.get()}`);
 
 // Or use withWrite with a mutable object
 const mutableCounter = RwLock({ value: 0 });
-await mutableCounter.withWrite((obj) => {
+await mutableCounter.withWrite(obj => {
     console.log(`Incrementing from ${obj.value} to ${obj.value + 1}`);
     obj.value++;
 });
@@ -56,21 +56,21 @@ console.log('Starting 3 concurrent read operations...');
 
 // These reads can proceed concurrently
 const results = await Promise.all([
-    data.withRead(async (d) => {
+    data.withRead(async d => {
         console.log('Reader A: starting');
         await new Promise(r => setTimeout(r, 50));
         const sum = d.items.reduce((a, b) => a + b, 0);
         console.log(`Reader A: sum = ${sum}`);
         return sum;
     }),
-    data.withRead(async (d) => {
+    data.withRead(async d => {
         console.log('Reader B: starting');
         await new Promise(r => setTimeout(r, 30));
         const max = Math.max(...d.items);
         console.log(`Reader B: max = ${max}`);
         return max;
     }),
-    data.withRead(async (d) => {
+    data.withRead(async d => {
         console.log('Reader C: starting');
         await new Promise(r => setTimeout(r, 10));
         const count = d.items.length;
@@ -92,7 +92,7 @@ const state = RwLock({ version: 1, data: 'initial' });
 console.log('Writer acquires lock first...');
 
 // Start a write operation
-const writePromise = state.withWrite(async (s) => {
+const writePromise = state.withWrite(async s => {
     console.log('Writer: starting update');
     await new Promise(r => setTimeout(r, 100));
     s.version++;
@@ -102,10 +102,10 @@ const writePromise = state.withWrite(async (s) => {
 
 // These reads will wait for the writer to finish
 const readPromises = Promise.all([
-    state.withRead((s) => {
+    state.withRead(s => {
         console.log(`Reader 1: version=${s.version}, data="${s.data}"`);
     }),
-    state.withRead((s) => {
+    state.withRead(s => {
         console.log(`Reader 2: version=${s.version}, data="${s.data}"`);
     }),
 ]);
@@ -137,17 +137,17 @@ const config = RwLock<AppConfig>({
 
 // Read-only access to check feature flags (frequent operation)
 async function isFeatureEnabled(feature: string): Promise<boolean> {
-    return config.withRead((cfg) => cfg.features.has(feature));
+    return config.withRead(cfg => cfg.features.has(feature));
 }
 
 // Read-only access to get API URL (frequent operation)
 async function getApiUrl(): Promise<string> {
-    return config.withRead((cfg) => cfg.apiUrl);
+    return config.withRead(cfg => cfg.apiUrl);
 }
 
 // Write access to enable a feature (rare operation)
 async function enableFeature(feature: string): Promise<void> {
-    await config.withWrite((cfg) => {
+    await config.withWrite(cfg => {
         cfg.features.add(feature);
         cfg.lastUpdated = new Date();
         console.log(`Enabled feature: ${feature}`);
@@ -156,7 +156,7 @@ async function enableFeature(feature: string): Promise<void> {
 
 // Write access to update timeout (rare operation)
 async function updateTimeout(timeout: number): Promise<void> {
-    await config.withWrite((cfg) => {
+    await config.withWrite(cfg => {
         cfg.timeout = timeout;
         cfg.lastUpdated = new Date();
         console.log(`Updated timeout to: ${timeout}ms`);
@@ -187,7 +187,7 @@ interface CacheEntry<T> {
 const cache = RwLock(new Map<string, CacheEntry<string>>());
 
 async function cacheGet(key: string): Promise<string | undefined> {
-    return cache.withRead((map) => {
+    return cache.withRead(map => {
         const entry = map.get(key);
         if (!entry) return undefined;
         if (Date.now() > entry.expiresAt) return undefined;
@@ -196,7 +196,7 @@ async function cacheGet(key: string): Promise<string | undefined> {
 }
 
 async function cacheSet(key: string, value: string, ttlMs: number): Promise<void> {
-    await cache.withWrite((map) => {
+    await cache.withWrite(map => {
         map.set(key, {
             value,
             expiresAt: Date.now() + ttlMs,
@@ -205,7 +205,7 @@ async function cacheSet(key: string, value: string, ttlMs: number): Promise<void
 }
 
 async function cacheDelete(key: string): Promise<boolean> {
-    return cache.withWrite((map) => map.delete(key));
+    return cache.withWrite(map => map.delete(key));
 }
 
 // Set some values
@@ -436,6 +436,6 @@ async function writerD() {
 await Promise.all([writerA(), readerB(), writerD()]);
 
 console.log('\nWithout downgrade, Writer D would go before Reader B (writer priority).');
-console.log("Downgrade let Reader B proceed first, reading the data A just wrote.");
+console.log('Downgrade let Reader B proceed first, reading the data A just wrote.');
 
 console.log('\n=== RwLock Examples Complete ===');

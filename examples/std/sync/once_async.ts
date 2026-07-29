@@ -46,11 +46,7 @@ async function getUser(id: number): Promise<User | undefined> {
 
 // Multiple concurrent calls - only one initialization
 console.log('Making concurrent getUser() calls:');
-const [user1, user2, user3] = await Promise.all([
-    getUser(1),
-    getUser(2),
-    getUser(3),
-]);
+const [user1, user2, user3] = await Promise.all([getUser(1), getUser(2), getUser(3)]);
 
 console.log(`User 1: ${user1?.name}`);
 console.log(`User 2: ${user2?.name}`);
@@ -88,7 +84,9 @@ async function loadConfig(url: string, shouldFail: boolean) {
 
 // First attempt fails
 const configResult1 = await loadConfig('https://primary.config.api', true);
-console.log(`Result: ${configResult1.isOk() ? 'Loaded' : `Failed: ${(configResult1.unwrapErr() as Error).message}`}`);
+console.log(
+    `Result: ${configResult1.isOk() ? 'Loaded' : `Failed: ${configResult1.unwrapErr().message}`}`,
+);
 console.log(`Initialized: ${configOnce.isInitialized()}`);
 
 // Second attempt succeeds (can retry because first failed)
@@ -103,11 +101,11 @@ console.log(`Config: ${JSON.stringify(configOnce.get().unwrap())}`);
 // ============================================================================
 console.log('\n=== Example 3: Concurrent initialization ===\n');
 
-const dbOnce = OnceAsync<{ id: string; connected: boolean; }>();
+const dbOnce = OnceAsync<{ id: string; connected: boolean }>();
 
 let connectionAttempts = 0;
 
-async function connectToDb(): Promise<{ id: string; connected: boolean; }> {
+async function connectToDb(): Promise<{ id: string; connected: boolean }> {
     return await dbOnce.getOrInit(async () => {
         connectionAttempts++;
         console.log(`Connection attempt #${connectionAttempts} starting...`);
@@ -164,7 +162,7 @@ console.log('\n=== Example 5: wait() - Producer-Consumer pattern ===\n');
 
 // Scenario: Multiple consumers wait for a configuration to be loaded by a producer
 
-const appConfig = OnceAsync<{ port: number; host: string; }>();
+const appConfig = OnceAsync<{ port: number; host: string }>();
 
 // Consumer function - waits for config to be available
 async function startServer(name: string): Promise<void> {
@@ -200,7 +198,7 @@ console.log('\n=== Example 6: wait() - Service dependency ===\n');
 
 // Scenario: Services depend on a database connection being established
 
-const dbConnection = OnceAsync<{ query: (sql: string) => string; }>();
+const dbConnection = OnceAsync<{ query: (sql: string) => string }>();
 
 class UserService {
     async getUsers(): Promise<string> {
@@ -275,7 +273,7 @@ console.log(db1.query('SELECT * FROM users'));
 // ============================================================================
 console.log('\n=== Example 8: take() and reinitialize ===\n');
 
-const sessionOnce = OnceAsync<{ token: string; expiresAt: number; }>();
+const sessionOnce = OnceAsync<{ token: string; expiresAt: number }>();
 
 // Initialize session
 await sessionOnce.getOrInit(async () => {

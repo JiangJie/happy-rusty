@@ -666,10 +666,13 @@ export interface Channel<T> {
  * ```
  */
 export function Channel<T>(capacity = Infinity): Channel<T> {
-    interface SendWaiter { value: T; resolve: (success: boolean) => void; }
+    interface SendWaiter {
+        value: T;
+        resolve: (success: boolean) => void;
+    }
     type ReceiveWaiter = (value: Option<T>) => void;
 
-    if (capacity < 0 || !Number.isInteger(capacity) && capacity !== Infinity) {
+    if (capacity < 0 || (!Number.isInteger(capacity) && capacity !== Infinity)) {
         throw new RangeError('Channel capacity must be a non-negative integer or Infinity');
     }
 
@@ -696,7 +699,7 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
         }
 
         // Buffer is full (or capacity is 0), wait for space
-        return new Promise<boolean>((resolve) => {
+        return new Promise<boolean>(resolve => {
             sendWaitQueue.push({ value, resolve });
         });
     }
@@ -733,7 +736,7 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
         }
 
         // Wait for a value
-        return new Promise<Option<T>>((resolve) => {
+        return new Promise<Option<T>>(resolve => {
             receiveWaitQueue.push(resolve);
         });
     }
@@ -792,7 +795,7 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
         }
 
         // Buffer is full, wait with timeout
-        return new Promise<boolean>((resolve) => {
+        return new Promise<boolean>(resolve => {
             const waiter: SendWaiter = { value, resolve };
             sendWaitQueue.push(waiter);
 
@@ -822,8 +825,8 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
         }
 
         // Wait with timeout
-        return new Promise<Option<T>>((resolve) => {
-            const wrappedWaiter: ReceiveWaiter = (value) => {
+        return new Promise<Option<T>>(resolve => {
+            const wrappedWaiter: ReceiveWaiter = value => {
                 clearTimeout(timeoutId);
                 resolve(value);
             };
@@ -966,11 +969,11 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
         },
 
         get sender(): Sender<T> {
-            return cachedSender ??= createSender();
+            return (cachedSender ??= createSender());
         },
 
         get receiver(): Receiver<T> {
-            return cachedReceiver ??= createReceiver();
+            return (cachedReceiver ??= createReceiver());
         },
 
         send,
@@ -982,7 +985,6 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
         close,
     } as const);
 }
-
 
 // #region Internal helpers
 
@@ -1022,7 +1024,7 @@ class Queue<T> {
             this.offset = 0;
         }
 
-        return item as T;
+        return item;
     }
 }
 

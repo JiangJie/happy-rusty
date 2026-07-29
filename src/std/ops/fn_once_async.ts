@@ -158,7 +158,9 @@ export interface FnOnceAsync<A extends unknown[], R> {
  * // await initialize.call(); // Throws Error: FnOnceAsync has already been consumed
  * ```
  */
-export function FnOnceAsync<A extends unknown[], R>(fn: (...args: A) => PromiseLike<R> | R): FnOnceAsync<A, R> {
+export function FnOnceAsync<A extends unknown[], R>(
+    fn: (...args: A) => PromiseLike<R> | R,
+): FnOnceAsync<A, R> {
     let consumed = false;
 
     return Object.freeze<FnOnceAsync<A, R>>({

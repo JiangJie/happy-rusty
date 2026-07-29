@@ -78,7 +78,7 @@ describe('Channel', () => {
         });
 
         it('should work with different types', async () => {
-            const ch = Channel<{ name: string; }>(10);
+            const ch = Channel<{ name: string }>(10);
 
             await ch.send({ name: 'test' });
             const result = await ch.receive();
@@ -176,7 +176,7 @@ describe('Channel', () => {
 
             // This receive should block
             let receivedValue: number | undefined;
-            const receivePromise = ch.receive().then((v) => {
+            const receivePromise = ch.receive().then(v => {
                 receivedValue = v.unwrap();
             });
 
@@ -228,7 +228,7 @@ describe('Channel', () => {
             await ch.send(3);
 
             await Promise.all([p1, p2, p3]);
-            expect(results.sort()).toEqual([1, 2, 3]);
+            expect(results.sort((a, b) => a - b)).toEqual([1, 2, 3]);
         });
     });
 
@@ -256,7 +256,7 @@ describe('Channel', () => {
             const ch = Channel<number>(0);
 
             let receivedValue: number | undefined;
-            const receivePromise = ch.receive().then((v) => {
+            const receivePromise = ch.receive().then(v => {
                 receivedValue = v.unwrap();
             });
 
@@ -856,7 +856,7 @@ describe('Channel', () => {
 
         it('should handle race between timeout and space availability', async () => {
             const ch = Channel<number>(1);
-            ch.trySend(1);  // Fill buffer
+            ch.trySend(1); // Fill buffer
 
             // Use a very short timeout
             const sendPromise = ch.sendTimeout(2, 1);
@@ -947,7 +947,7 @@ describe('Channel', () => {
         });
 
         it('should wake up waiting sender when buffer is full', async () => {
-            const ch = Channel<number>(1);  // capacity = 1
+            const ch = Channel<number>(1); // capacity = 1
 
             // Fill the buffer
             ch.trySend(1);
@@ -1113,5 +1113,4 @@ describe('Channel', () => {
             // causing issues with future operations
         });
     });
-
 });

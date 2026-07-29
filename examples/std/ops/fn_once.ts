@@ -44,10 +44,7 @@ console.log(`Second tryCall: ${result2.isSome() ? result2.unwrap() : 'None'}`);
 
 // Using mapOr pattern
 const compute = FnOnce(() => Math.random());
-const value = compute.tryCall().mapOr(
-    'Already consumed',
-    v => `Got value: ${v.toFixed(4)}`,
-);
+const value = compute.tryCall().mapOr('Already consumed', v => `Got value: ${v.toFixed(4)}`);
 console.log(value);
 
 // ============================================================================
@@ -151,13 +148,13 @@ const emitter = new EventEmitter();
 const clicks: number[] = [];
 
 // Only handle the first event
-const onFirstEvent = FnOnce((eventData: { x: number; }) => {
+const onFirstEvent = FnOnce((eventData: { x: number }) => {
     clicks.push(eventData.x);
     console.log(`First event handled: x=${eventData.x}`);
 });
 
-emitter.on((data) => {
-    onFirstEvent.tryCall(data as { x: number; });
+emitter.on(data => {
+    onFirstEvent.tryCall(data as { x: number });
 });
 
 // Emit multiple events
@@ -174,7 +171,7 @@ console.log(`Recorded clicks: [${clicks.join(', ')}]`); // Only [10]
 console.log('\n=== Example 6: Initialization Guard ===\n');
 
 class Application {
-    private _initialize: ReturnType<typeof FnOnce<[], { ready: boolean; }>>;
+    private _initialize: ReturnType<typeof FnOnce<[], { ready: boolean }>>;
 
     constructor() {
         this._initialize = FnOnce(() => {
@@ -257,7 +254,7 @@ function createDeferredPromise<T>() {
     });
 
     // Single FnOnce to guard settlement
-    const settle = FnOnce((action: 'resolve' | 'reject', value: T | unknown) => {
+    const settle = FnOnce((action: 'resolve' | 'reject', value: unknown) => {
         settled = true;
         if (action === 'resolve') {
             console.log('Resolving promise');
@@ -279,9 +276,9 @@ function createDeferredPromise<T>() {
 const deferred = createDeferredPromise<string>();
 
 // Multiple resolution attempts
-deferred.resolve('First');  // Resolves
+deferred.resolve('First'); // Resolves
 deferred.resolve('Second'); // No-op
-deferred.reject('Error');   // No-op
+deferred.reject('Error'); // No-op
 
 const result = await deferred.promise;
 console.log(`Promise result: ${result}`);

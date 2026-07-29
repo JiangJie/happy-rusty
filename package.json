@@ -5,15 +5,20 @@
   "license": "MIT",
   "version": "1.10.0",
   "type": "module",
-  "main": "dist/main.cjs",
-  "module": "dist/main.mjs",
-  "types": "dist/types.d.ts",
+  "main": "dist/mod.cjs",
+  "module": "dist/mod.mjs",
+  "types": "dist/mod.d.mts",
   "exports": {
     ".": {
-      "types": "./dist/types.d.ts",
-      "import": "./dist/main.mjs",
-      "require": "./dist/main.cjs",
-      "default": "./dist/main.mjs"
+      "import": {
+        "types": "./dist/mod.d.mts",
+        "default": "./dist/mod.mjs"
+      },
+      "require": {
+        "types": "./dist/mod.d.cts",
+        "default": "./dist/mod.cjs"
+      },
+      "default": "./dist/mod.mjs"
     },
     "./package.json": "./package.json"
   },
@@ -26,11 +31,13 @@
   "sideEffects": false,
   "scripts": {
     "check": "pnpm exec tsc --noEmit",
-    "lint": "pnpm exec eslint .",
-    "prebuild": "pnpm run check && pnpm run lint",
-    "build": "pnpm exec vite build && pnpm exec rollup --config rollup.config.ts",
-    "test": "pnpm exec vitest run --coverage",
-    "test:watch": "pnpm exec vitest",
+    "lint": "pnpm exec vp lint",
+    "fmt": "pnpm exec vp fmt",
+    "fmt:check": "pnpm exec vp fmt --check",
+    "prebuild": "pnpm exec vp check",
+    "build": "pnpm exec vp pack",
+    "test": "pnpm exec vp test run --coverage",
+    "test:watch": "pnpm exec vp test",
     "test:ui": "pnpm exec vitest --ui",
     "docs": "pnpm exec typedoc",
     "eg": "deno run -A examples/main.ts",
@@ -63,17 +70,13 @@
     "concurrency"
   ],
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@stylistic/eslint-plugin": "^5.10.0",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/coverage-v8": "4.1.10",
     "@vitest/ui": "4.1.10",
-    "eslint": "^10.8.0",
-    "rollup": "^4.62.3",
-    "rollup-plugin-dts": "^6.4.1",
+    "@voidzero-dev/vite-plus-core": "^0.2.6",
     "typedoc": "^0.28.20",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.65.0",
     "vite": "^8.1.5",
-    "vitest": "^4.1.10"
+    "vite-plus": "^0.2.6",
+    "vitest": "4.1.10"
   }
 }

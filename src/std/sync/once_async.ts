@@ -10,7 +10,18 @@
  * - Use `OnceAsync<T>` for async initialization with concurrent call handling
  */
 
-import { Err, None, Ok, RESULT_VOID, Some, type AsyncLikeResult, type AsyncResult, type Option, type Result, type VoidResult } from '../../core/mod.ts';
+import {
+    Err,
+    None,
+    Ok,
+    RESULT_VOID,
+    Some,
+    type AsyncLikeResult,
+    type AsyncResult,
+    type Option,
+    type Result,
+    type VoidResult,
+} from '../../core/mod.ts';
 
 /**
  * An async-first container which can be written to only once.
@@ -173,7 +184,9 @@ export interface OnceAsync<T> {
      * });
      * ```
      */
-    getOrTryInit<E>(fn: () => AsyncLikeResult<Awaited<T>, E> | Result<Awaited<T>, E>): AsyncResult<Awaited<T>, E>;
+    getOrTryInit<E>(
+        fn: () => AsyncLikeResult<Awaited<T>, E> | Result<Awaited<T>, E>,
+    ): AsyncResult<Awaited<T>, E>;
 
     /**
      * Takes the value out, leaving it uninitialized.
@@ -311,10 +324,15 @@ export function OnceAsync<T>(): OnceAsync<T> {
 
     // Use `Promise.resolve(fn())` instead of `async` to preserve sync error behavior:
     // sync throws propagate directly, async errors become rejected Promises.
-    function getOrTryInit<E>(fn: () => AsyncLikeResult<Value, E> | Result<Value, E>): AsyncResult<Value, E> {
+    function getOrTryInit<E>(
+        fn: () => AsyncLikeResult<Value, E> | Result<Value, E>,
+    ): AsyncResult<Value, E> {
         if (initialized) {
             // Reuse cached promise to avoid creating new Promise on each call
-            return (resolvedResultPromise ??= Promise.resolve(Ok(value as Value))) as AsyncResult<Value, E>;
+            return (resolvedResultPromise ??= Promise.resolve(Ok(value as Value))) as AsyncResult<
+                Value,
+                E
+            >;
         }
 
         // If already initializing, wait for it
@@ -333,8 +351,8 @@ export function OnceAsync<T>(): OnceAsync<T> {
         // Store the Result separately to preserve the original Result
         const resultPromise = Promise.resolve(fn());
 
-        pendingPromise = resultPromise.then(
-            (result) => {
+        pendingPromise = resultPromise
+            .then(result => {
                 if (result.isOk()) {
                     const val = result.unwrap();
                     setValue(val);
@@ -342,10 +360,10 @@ export function OnceAsync<T>(): OnceAsync<T> {
                 }
                 // If Err, throw to signal failure (waiters will retry)
                 throw result;
-            },
-        ).finally(() => {
-            pendingPromise = undefined;
-        });
+            })
+            .finally(() => {
+                pendingPromise = undefined;
+            });
 
         // Wait for pendingPromise to complete (success or failure), then return original Result
         return pendingPromise.then(
@@ -394,14 +412,14 @@ export function OnceAsync<T>(): OnceAsync<T> {
                 return pendingPromise;
             }
 
-            pendingPromise = Promise.resolve(fn()).then(
-                (result) => {
+            pendingPromise = Promise.resolve(fn())
+                .then(result => {
                     setValue(result);
                     return result;
-                },
-            ).finally(() => {
-                pendingPromise = undefined;
-            });
+                })
+                .finally(() => {
+                    pendingPromise = undefined;
+                });
 
             return pendingPromise;
         },
@@ -415,8 +433,8 @@ export function OnceAsync<T>(): OnceAsync<T> {
             const taken = value as Value;
             value = undefined;
             initialized = false;
-            resolvedPromise = undefined;  // Clear cached promise
-            resolvedResultPromise = undefined;  // Clear cached result promise
+            resolvedPromise = undefined; // Clear cached promise
+            resolvedResultPromise = undefined; // Clear cached result promise
             return Some(taken);
         },
 
@@ -437,7 +455,7 @@ export function OnceAsync<T>(): OnceAsync<T> {
             }
 
             // Otherwise, add to waiters and wait for someone to initialize
-            return new Promise<Value>((resolve) => {
+            return new Promise<Value>(resolve => {
                 waiters.push(resolve);
             });
         },

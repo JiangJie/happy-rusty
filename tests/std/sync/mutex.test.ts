@@ -63,11 +63,11 @@ describe('Mutex', () => {
         it('should execute callback with the protected value', async () => {
             const mutex = Mutex({ count: 0 });
 
-            await mutex.withLock((value) => {
+            await mutex.withLock(value => {
                 value.count = 42;
             });
 
-            await mutex.withLock((value) => {
+            await mutex.withLock(value => {
                 expect(value.count).toBe(42);
             });
         });
@@ -75,7 +75,7 @@ describe('Mutex', () => {
         it('should return the callback result', async () => {
             const mutex = Mutex(10);
 
-            const result = await mutex.withLock((value) => {
+            const result = await mutex.withLock(value => {
                 return value * 2;
             });
 
@@ -85,12 +85,12 @@ describe('Mutex', () => {
         it('should work with async callbacks', async () => {
             const mutex = Mutex<string[]>([]);
 
-            await mutex.withLock(async (arr) => {
+            await mutex.withLock(async arr => {
                 await new Promise(r => setTimeout(r, 10));
                 arr.push('first');
             });
 
-            await mutex.withLock((arr) => {
+            await mutex.withLock(arr => {
                 expect(arr).toEqual(['first']);
             });
         });
@@ -98,13 +98,15 @@ describe('Mutex', () => {
         it('should release lock on callback error', async () => {
             const mutex = Mutex(42);
 
-            await expect(mutex.withLock(() => {
-                throw new Error('test error');
-            })).rejects.toThrow('test error');
+            await expect(
+                mutex.withLock(() => {
+                    throw new Error('test error');
+                }),
+            ).rejects.toThrow('test error');
 
             // Lock should be released, allowing another acquire
             expect(mutex.isLocked()).toBe(false);
-            await mutex.withLock((value) => {
+            await mutex.withLock(value => {
                 expect(value).toBe(42);
             });
         });
@@ -112,10 +114,12 @@ describe('Mutex', () => {
         it('should release lock on async callback error', async () => {
             const mutex = Mutex(42);
 
-            await expect(mutex.withLock(async () => {
-                await new Promise(r => setTimeout(r, 10));
-                throw new Error('async error');
-            })).rejects.toThrow('async error');
+            await expect(
+                mutex.withLock(async () => {
+                    await new Promise(r => setTimeout(r, 10));
+                    throw new Error('async error');
+                }),
+            ).rejects.toThrow('async error');
 
             expect(mutex.isLocked()).toBe(false);
         });
@@ -125,19 +129,19 @@ describe('Mutex', () => {
             const order: string[] = [];
 
             await Promise.all([
-                mutex.withLock(async (arr) => {
+                mutex.withLock(async arr => {
                     order.push('a-start');
                     await new Promise(r => setTimeout(r, 30));
                     arr.push(1);
                     order.push('a-end');
                 }),
-                mutex.withLock(async (arr) => {
+                mutex.withLock(async arr => {
                     order.push('b-start');
                     await new Promise(r => setTimeout(r, 10));
                     arr.push(2);
                     order.push('b-end');
                 }),
-                mutex.withLock(async (arr) => {
+                mutex.withLock(async arr => {
                     order.push('c-start');
                     arr.push(3);
                     order.push('c-end');
@@ -145,13 +149,9 @@ describe('Mutex', () => {
             ]);
 
             // Operations should be serialized
-            expect(order).toEqual([
-                'a-start', 'a-end',
-                'b-start', 'b-end',
-                'c-start', 'c-end',
-            ]);
+            expect(order).toEqual(['a-start', 'a-end', 'b-start', 'b-end', 'c-start', 'c-end']);
 
-            await mutex.withLock((arr) => {
+            await mutex.withLock(arr => {
                 expect(arr).toEqual([1, 2, 3]);
             });
         });
@@ -166,7 +166,7 @@ describe('Mutex', () => {
 
         it('should work with sync return value', async () => {
             const mutex = Mutex(10);
-            const result = await mutex.withLock((value) => value * 10);
+            const result = await mutex.withLock(value => value * 10);
             expect(result).toBe(100);
         });
     });
@@ -187,7 +187,7 @@ describe('Mutex', () => {
             guard.value.count = 100;
             guard.unlock();
 
-            await mutex.withLock((value) => {
+            await mutex.withLock(value => {
                 expect(value.count).toBe(100);
             });
         });
@@ -199,7 +199,7 @@ describe('Mutex', () => {
             guard.value = 100;
             guard.unlock();
 
-            await mutex.withLock((value) => {
+            await mutex.withLock(value => {
                 expect(value).toBe(100);
             });
         });
@@ -221,7 +221,7 @@ describe('Mutex', () => {
             const guard1 = await mutex.lock();
             events.push('first-locked');
 
-            const promise2 = mutex.lock().then((g) => {
+            const promise2 = mutex.lock().then(g => {
                 events.push('second-locked');
                 return g;
             });
@@ -246,7 +246,9 @@ describe('Mutex', () => {
             guard.unlock();
 
             expect(() => guard.value).toThrow('MutexGuard has been released');
-            expect(() => { guard.value = 100; }).toThrow('MutexGuard has been released');
+            expect(() => {
+                guard.value = 100;
+            }).toThrow('MutexGuard has been released');
         });
 
         it('should ignore multiple unlock calls', async () => {
@@ -348,7 +350,9 @@ describe('Mutex', () => {
         it('should return updated value after modification', async () => {
             const mutex = Mutex({ count: 0 });
 
-            await mutex.withLock((v) => { v.count = 100; });
+            await mutex.withLock(v => {
+                v.count = 100;
+            });
 
             const value = await mutex.get();
             expect(value.count).toBe(100);
@@ -361,7 +365,7 @@ describe('Mutex', () => {
             const guard = await mutex.lock();
             events.push('locked');
 
-            const getPromise = mutex.get().then((v) => {
+            const getPromise = mutex.get().then(v => {
                 events.push('got');
                 return v;
             });
@@ -455,7 +459,7 @@ describe('Mutex', () => {
             const guard = await mutex.lock();
             events.push('locked');
 
-            const replacePromise = mutex.replace(100).then((old) => {
+            const replacePromise = mutex.replace(100).then(old => {
                 events.push('replaced');
                 return old;
             });
@@ -509,16 +513,22 @@ describe('Mutex', () => {
             const guard = await mutex.lock();
 
             // Queue up waiters
-            const p1 = mutex.withLock((arr) => { arr.push('first'); });
-            const p2 = mutex.withLock((arr) => { arr.push('second'); });
-            const p3 = mutex.withLock((arr) => { arr.push('third'); });
+            const p1 = mutex.withLock(arr => {
+                arr.push('first');
+            });
+            const p2 = mutex.withLock(arr => {
+                arr.push('second');
+            });
+            const p3 = mutex.withLock(arr => {
+                arr.push('third');
+            });
 
             // Release initial lock
             guard.unlock();
 
             await Promise.all([p1, p2, p3]);
 
-            await mutex.withLock((arr) => {
+            await mutex.withLock(arr => {
                 expect(arr).toEqual(['first', 'second', 'third']);
             });
         });
@@ -530,7 +540,7 @@ describe('Mutex', () => {
 
             await Promise.all(
                 Array.from({ length: 100 }, () =>
-                    mutex.withLock(async (state) => {
+                    mutex.withLock(async state => {
                         const current = state.count;
                         await new Promise(r => setTimeout(r, 1));
                         state.count = current + 1;
@@ -538,7 +548,7 @@ describe('Mutex', () => {
                 ),
             );
 
-            await mutex.withLock((state) => {
+            await mutex.withLock(state => {
                 expect(state.count).toBe(100);
             });
         });
@@ -552,7 +562,7 @@ describe('Mutex', () => {
             });
 
             async function getToken() {
-                return await mutex.withLock(async (state) => {
+                return await mutex.withLock(async state => {
                     if (isExpired(state.token)) {
                         state.token = await refreshToken();
                         state.refreshCount++;
@@ -576,7 +586,7 @@ describe('Mutex', () => {
             // Refresh should only be called once
             expect(refreshToken).toHaveBeenCalledTimes(1);
 
-            await mutex.withLock((state) => {
+            await mutex.withLock(state => {
                 expect(state.refreshCount).toBe(1);
             });
         });

@@ -336,7 +336,7 @@ export function Continue<B = never, C = void>(value: C): ControlFlow<B, C>;
  * const typedFlow = Continue<string>();  // ControlFlow<string, void>
  * ```
  */
-export function Continue<B = never>(): ControlFlow<B, void>;
+export function Continue<B = never>(): ControlFlow<B>;
 export function Continue<B, C>(value?: C): ControlFlow<B, C> {
     const cont: ControlFlow<B, C> = Object.freeze<ControlFlow<B, C>>({
         [Symbol.toStringTag]: 'ControlFlow',

@@ -99,7 +99,9 @@ describe('RwLock', () => {
             const guard = await rwlock.write();
             guard.unlock();
             expect(() => guard.value).toThrow('RwLockWriteGuard has been released');
-            expect(() => { guard.value = 100; }).toThrow('RwLockWriteGuard has been released');
+            expect(() => {
+                guard.value = 100;
+            }).toThrow('RwLockWriteGuard has been released');
         });
 
         it('should be frozen', async () => {
@@ -223,7 +225,7 @@ describe('RwLock', () => {
             const writeGuard = await rwlock.write();
             events.push('write-acquired');
 
-            const readPromise = rwlock.read().then((g) => {
+            const readPromise = rwlock.read().then(g => {
                 events.push('read-acquired');
                 return g;
             });
@@ -247,7 +249,7 @@ describe('RwLock', () => {
             const guard1 = await rwlock.write();
             events.push('write1-acquired');
 
-            const writePromise = rwlock.write().then((g) => {
+            const writePromise = rwlock.write().then(g => {
                 events.push('write2-acquired');
                 return g;
             });
@@ -286,7 +288,7 @@ describe('RwLock', () => {
             events.push('read1-acquired');
 
             // Queue a write (should wait)
-            const writePromise = rwlock.write().then((g) => {
+            const writePromise = rwlock.write().then(g => {
                 events.push('write-acquired');
                 return g;
             });
@@ -294,7 +296,7 @@ describe('RwLock', () => {
             await new Promise(r => setTimeout(r, 10));
 
             // Queue another read (should wait because writer is pending)
-            const read2Promise = rwlock.read().then((g) => {
+            const read2Promise = rwlock.read().then(g => {
                 events.push('read2-acquired');
                 return g;
             });
@@ -328,7 +330,7 @@ describe('RwLock', () => {
         it('should execute callback with the value', async () => {
             const rwlock = RwLock({ items: [1, 2, 3] });
 
-            const sum = await rwlock.withRead((value) => {
+            const sum = await rwlock.withRead(value => {
                 return value.items.reduce((a, b) => a + b, 0);
             });
 
@@ -345,16 +347,18 @@ describe('RwLock', () => {
 
         it('should work with sync return value', async () => {
             const rwlock = RwLock(10);
-            const result = await rwlock.withRead((value) => value * 2);
+            const result = await rwlock.withRead(value => value * 2);
             expect(result).toBe(20);
         });
 
         it('should release lock on error', async () => {
             const rwlock = RwLock(42);
 
-            await expect(rwlock.withRead(() => {
-                throw new Error('test error');
-            })).rejects.toThrow('test error');
+            await expect(
+                rwlock.withRead(() => {
+                    throw new Error('test error');
+                }),
+            ).rejects.toThrow('test error');
 
             expect(rwlock.readerCount()).toBe(0);
         });
@@ -389,7 +393,7 @@ describe('RwLock', () => {
         it('should execute callback and allow modification', async () => {
             const rwlock = RwLock({ count: 0 });
 
-            await rwlock.withWrite((value) => {
+            await rwlock.withWrite(value => {
                 value.count = 100;
             });
 
@@ -406,16 +410,18 @@ describe('RwLock', () => {
 
         it('should work with sync return value', async () => {
             const rwlock = RwLock(10);
-            const result = await rwlock.withWrite((value) => value * 2);
+            const result = await rwlock.withWrite(value => value * 2);
             expect(result).toBe(20);
         });
 
         it('should release lock on error', async () => {
             const rwlock = RwLock(42);
 
-            await expect(rwlock.withWrite(() => {
-                throw new Error('test error');
-            })).rejects.toThrow('test error');
+            await expect(
+                rwlock.withWrite(() => {
+                    throw new Error('test error');
+                }),
+            ).rejects.toThrow('test error');
 
             expect(rwlock.isWriteLocked()).toBe(false);
         });
@@ -425,13 +431,13 @@ describe('RwLock', () => {
             const order: string[] = [];
 
             await Promise.all([
-                rwlock.withWrite(async (arr) => {
+                rwlock.withWrite(async arr => {
                     order.push('a-start');
                     await new Promise(r => setTimeout(r, 30));
                     arr.push(1);
                     order.push('a-end');
                 }),
-                rwlock.withWrite(async (arr) => {
+                rwlock.withWrite(async arr => {
                     order.push('b-start');
                     await new Promise(r => setTimeout(r, 10));
                     arr.push(2);
@@ -545,7 +551,9 @@ describe('RwLock', () => {
         it('should return updated value after modification', async () => {
             const rwlock = RwLock({ count: 0 });
 
-            await rwlock.withWrite((v) => { v.count = 100; });
+            await rwlock.withWrite(v => {
+                v.count = 100;
+            });
 
             expect((await rwlock.get()).count).toBe(100);
         });
@@ -595,7 +603,7 @@ describe('RwLock', () => {
             const guard = await rwlock.write();
             events.push('locked');
 
-            const replacePromise = rwlock.replace(100).then((old) => {
+            const replacePromise = rwlock.replace(100).then(old => {
                 events.push('replaced');
                 return old;
             });
@@ -635,7 +643,8 @@ describe('RwLock', () => {
         it('RwLock should prevent property modification', () => {
             const rwlock = RwLock(42);
             expect(() => {
-                (rwlock as unknown as Record<string, unknown>)['read'] = () => Promise.resolve(null);
+                (rwlock as unknown as Record<string, unknown>)['read'] = () =>
+                    Promise.resolve(null);
             }).toThrow(TypeError);
         });
 
@@ -652,7 +661,7 @@ describe('RwLock', () => {
             const cache = RwLock(new Map<string, number>());
 
             // Write some initial data
-            await cache.withWrite((map) => {
+            await cache.withWrite(map => {
                 map.set('a', 1);
                 map.set('b', 2);
                 map.set('c', 3);
@@ -660,11 +669,11 @@ describe('RwLock', () => {
 
             // Many concurrent reads
             const results = await Promise.all([
-                cache.withRead((map) => map.get('a')),
-                cache.withRead((map) => map.get('b')),
-                cache.withRead((map) => map.get('c')),
-                cache.withRead((map) => map.get('a')),
-                cache.withRead((map) => map.get('b')),
+                cache.withRead(map => map.get('a')),
+                cache.withRead(map => map.get('b')),
+                cache.withRead(map => map.get('c')),
+                cache.withRead(map => map.get('a')),
+                cache.withRead(map => map.get('b')),
             ]);
 
             expect(results).toEqual([1, 2, 3, 1, 2]);
@@ -685,12 +694,12 @@ describe('RwLock', () => {
 
             // Concurrent reads during write
             const readPromises = Promise.all([
-                config.withRead((cfg) => cfg.features.includes('feature-a')),
-                config.withRead((cfg) => cfg.timeout),
+                config.withRead(cfg => cfg.features.includes('feature-a')),
+                config.withRead(cfg => cfg.timeout),
             ]);
 
             // Write update
-            await config.withWrite((cfg) => {
+            await config.withWrite(cfg => {
                 cfg.features.push('feature-b');
                 cfg.timeout = 10000;
             });
@@ -794,13 +803,13 @@ describe('RwLock', () => {
             const writeGuard = await rwlock.write();
 
             let readerAcquired = false;
-            const readPromise = rwlock.read().then((g) => {
+            const readPromise = rwlock.read().then(g => {
                 readerAcquired = true;
                 return g;
             });
 
             let writerAcquired = false;
-            const write2Promise = rwlock.write().then((g) => {
+            const write2Promise = rwlock.write().then(g => {
                 writerAcquired = true;
                 return g;
             });

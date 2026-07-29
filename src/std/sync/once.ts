@@ -10,7 +10,16 @@
  * - Use `OnceAsync<T>` for async initialization with concurrent call handling
  */
 
-import { Err, None, Ok, RESULT_VOID, Some, type Option, type Result, type VoidResult } from '../../core/mod.ts';
+import {
+    Err,
+    None,
+    Ok,
+    RESULT_VOID,
+    Some,
+    type Option,
+    type Result,
+    type VoidResult,
+} from '../../core/mod.ts';
 
 /**
  * A container which can be written to only once.

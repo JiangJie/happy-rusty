@@ -45,7 +45,7 @@ describe('isOption', () => {
 
         it('should return false for functions', () => {
             expect(isOption(() => {})).toBe(false);
-            expect(isOption(function() {})).toBe(false);
+            expect(isOption(function () {})).toBe(false);
         });
 
         it('should return false for Result values', () => {
@@ -112,7 +112,7 @@ describe('isResult', () => {
 
         it('should return false for functions', () => {
             expect(isResult(() => {})).toBe(false);
-            expect(isResult(function() {})).toBe(false);
+            expect(isResult(function () {})).toBe(false);
         });
 
         it('should return false for Option values', () => {

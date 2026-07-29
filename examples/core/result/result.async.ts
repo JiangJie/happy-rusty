@@ -80,7 +80,9 @@ async function sendNotification(email: string, message: string): Promise<Result<
 // Example 1: Chain async operations
 console.log('=== Example 1: Fetch user and their posts ===');
 
-const userWithPosts = await (await fetchUser(1))
+const userWithPosts = await (
+    await fetchUser(1)
+)
     .inspect(user => console.log(`Found user: ${user.name}`))
     .andThenAsync(async user => {
         const postsResult = await fetchUserPosts(user.id);
@@ -97,7 +99,9 @@ userWithPosts
 // Example 2: Error recovery with async fallback
 console.log('\n=== Example 2: Fallback on error ===');
 
-const result2 = await (await fetchUser(999))
+const result2 = await (
+    await fetchUser(999)
+)
     .inspectErr(err => console.log(`Primary fetch failed: ${err.message}`))
     .orElseAsync(async err => {
         console.log('Trying fallback: fetching first available user...');
@@ -112,7 +116,9 @@ console.log(`Got user: ${result2.map(u => u.name).unwrapOr('None')}`);
 // Example 3: Async validation
 console.log('\n=== Example 3: Async validation chain ===');
 
-const isValidUser = await (await fetchUser(1)).isOkAndAsync(async user => {
+const isValidUser = await (
+    await fetchUser(1)
+).isOkAndAsync(async user => {
     // Check if user has posts
     const postsResult = await fetchUserPosts(user.id);
     return postsResult.isOk() && postsResult.unwrap().length > 0;
@@ -136,14 +142,19 @@ for (let i = 0; i < 3; i++) {
     console.log(
         result
             .map(msg => `Success: ${msg}`)
-            .unwrapOr(`Failed: ${result.err().map(e => e.message).unwrapOr('Unknown')}`),
+            .unwrapOr(
+                `Failed: ${result
+                    .err()
+                    .map(e => e.message)
+                    .unwrapOr('Unknown')}`,
+            ),
     );
 }
 
 // Example 4b: tryAsyncResult with argument passing (like Promise.try)
 console.log('\n=== Example 4b: tryAsyncResult with arguments ===');
 
-async function fetchData(url: string, options: { method: string; }): Promise<string> {
+async function fetchData(url: string, options: { method: string }): Promise<string> {
     // Simulate fetch
     await new Promise(resolve => setTimeout(resolve, 50));
     return `Fetched from ${url} with method ${options.method}`;
@@ -193,8 +204,9 @@ async function processUserNotification(userId: number): Promise<Result<string, A
         .map(posts => `You have ${posts.length} posts`)
         .unwrapOr('Start writing your first post!');
 
-    return (await sendNotification(user.email, message))
-        .map(() => `Notification sent to ${user.name}`);
+    return (await sendNotification(user.email, message)).map(
+        () => `Notification sent to ${user.name}`,
+    );
 }
 
 const notificationResult = await processUserNotification(1);

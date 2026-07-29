@@ -179,7 +179,7 @@ if (secondFetch.isNone()) {
 console.log('\n=== Example 6: Async Initialization Guard ===\n');
 
 class AsyncApplication {
-    private _initialize: ReturnType<typeof FnOnceAsync<[], { ready: boolean; }>>;
+    private _initialize: ReturnType<typeof FnOnceAsync<[], { ready: boolean }>>;
 
     constructor() {
         this._initialize = FnOnceAsync(async () => {
@@ -300,13 +300,14 @@ function createQueryBuilder<T>(table: string): QueryBuilder<T> {
         },
         then(resolve, reject) {
             // Build and execute the query when awaited
-            const sql = `SELECT ${fields.join(', ')} FROM ${table}${conditions.length ? ` WHERE ${conditions.join(' AND ')}` : ''
-                }${limitValue ? ` LIMIT ${limitValue}` : ''}`;
+            const sql = `SELECT ${fields.join(', ')} FROM ${table}${
+                conditions.length ? ` WHERE ${conditions.join(' AND ')}` : ''
+            }${limitValue ? ` LIMIT ${limitValue}` : ''}`;
 
             console.log(`Executing: ${sql}`);
 
             // Simulate async query execution
-            return new Promise<T>((res) => {
+            return new Promise<T>(res => {
                 setTimeout(() => {
                     res({ rows: [], sql } as T);
                 }, 10);
@@ -319,7 +320,7 @@ function createQueryBuilder<T>(table: string): QueryBuilder<T> {
 
 // FnOnceAsync can wrap the query builder directly
 const fetchUsers = FnOnceAsync(() =>
-    createQueryBuilder<{ rows: unknown[]; sql: string; }>('users')
+    createQueryBuilder<{ rows: unknown[]; sql: string }>('users')
         .select(['id', 'name', 'email'])
         .where('active = true')
         .limit(10),
@@ -331,7 +332,9 @@ console.log(`Query result: ${JSON.stringify(queryResult)}`);
 
 // Second call fails - ensures query runs exactly once
 const secondQuery = await fetchUsers.tryCall();
-console.log(`Second query attempt: ${secondQuery.isNone() ? 'blocked (already executed)' : 'executed'}`);
+console.log(
+    `Second query attempt: ${secondQuery.isNone() ? 'blocked (already executed)' : 'executed'}`,
+);
 
 // ============================================================================
 // Example 9: Error Handling

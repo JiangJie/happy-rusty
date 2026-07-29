@@ -47,7 +47,7 @@ console.log(getConfig());
 // ============================================================================
 console.log('\n=== Example 2: Fallible initialization ===\n');
 
-const dbOnce = Once<{ connected: boolean; host: string; }>();
+const dbOnce = Once<{ connected: boolean; host: string }>();
 
 function connectToDatabase(host: string, shouldFail: boolean) {
     console.log(`Attempting to connect to ${host}...`);
@@ -62,7 +62,7 @@ function connectToDatabase(host: string, shouldFail: boolean) {
 
 // First attempt fails
 const result1 = connectToDatabase('primary.db.local', true);
-console.log(`Result: ${result1.isOk() ? 'Connected' : `Failed: ${(result1.unwrapErr() as Error).message}`}`);
+console.log(`Result: ${result1.isOk() ? 'Connected' : `Failed: ${result1.unwrapErr().message}`}`);
 console.log(`Initialized: ${dbOnce.isInitialized()}`);
 
 // Second attempt succeeds (still empty, so we can retry)
@@ -85,7 +85,9 @@ console.log(`First set: ${setResult1.isOk() ? 'Success' : 'Already set'}`);
 
 // Try to set again
 const setResult2 = tokenOnce.set('token-xyz-789');
-console.log(`Second set: ${setResult2.isOk() ? 'Success' : `Already set, returned: ${setResult2.unwrapErr()}`}`);
+console.log(
+    `Second set: ${setResult2.isOk() ? 'Success' : `Already set, returned: ${setResult2.unwrapErr()}`}`,
+);
 
 // Take the value
 const taken = tokenOnce.take();
@@ -134,7 +136,12 @@ console.log('\n=== Example 5: tryInsert() ===\n');
 const cacheOnce = Once<Map<string, number>>();
 
 // First insert succeeds
-const insert1 = cacheOnce.tryInsert(new Map([['a', 1], ['b', 2]]));
+const insert1 = cacheOnce.tryInsert(
+    new Map([
+        ['a', 1],
+        ['b', 2],
+    ]),
+);
 console.log(`First insert: ${insert1.isOk() ? 'Success' : 'Failed'}`);
 if (insert1.isOk()) {
     console.log(`Cache size: ${insert1.unwrap().size}`);
@@ -162,25 +169,31 @@ interface AppConfig {
 const appConfig = Once<AppConfig>();
 
 function loadAppConfig(rawConfig: Record<string, unknown>): AppConfig {
-    return appConfig.getOrTryInit(() => {
-        // Validate required fields
-        if (typeof rawConfig['port'] !== 'number' || rawConfig['port'] < 1 || rawConfig['port'] > 65535) {
-            return Err(new Error('Invalid port number'));
-        }
-        if (typeof rawConfig['host'] !== 'string' || rawConfig['host'].length === 0) {
-            return Err(new Error('Invalid host'));
-        }
+    return appConfig
+        .getOrTryInit(() => {
+            // Validate required fields
+            if (
+                typeof rawConfig['port'] !== 'number' ||
+                rawConfig['port'] < 1 ||
+                rawConfig['port'] > 65535
+            ) {
+                return Err(new Error('Invalid port number'));
+            }
+            if (typeof rawConfig['host'] !== 'string' || rawConfig['host'].length === 0) {
+                return Err(new Error('Invalid host'));
+            }
 
-        return Ok({
-            port: rawConfig['port'] as number,
-            host: rawConfig['host'] as string,
-            maxConnections: (rawConfig['maxConnections'] as number) || 100,
+            return Ok({
+                port: rawConfig['port'],
+                host: rawConfig['host'],
+                maxConnections: (rawConfig['maxConnections'] as number) || 100,
+            });
+        })
+        .unwrapOr({
+            port: 3000,
+            host: 'localhost',
+            maxConnections: 100,
         });
-    }).unwrapOr({
-        port: 3000,
-        host: 'localhost',
-        maxConnections: 100,
-    });
 }
 
 // Load with valid config

@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-    RESULT_FALSE,
-    RESULT_TRUE,
-    RESULT_VOID,
-    RESULT_ZERO,
-    isResult,
-} from '../../../src/mod.ts';
+import { RESULT_FALSE, RESULT_TRUE, RESULT_VOID, RESULT_ZERO, isResult } from '../../../src/mod.ts';
 
 describe('Result Constants', () => {
     const constants = [

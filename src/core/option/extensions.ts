@@ -43,7 +43,10 @@ import type { AsyncOption, Option } from './option.ts';
  * const decoded = tryOption(decodeURIComponent, str);
  * ```
  */
-export function tryOption<T, Args extends unknown[]>(fn: (...args: Args) => T, ...args: Args): Option<T> {
+export function tryOption<T, Args extends unknown[]>(
+    fn: (...args: Args) => T,
+    ...args: Args
+): Option<T> {
     try {
         return Some(fn(...args));
     } catch {
@@ -113,8 +116,14 @@ export function tryAsyncOption<T>(task: PromiseLike<T>): AsyncOption<Awaited<T>>
  * });
  * ```
  */
-export function tryAsyncOption<T, Args extends unknown[]>(task: (...args: Args) => PromiseLike<T> | T, ...args: Args): AsyncOption<Awaited<T>>;
-export async function tryAsyncOption<T, Args extends unknown[]>(task: PromiseLike<T> | ((...args: Args) => PromiseLike<T> | T), ...args: Args): AsyncOption<Awaited<T>> {
+export function tryAsyncOption<T, Args extends unknown[]>(
+    task: (...args: Args) => PromiseLike<T> | T,
+    ...args: Args
+): AsyncOption<Awaited<T>>;
+export async function tryAsyncOption<T, Args extends unknown[]>(
+    task: PromiseLike<T> | ((...args: Args) => PromiseLike<T> | T),
+    ...args: Args
+): AsyncOption<Awaited<T>> {
     try {
         const result = typeof task === 'function' ? task(...args) : task;
         return Some(await result);

@@ -100,18 +100,18 @@ describe('FnOnce', () => {
 
     describe('isConsumed', () => {
         it('should return false before call', () => {
-            const fn = FnOnce(() => { });
+            const fn = FnOnce(() => {});
             expect(fn.isConsumed()).toBe(false);
         });
 
         it('should return true after call()', () => {
-            const fn = FnOnce(() => { });
+            const fn = FnOnce(() => {});
             fn.call();
             expect(fn.isConsumed()).toBe(true);
         });
 
         it('should return true after tryCall()', () => {
-            const fn = FnOnce(() => { });
+            const fn = FnOnce(() => {});
             fn.tryCall();
             expect(fn.isConsumed()).toBe(true);
         });

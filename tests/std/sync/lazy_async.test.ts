@@ -67,11 +67,7 @@ describe('LazyAsync', () => {
                 return 42;
             });
 
-            const results = await Promise.all([
-                lazy.force(),
-                lazy.force(),
-                lazy.force(),
-            ]);
+            const results = await Promise.all([lazy.force(), lazy.force(), lazy.force()]);
 
             expect(callCount).toBe(1);
             expect(results).toEqual([42, 42, 42]);

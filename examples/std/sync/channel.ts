@@ -142,11 +142,7 @@ const logWriter = (async () => {
 })();
 
 // Start multiple producers
-await Promise.all([
-    serviceLogger('auth', 3),
-    serviceLogger('api', 3),
-    serviceLogger('db', 3),
-]);
+await Promise.all([serviceLogger('auth', 3), serviceLogger('api', 3), serviceLogger('db', 3)]);
 
 logChannel.close();
 await logWriter;
@@ -159,7 +155,7 @@ logs.forEach(log => console.log(`  ${log}`));
 // ============================================================================
 console.log('\n=== Example 6: Multiple consumers (work stealing) ===\n');
 
-const workQueue = Channel<{ id: number; data: string; }>(10);
+const workQueue = Channel<{ id: number; data: string }>(10);
 
 // Fill work queue
 for (let i = 1; i <= 6; i++) {
@@ -181,11 +177,7 @@ async function worker(name: string) {
     console.log(`  ${name} finished`);
 }
 
-await Promise.all([
-    worker('Worker-A'),
-    worker('Worker-B'),
-    worker('Worker-C'),
-]);
+await Promise.all([worker('Worker-A'), worker('Worker-B'), worker('Worker-C')]);
 
 console.log(`\nResults: ${results.join(', ')}`);
 
@@ -249,7 +241,7 @@ console.log('\n=== Example 9: Sender/Receiver type separation ===\n');
 interface Log {
     type: string;
     payload: unknown;
-};
+}
 
 const typedChannel = Channel<Log>(10);
 

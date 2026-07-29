@@ -164,18 +164,18 @@ describe('FnOnceAsync', () => {
 
     describe('isConsumed', () => {
         it('should return false before call', () => {
-            const fn = FnOnceAsync(async () => { });
+            const fn = FnOnceAsync(async () => {});
             expect(fn.isConsumed()).toBe(false);
         });
 
         it('should return true after call()', async () => {
-            const fn = FnOnceAsync(async () => { });
+            const fn = FnOnceAsync(async () => {});
             await fn.call();
             expect(fn.isConsumed()).toBe(true);
         });
 
         it('should return true after tryCall()', async () => {
-            const fn = FnOnceAsync(async () => { });
+            const fn = FnOnceAsync(async () => {});
             await fn.tryCall();
             expect(fn.isConsumed()).toBe(true);
         });
@@ -189,7 +189,9 @@ describe('FnOnceAsync', () => {
                     onfulfilled?: ((value: number) => TResult1 | PromiseLike<TResult1>) | null,
                     _onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null,
                 ): PromiseLike<TResult1 | TResult2> {
-                    return Promise.resolve(onfulfilled ? onfulfilled(42) : 42 as unknown as TResult1);
+                    return Promise.resolve(
+                        onfulfilled ? onfulfilled(42) : (42 as unknown as TResult1),
+                    );
                 },
             };
 

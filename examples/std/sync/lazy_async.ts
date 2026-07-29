@@ -19,7 +19,9 @@ const asyncValue = LazyAsync(async () => {
 });
 
 console.log(`Before force: isInitialized = ${asyncValue.isInitialized()}`);
-console.log(`get() = ${asyncValue.get().isNone() ? 'None' : asyncValue.get().unwrap()}`);
+console.log(
+    `get() = ${asyncValue.get().isNone() ? 'None' : JSON.stringify(asyncValue.get().unwrap())}`,
+);
 
 console.log('\nFirst access via force():');
 const result = await asyncValue.force();
@@ -144,6 +146,7 @@ async function loadWithRetry(maxRetries: number) {
             console.log('Retrying...');
         }
     }
+    throw new Error(`No attempts made: maxRetries is ${maxRetries}`);
 }
 
 try {

@@ -17,7 +17,7 @@ console.log('=== Example 1: Short-circuiting Search ===\n');
  * Using ControlFlow for more explicit control flow.
  * This pattern is useful when you need to carry additional state.
  */
-function findFirstWithFlow<T>(arr: T[], predicate: (item: T) => boolean): ControlFlow<T, void> {
+function findFirstWithFlow<T>(arr: T[], predicate: (item: T) => boolean): ControlFlow<T> {
     for (const item of arr) {
         if (predicate(item)) {
             return Break(item);

@@ -380,7 +380,7 @@ export function Mutex<T>(value: T): Mutex<T> {
             return Promise.resolve(createGuard());
         }
 
-        return new Promise<MutexGuard<T>>((resolve) => {
+        return new Promise<MutexGuard<T>>(resolve => {
             waitQueue.push(() => {
                 resolve(createGuard());
             });

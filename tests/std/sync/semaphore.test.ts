@@ -120,9 +120,11 @@ describe('Semaphore', () => {
 
         it('should auto-release permit after callback rejects', async () => {
             const sem = Semaphore(1);
-            await expect(sem.withPermit(async () => {
-                throw new Error('boom');
-            })).rejects.toThrow('boom');
+            await expect(
+                sem.withPermit(async () => {
+                    throw new Error('boom');
+                }),
+            ).rejects.toThrow('boom');
             expect(sem.availablePermits()).toBe(1);
         });
 
@@ -165,7 +167,7 @@ describe('Semaphore', () => {
             const permit = await sem.acquire();
 
             let secondAcquired = false;
-            const second = sem.acquire().then((p) => {
+            const second = sem.acquire().then(p => {
                 secondAcquired = true;
                 return p;
             });
@@ -205,8 +207,8 @@ describe('Semaphore', () => {
             const first = await sem.acquire();
             order.push('first-acquired');
 
-            const waiters = ['A', 'B', 'C'].map((name) =>
-                sem.acquire().then((p) => {
+            const waiters = ['A', 'B', 'C'].map(name =>
+                sem.acquire().then(p => {
                     order.push(`${name}-acquired`);
                     return p;
                 }),
@@ -222,12 +224,7 @@ describe('Semaphore', () => {
             await new Promise(r => setTimeout(r, 10));
             (await waiters[2]).release();
 
-            expect(order).toEqual([
-                'first-acquired',
-                'A-acquired',
-                'B-acquired',
-                'C-acquired',
-            ]);
+            expect(order).toEqual(['first-acquired', 'A-acquired', 'B-acquired', 'C-acquired']);
         });
     });
 
@@ -281,7 +278,7 @@ describe('Semaphore', () => {
             const responses = await Promise.all(urls.map(fakeFetch));
 
             expect(maxActive).toBe(3);
-            expect(responses).toEqual(urls.map((u) => `response-${u}`));
+            expect(responses).toEqual(urls.map(u => `response-${u}`));
         });
 
         it('should support task queue with backpressure', async () => {

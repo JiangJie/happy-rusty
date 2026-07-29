@@ -174,15 +174,20 @@ export function Some<T>(value: T): Option<T> {
             const tuple = value as [U, R];
 
             if (!Array.isArray(tuple) || tuple.length !== 2) {
-                throw new TypeError(`Option::unzip() requires a 2-element tuple, received ${Array.isArray(tuple) ? `array with ${tuple.length} elements` : typeof tuple}`);
+                throw new TypeError(
+                    `Option::unzip() requires a 2-element tuple, received ${Array.isArray(tuple) ? `array with ${tuple.length} elements` : typeof tuple}`,
+                );
             }
 
             const [a, b] = tuple;
             return [Some(a), Some(b)];
         },
-        reduce<U, R = T | U>(other: Option<U>, fn: (value: T, otherValue: U) => R): Option<T | U | R> {
+        reduce<U, R = T | U>(
+            other: Option<U>,
+            fn: (value: T, otherValue: U) => R,
+        ): Option<T | U | R> {
             assertOption<U>(other);
-            return other.isSome() ? Some(fn(value, other.unwrap())) : some as Option<T | U | R>;
+            return other.isSome() ? Some(fn(value, other.unwrap())) : some;
         },
 
         and<U>(other: Option<U>): Option<U> {
@@ -330,7 +335,7 @@ export const None: None = /*#__PURE__*/ Object.freeze<None>({
     },
     reduce<U, R = U>(other: Option<U>, _fn: (value: never, otherValue: U) => R): Option<U | R> {
         assertOption<U>(other);
-        return other as Option<U | R>;
+        return other;
     },
 
     and<U>(_other: Option<U>): None {
@@ -579,10 +584,7 @@ export function Ok<T, E>(value?: T): Result<T, E> {
         andTryAsync<U>(fn: (value: T) => PromiseLike<U> | U): AsyncResult<Awaited<U>, E> {
             try {
                 const result = fn(value as T);
-                return Promise.resolve(result).then(
-                    Ok<Awaited<U>, E>,
-                    Err<Awaited<U>, E>,
-                );
+                return Promise.resolve(result).then(Ok<Awaited<U>, E>, Err<Awaited<U>, E>);
             } catch (e) {
                 return Promise.resolve(Err<Awaited<U>, E>(e as E));
             }
@@ -710,7 +712,9 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
         andThen<U>(_fn: (value: T) => Result<U, E>): Result<U, E> {
             return err as unknown as Result<U, E>;
         },
-        andThenAsync<U>(_fn: (value: T) => AsyncLikeResult<U, E> | Result<U, E>): AsyncResult<U, E> {
+        andThenAsync<U>(
+            _fn: (value: T) => AsyncLikeResult<U, E> | Result<U, E>,
+        ): AsyncResult<U, E> {
             return Promise.resolve(err as unknown as Result<U, E>);
         },
         orElse<F>(fn: (error: E) => Result<T, F>): Result<T, F> {
@@ -746,10 +750,7 @@ export function Err<T = never, E = unknown>(error: E): Result<T, E> {
         orTryAsync<F>(fn: (error: E) => PromiseLike<T> | T): AsyncResult<Awaited<T>, F> {
             try {
                 const result = fn(error);
-                return Promise.resolve(result).then(
-                    Ok<Awaited<T>, F>,
-                    Err<Awaited<T>, F>,
-                );
+                return Promise.resolve(result).then(Ok<Awaited<T>, F>, Err<Awaited<T>, F>);
             } catch (e) {
                 return Promise.resolve(Err<Awaited<T>, F>(e as F));
             }
@@ -777,6 +778,8 @@ function safeStringify(value: unknown): string {
         if (typeof value === 'object') {
             return Object.prototype.toString.call(value);
         }
+        // Only primitives and functions reach here; default stringification is intended.
+        // oxlint-disable-next-line typescript/no-base-to-string
         return String(value);
     } catch {
         return '[unable to stringify]';

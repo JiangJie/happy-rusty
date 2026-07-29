@@ -1,5 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
-import { ASYNC_NONE, Err, None, Ok, Some, type AsyncOption, type Option } from '../../../src/mod.ts';
+import {
+    ASYNC_NONE,
+    Err,
+    None,
+    Ok,
+    Some,
+    type AsyncOption,
+    type Option,
+} from '../../../src/mod.ts';
 
 describe('Option', () => {
     describe('Some variant', () => {
@@ -32,7 +40,7 @@ describe('Option', () => {
 
             it('isSomeAndAsync() should work with async predicates', async () => {
                 const result = await some.isSomeAndAsync(async v => {
-                    return v === await Promise.resolve(10);
+                    return v === (await Promise.resolve(10));
                 });
                 expect(result).toBe(true);
             });
@@ -50,7 +58,7 @@ describe('Option', () => {
 
             it('isNoneOrAsync() should work with async predicates', async () => {
                 const result = await some.isNoneOrAsync(async v => {
-                    return v === await Promise.resolve(10);
+                    return v === (await Promise.resolve(10));
                 });
                 expect(result).toBe(true);
 
@@ -95,7 +103,9 @@ describe('Option', () => {
                 // This test verifies that Promise<Awaited<T>> correctly flattens nested Promises
                 // When Some contains Promise<number>, Promise.resolve(value) unwraps it
                 const somePromise: Option<Promise<number>> = Some(Promise.resolve(42));
-                const result = await somePromise.unwrapOrElseAsync(() => Promise.resolve(Promise.resolve(100)));
+                const result = await somePromise.unwrapOrElseAsync(() =>
+                    Promise.resolve(Promise.resolve(100)),
+                );
                 // Runtime: Promise.resolve(Promise.resolve(42)) flattens to 42, not Promise<42>
                 expect(result).toBe(42);
             });
@@ -139,7 +149,12 @@ describe('Option', () => {
             });
 
             it('mapOrElse() should apply fn to the value', () => {
-                expect(some.mapOrElse(() => 0, v => v + 1)).toBe(11);
+                expect(
+                    some.mapOrElse(
+                        () => 0,
+                        v => v + 1,
+                    ),
+                ).toBe(11);
             });
 
             it('filter() should return Some when predicate matches', () => {
@@ -179,15 +194,18 @@ describe('Option', () => {
 
         describe('unzip validation', () => {
             it('should throw for non-tuple values', () => {
-                expect(() => (some as unknown as Option<[number, number]>).unzip())
-                    .toThrow('Option::unzip() requires a 2-element tuple');
+                expect(() => (some as unknown as Option<[number, number]>).unzip()).toThrow(
+                    'Option::unzip() requires a 2-element tuple',
+                );
             });
 
             it('should throw for array with wrong length', () => {
-                expect(() => (Some([1]) as unknown as Option<[number, number]>).unzip())
-                    .toThrow('Option::unzip() requires a 2-element tuple');
-                expect(() => (Some([1, 2, 3]) as unknown as Option<[number, number]>).unzip())
-                    .toThrow('Option::unzip() requires a 2-element tuple');
+                expect(() => (Some([1]) as unknown as Option<[number, number]>).unzip()).toThrow(
+                    'Option::unzip() requires a 2-element tuple',
+                );
+                expect(() =>
+                    (Some([1, 2, 3]) as unknown as Option<[number, number]>).unzip(),
+                ).toThrow('Option::unzip() requires a 2-element tuple');
             });
         });
 
@@ -224,8 +242,9 @@ describe('Option', () => {
             });
 
             it('should throw for invalid other argument', () => {
-                expect(() => some.reduce('not an option' as unknown as Option<number>, (x, y) => x + y))
-                    .toThrow('Expected an Option');
+                expect(() =>
+                    some.reduce('not an option' as unknown as Option<number>, (x, y) => x + y),
+                ).toThrow('Expected an Option');
             });
         });
 
@@ -273,14 +292,14 @@ describe('Option', () => {
 
         describe('inspect', () => {
             it('should call fn with the contained value', () => {
-                const fn = vi.fn((_value: number) => { });
+                const fn = vi.fn((_value: number) => {});
                 some.inspect(fn);
                 expect(fn).toHaveBeenCalledTimes(1);
                 expect(fn).toHaveBeenCalledWith(10);
             });
 
             it('should return self for chaining', () => {
-                expect(some.inspect(() => { }).eq(some)).toBe(true);
+                expect(some.inspect(() => {}).eq(some)).toBe(true);
             });
         });
 
@@ -330,21 +349,26 @@ describe('Option', () => {
             });
 
             it('should include value in error message for undefined', () => {
-                expect(() => some.zip(undefined as unknown as Option<string>))
-                    .toThrow('Expected an Option, but received: undefined');
+                expect(() => some.zip(undefined as unknown as Option<string>)).toThrow(
+                    'Expected an Option, but received: undefined',
+                );
             });
 
             it('should handle objects that throw on stringify', () => {
-                const badProxy = new Proxy({}, {
-                    get(_target, prop) {
-                        if (prop === Symbol.toStringTag) {
-                            throw new Error('Cannot get toStringTag');
-                        }
-                        return undefined;
+                const badProxy = new Proxy(
+                    {},
+                    {
+                        get(_target, prop) {
+                            if (prop === Symbol.toStringTag) {
+                                throw new Error('Cannot get toStringTag');
+                            }
+                            return undefined;
+                        },
                     },
-                });
-                expect(() => some.zip(badProxy as unknown as Option<string>))
-                    .toThrow('Expected an Option, but received: [unable to stringify]');
+                );
+                expect(() => some.zip(badProxy as unknown as Option<string>)).toThrow(
+                    'Expected an Option, but received: [unable to stringify]',
+                );
             });
         });
     });
@@ -380,7 +404,7 @@ describe('Option', () => {
 
             it('isSomeAndAsync() should return false', async () => {
                 const result = await none.isSomeAndAsync(async v => {
-                    return v === await Promise.resolve(10);
+                    return v === (await Promise.resolve(10));
                 });
                 expect(result).toBe(false);
             });
@@ -429,7 +453,9 @@ describe('Option', () => {
                 // When T is Promise<number>, the callback returns Promise<Promise<number>>
                 // But Promise.resolve() flattens it to Promise<number>, so we only need one await
                 const nonePromise: Option<Promise<number>> = None;
-                const result = await nonePromise.unwrapOrElseAsync(() => Promise.resolve(Promise.resolve(42)));
+                const result = await nonePromise.unwrapOrElseAsync(() =>
+                    Promise.resolve(Promise.resolve(42)),
+                );
                 // Runtime: Promise.resolve(Promise.resolve(42)) flattens to Promise<42>
                 // So result is 42, not Promise<42>
                 expect(result).toBe(42);
@@ -547,13 +573,13 @@ describe('Option', () => {
 
         describe('inspect', () => {
             it('should not call fn', () => {
-                const fn = vi.fn((_value: number) => { });
+                const fn = vi.fn((_value: number) => {});
                 none.inspect(fn);
                 expect(fn).not.toHaveBeenCalled();
             });
 
             it('should return self for chaining', () => {
-                expect(none.inspect(() => { })).toBe(None);
+                expect(none.inspect(() => {})).toBe(None);
             });
         });
 
@@ -649,7 +675,7 @@ describe('Option', () => {
         it('should be assignable to AsyncOption<T> for any T', async () => {
             const stringOption: AsyncOption<string> = ASYNC_NONE;
             const numberOption: AsyncOption<number> = ASYNC_NONE;
-            const objectOption: AsyncOption<{ id: number; }> = ASYNC_NONE;
+            const objectOption: AsyncOption<{ id: number }> = ASYNC_NONE;
 
             expect((await stringOption).isNone()).toBe(true);
             expect((await numberOption).isNone()).toBe(true);
@@ -661,14 +687,14 @@ describe('Option', () => {
         describe('andThenAsync', () => {
             it('Some.andThenAsync should work with async fn returning Option', async () => {
                 const some = Some(10);
-                const result = await some.andThenAsync(async (v) => Some(v * 2));
+                const result = await some.andThenAsync(async v => Some(v * 2));
                 expect(result.isSome()).toBe(true);
                 expect(result.unwrap()).toBe(20);
             });
 
             it('Some.andThenAsync should handle sync Option return', async () => {
                 const some = Some(10);
-                const result = await some.andThenAsync((v) => Some(v * 2));
+                const result = await some.andThenAsync(v => Some(v * 2));
                 expect(result.unwrap()).toBe(20);
             });
 

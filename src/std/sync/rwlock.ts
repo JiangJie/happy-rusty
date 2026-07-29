@@ -599,7 +599,7 @@ export function RwLock<T>(value: T): RwLock<T> {
             return Promise.resolve(createReadGuard());
         }
 
-        return new Promise<RwLockReadGuard<T>>((resolve) => {
+        return new Promise<RwLockReadGuard<T>>(resolve => {
             readWaitQueue.push(() => {
                 resolve(createReadGuard());
             });
@@ -612,7 +612,7 @@ export function RwLock<T>(value: T): RwLock<T> {
         }
 
         pendingWriters++;
-        return new Promise<RwLockWriteGuard<T>>((resolve) => {
+        return new Promise<RwLockWriteGuard<T>>(resolve => {
             writeWaitQueue.push(() => {
                 resolve(createWriteGuard());
             });
