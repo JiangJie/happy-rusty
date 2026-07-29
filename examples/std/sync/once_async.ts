@@ -239,9 +239,11 @@ console.log(await ordersPromise);
 console.log('\n=== Example 7: Async singleton pattern ===\n');
 
 class AsyncDatabase {
+    public readonly connectionId: string;
     private static instance = OnceAsync<AsyncDatabase>();
 
-    private constructor(public readonly connectionId: string) {
+    private constructor(connectionId: string) {
+        this.connectionId = connectionId;
         console.log(`Database connection ${connectionId} established`);
     }
 

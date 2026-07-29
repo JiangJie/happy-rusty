@@ -104,9 +104,11 @@ console.log(`After re-set: ${tokenOnce.get().unwrap()}`);
 console.log('\n=== Example 4: Singleton pattern ===\n');
 
 class Logger {
+    readonly name: string;
     private static instance = Once<Logger>();
 
-    private constructor(public readonly name: string) {
+    private constructor(name: string) {
+        this.name = name;
         console.log(`Logger "${name}" created`);
     }
 

@@ -39,7 +39,7 @@
     "test": "pnpm exec vp test run --coverage",
     "test:watch": "pnpm exec vp test",
     "docs": "pnpm exec typedoc",
-    "eg": "deno run -A examples/main.ts",
+    "eg": "node examples/main.ts",
     "prepublishOnly": "pnpm run build"
   },
   "repository": {
