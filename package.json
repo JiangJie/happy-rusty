@@ -38,7 +38,6 @@
     "build": "pnpm exec vp pack",
     "test": "pnpm exec vp test run --coverage",
     "test:watch": "pnpm exec vp test",
-    "test:ui": "pnpm exec vitest --ui",
     "docs": "pnpm exec typedoc",
     "eg": "deno run -A examples/main.ts",
     "prepublishOnly": "pnpm run build"
@@ -71,12 +70,8 @@
   ],
   "devDependencies": {
     "@vitest/coverage-v8": "4.1.10",
-    "@vitest/ui": "4.1.10",
-    "@voidzero-dev/vite-plus-core": "^0.2.6",
     "typedoc": "^0.28.20",
     "typescript": "^6.0.3",
-    "vite": "^8.1.5",
-    "vite-plus": "^0.2.6",
-    "vitest": "4.1.10"
+    "vite-plus": "^0.2.6"
   }
 }

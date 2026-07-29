@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 import { RESULT_FALSE, RESULT_TRUE, RESULT_VOID, RESULT_ZERO, isResult } from '../../../src/mod.ts';
 
 describe('Result Constants', () => {

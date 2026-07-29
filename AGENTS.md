@@ -27,9 +27,6 @@ pnpm run test
 
 # Run tests in watch mode
 pnpm run test:watch
-
-# Run tests with UI
-pnpm run test:ui
 ```
 
 ### Building
@@ -219,14 +216,14 @@ This project uses **pnpm** for all development tasks:
 
 #### pnpm (Build, Test & Development Tools)
 - **Purpose**: Manages the Node.js toolchain (`vite-plus` CLI) and testing
-- **Dependencies**: `vite-plus` (+ `@voidzero-dev/vite-plus-core`), Vitest coverage/UI addons, TypeScript, TypeDoc
+- **Dependencies**: `vite-plus`, `@vitest/coverage-v8`, TypeScript, TypeDoc
 - **Location**: `node_modules/` (from npm registry)
 - **Used for**: Building npm packages, testing, linting, formatting, type checking, documentation
 
 **Dependency version management with Vite+:**
-- `vite` is aliased to `npm:@voidzero-dev/vite-plus-core` via `overrides` in `pnpm-workspace.yaml`; `vitest` is pinned to the version bundled by Vite+ (`4.1.10`). `@vitest/coverage-v8` and `@vitest/ui` are NOT bundled and must stay pinned to the same Vitest version.
-- Upgrading the toolchain means bumping `vite-plus` + `@voidzero-dev/vite-plus-core` and syncing the `vite` override version and the `vitest` pin — NOT running a blanket devDeps upgrade. Check the Vite+ changelog for breaking changes first (pre-1.0).
-- The direct `vite` devDependency must stay declared: without it, pnpm auto-installs upstream vite for vitest's peer dependency, splitting vite into two instances.
+- `vite-plus` is the single toolchain dependency; `@vitest/coverage-v8` is the only unbundled addon and must stay pinned to the Vitest version bundled by Vite+.
+- Upgrading the toolchain means bumping `vite-plus` — NOT running a blanket devDeps upgrade. Check the Vite+ changelog for breaking changes first (pre-1.0).
+- `vite` and `vitest` are NOT declared as devDependencies — Vite+ bundles its own copies of both.
 - `typescript` stays pinned to `^6.0.3` — do NOT upgrade to TS 7. TypeDoc and the dts bundling path consume the TypeScript JS API, which TS 7 removed (7.0 ships CLI/LSP only). Type checking in `vp check` already runs on tsgo (the TS 7 compiler), so upgrading the local package adds no value.
 
 **Key Point**: Test code (`tests/`) is NEVER bundled into `dist/`.
@@ -262,8 +259,9 @@ Dual publishing to:
   - `tests/std/ops/control_flow.test.ts` - ControlFlow tests
   - `tests/std/ops/fn_once.test.ts` - FnOnce tests
   - `tests/std/ops/fn_once_async.test.ts` - FnOnceAsync tests
-- Uses Vitest with `@vitest/coverage-v8` for coverage
-- Tests import from `../../../src/mod.ts` using relative paths
+- Uses `@vitest/coverage-v8` for coverage
+- Tests import from `vite-plus/test` (e.g. `import { describe, expect, it, vi } from 'vite-plus/test'`), not from `vitest`
+- Source imports use relative paths from `../../../src/mod.ts`
 - Run with: `pnpm run test`
 - **Branch coverage**: any new branch (a new `toString` state, a `typeof` fast path, conditional logic, etc.) must be accompanied by tests covering that branch. New code should reach 100% branch coverage; never leave a newly introduced branch untested
 
