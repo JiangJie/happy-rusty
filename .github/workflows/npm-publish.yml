@@ -11,11 +11,11 @@ permissions:
   packages: read
 
 jobs:
-  test:
-    uses: ./.github/workflows/test.yml
+  ci:
+    uses: ./.github/workflows/ci.yml
 
   publish:
-    needs: test
+    needs: ci
     runs-on: ubuntu-latest
     permissions:
       contents: read

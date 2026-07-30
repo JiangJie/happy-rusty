@@ -81,7 +81,7 @@ pnpm run eg
 ```
 
 ### Publish Hook
-`prepublishOnly` runs the full `build` automatically before `npm publish`, so local publishes also produce a fresh `dist/`. CI handles publishing on tags — see Releasing below.
+`prepublishOnly` runs `build && verify:package` automatically before `npm publish`, so every publish (local or CI) produces a fresh `dist/` and validates the exact tarball being shipped (attw + publint). CI handles publishing on tags — see Releasing below.
 
 ## Architecture
 
@@ -303,7 +303,7 @@ pnpm exec vp test tests/core/option/option.test.ts
 
 ## CI/CD
 
-- **test.yml** - Runs tests on push to main; reusable via `workflow_call`
+- **ci.yml** - All quality gates in a single job on push to main: build (prebuild runs `vp check` for fmt+lint+types), tests, and package verification (`verify:package` script: attw + publint); reusable via `workflow_call`
 - **docs.yml** - Deploys TypeDoc HTML to GitHub Pages on push to main
 - **npm-publish.yml** - Publishes to npm on version tags (v*)
 - **npm-publish-github-packages.yml** - Publishes to GitHub Packages on version tags

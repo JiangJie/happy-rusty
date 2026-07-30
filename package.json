@@ -40,7 +40,8 @@
     "test:watch": "pnpm exec vp test",
     "docs": "pnpm exec typedoc",
     "eg": "node examples/main.ts",
-    "prepublishOnly": "pnpm run build"
+    "verify:package": "pnpm exec attw --pack && pnpm exec publint --strict",
+    "prepublishOnly": "pnpm run build && pnpm run verify:package"
   },
   "repository": {
     "type": "git",
@@ -69,7 +70,9 @@
     "concurrency"
   ],
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
     "@vitest/coverage-v8": "4.1.10",
+    "publint": "^0.3.22",
     "typedoc": "^0.28.20",
     "typescript": "^6.0.3",
     "vite-plus": "^0.2.6"
