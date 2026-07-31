@@ -983,7 +983,7 @@ describe('tryAsyncResult', () => {
     });
 
     it('should flatten nested Promises from function return', async () => {
-        const fn = async () => Promise.resolve(99);
+        const fn = async () => 99;
         const result = await tryAsyncResult(fn);
         expect(result.unwrap()).toBe(99);
     });
@@ -1139,7 +1139,7 @@ describe('tryAsyncOption', () => {
     });
 
     it('should flatten nested Promises from function return', async () => {
-        const fn = async () => Promise.resolve(99);
+        const fn = async () => 99;
         const option = await tryAsyncOption(fn);
         expect(option.unwrap()).toBe(99);
     });

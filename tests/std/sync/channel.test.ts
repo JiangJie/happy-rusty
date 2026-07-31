@@ -228,7 +228,7 @@ describe('Channel', () => {
             await ch.send(3);
 
             await Promise.all([p1, p2, p3]);
-            expect(results.sort((a, b) => a - b)).toEqual([1, 2, 3]);
+            expect(results.toSorted((a, b) => a - b)).toEqual([1, 2, 3]);
         });
     });
 
@@ -620,7 +620,9 @@ describe('Channel', () => {
             ]);
 
             // All values should be consumed exactly once
-            const allValues = [...results[0], ...results[1], ...results[2]].sort((a, b) => a - b);
+            const allValues = [...results[0], ...results[1], ...results[2]].toSorted(
+                (a, b) => a - b,
+            );
             expect(allValues).toEqual(Array.from({ length: 30 }, (_, i) => i));
         });
 

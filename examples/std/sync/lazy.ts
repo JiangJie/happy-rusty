@@ -81,7 +81,6 @@ class Logger {
         return new Logger();
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     private constructor() {}
 
     static get instance(): Logger {
@@ -193,6 +192,7 @@ const shouldFail = true;
 
 const riskyValue = Lazy(() => {
     console.log('Attempting to compute value...');
+    // oxlint-disable-next-line typescript/no-unnecessary-condition -- demo toggle: flip to false to see the success path
     if (shouldFail) {
         throw new Error('Computation failed!');
     }

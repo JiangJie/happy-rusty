@@ -53,8 +53,8 @@ function validatePassword(password: string): Result<string, ValidationError> {
  * Validate and parse age
  */
 function validateAge(ageStr: string): Result<number, ValidationError> {
-    const age = parseInt(ageStr, 10);
-    if (isNaN(age)) {
+    const age = Number.parseInt(ageStr, 10);
+    if (Number.isNaN(age)) {
         return Err({ field: 'age', message: 'Age must be a number' });
     }
     if (age < 18 || age > 120) {

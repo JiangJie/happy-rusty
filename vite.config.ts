@@ -10,11 +10,13 @@ export default defineConfig({
         },
     },
     lint: {
-        plugins: ['typescript', 'oxc', 'eslint'],
-        ignorePatterns: ['dist', 'coverage'],
+        plugins: ['typescript', 'oxc', 'eslint', 'import', 'unicorn', 'vitest'],
+        ignorePatterns: ['coverage', 'dist', 'docs'],
         options: {
             typeAware: true,
             typeCheck: true,
+            maxWarnings: 0,
+            reportUnusedDisableDirectives: 'warn',
         },
         categories: {
             correctness: 'error',
@@ -31,8 +33,34 @@ export default defineConfig({
             'prefer-template': 'error',
             'object-shorthand': 'error',
             'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+            'symbol-description': 'error',
+            'logical-assignment-operators': 'error',
+            'no-implicit-coercion': 'error',
             'typescript/no-non-null-assertion': 'error',
             'typescript/no-explicit-any': 'error',
+            'typescript/array-type': 'error',
+            'typescript/ban-ts-comment': 'error',
+            'typescript/no-misused-promises': 'error',
+            'typescript/prefer-nullish-coalescing': 'error',
+            'typescript/prefer-includes': 'error',
+            'typescript/switch-exhaustiveness-check': 'error',
+            'typescript/no-unnecessary-condition': 'error',
+            // Enforce the explicit `.ts` extension convention on relative imports.
+            'import/extensions': ['error', 'always', { ignorePackages: true }],
+            'import/no-duplicates': 'error',
+            'import/no-self-import': 'error',
+            'import/no-cycle': 'error',
+            'unicorn/no-instanceof-array': 'error',
+            'unicorn/prefer-number-properties': 'error',
+            'unicorn/no-useless-promise-resolve-reject': 'error',
+            'unicorn/prefer-optional-catch-binding': 'error',
+            'unicorn/throw-new-error': 'error',
+            // Deliberate thenables: the fn_once_async example implements a lazy query object
+            // (`then(resolve, reject)`) and its test mirrors it.
+            'unicorn/no-thenable': 'off',
+            'vitest/no-focused-tests': 'error',
+            'vitest/no-disabled-tests': 'warn',
+            'vitest/no-identical-title': 'error',
             // Type-aware rules disabled: frozen-literal construction (`Object.freeze({...}) as Option<T>`)
             // and intentional generic stringification in toString are core design patterns of this library.
             'typescript/no-unsafe-type-assertion': 'off',
@@ -50,6 +78,11 @@ export default defineConfig({
                     // Deliberate patterns in tests: unawaited promises in race tests, unbound method references.
                     'typescript/no-floating-promises': 'off',
                     'typescript/unbound-method': 'off',
+                    // Inferred mock type parameters and message-less toThrow are fine in tests.
+                    'vitest/require-mock-type-parameters': 'off',
+                    'vitest/require-to-throw-message': 'off',
+                    // Per-`it` local closures are idiomatic in tests; hoisting hurts locality.
+                    'unicorn/consistent-function-scoping': 'off',
                 },
             },
         ],
@@ -63,18 +96,19 @@ export default defineConfig({
         trailingComma: 'all',
         sortPackageJson: false,
         ignorePatterns: [
-            'dist',
-            'coverage',
-            'pnpm-lock.yaml',
             '**/*.md',
-            '**/*.yml',
             '**/*.yaml',
+            '**/*.yml',
             '.github/**',
             '.vscode/**',
+            'coverage',
+            'dist',
+            'docs',
+            'pnpm-lock.yaml',
         ],
         overrides: [
             {
-                files: ['*.json', '*.jsonc'],
+                files: ['**/*.json', '**/*.jsonc'],
                 options: {
                     tabWidth: 2,
                 },

@@ -171,15 +171,14 @@ export function Some<T>(value: T): Option<T> {
             return other.isSome() ? Some(fn(value, other.unwrap())) : None;
         },
         unzip<U, R>(): [Option<U>, Option<R>] {
-            const tuple = value as [U, R];
-
-            if (!Array.isArray(tuple) || tuple.length !== 2) {
+            // Validate the runtime shape before casting: nothing guarantees T is actually a 2-tuple.
+            if (!Array.isArray(value) || value.length !== 2) {
                 throw new TypeError(
-                    `Option::unzip() requires a 2-element tuple, received ${Array.isArray(tuple) ? `array with ${tuple.length} elements` : typeof tuple}`,
+                    `Option::unzip() requires a 2-element tuple, received ${Array.isArray(value) ? `array with ${value.length} elements` : typeof value}`,
                 );
             }
 
-            const [a, b] = tuple;
+            const [a, b] = value as [U, R];
             return [Some(a), Some(b)];
         },
         reduce<U, R = T | U>(
