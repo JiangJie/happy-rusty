@@ -1,7 +1,7 @@
 /**
  * Happy-Rusty Examples
  *
- * Run with: deno run -A examples/main.ts
+ * Run with: pnpm run examples
  *
  * Each example demonstrates real-world usage patterns for Option and Result types.
  */

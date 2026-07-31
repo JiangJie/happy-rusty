@@ -30,18 +30,17 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "check": "pnpm exec tsc --noEmit",
+    "check": "pnpm exec vp check",
+    "typecheck": "pnpm exec tsc --noEmit",
     "lint": "pnpm exec vp lint",
     "fmt": "pnpm exec vp fmt",
-    "fmt:check": "pnpm exec vp fmt --check",
-    "prebuild": "pnpm exec vp check",
-    "build": "pnpm exec vp pack",
     "test": "pnpm exec vp test run --coverage",
-    "test:watch": "pnpm exec vp test",
-    "docs": "pnpm exec typedoc",
-    "eg": "node examples/main.ts",
+    "prebuild": "pnpm run check",
+    "build": "pnpm exec vp pack",
     "verify:package": "pnpm exec attw --pack && pnpm exec publint --strict",
-    "prepublishOnly": "pnpm run build && pnpm run verify:package"
+    "prepublishOnly": "pnpm run build && pnpm run verify:package",
+    "docs": "pnpm exec typedoc",
+    "examples": "node examples/main.ts"
   },
   "repository": {
     "type": "git",

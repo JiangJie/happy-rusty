@@ -26,9 +26,6 @@ Key characteristics:
 ```bash
 # Run all tests with coverage
 pnpm run test
-
-# Run tests in watch mode
-pnpm run test:watch
 ```
 
 ### Building
@@ -38,17 +35,17 @@ pnpm run test:watch
 pnpm run build
 
 # Format + lint + type-aware type check in one command (tsgo-powered)
-pnpm exec vp check
+pnpm run check
 
 # Type checking only (local tsc, editor-consistent reference)
-pnpm run check
+pnpm run typecheck
 
 # Linting / formatting
 pnpm run lint
 pnpm run fmt
 ```
 
-`pnpm run build` is gated by a `prebuild` hook (`pnpm exec vp check`), so it always runs format check, lint, and type check first — a "build" failure is often actually a format/lint/type error.
+`pnpm run build` is gated by a `prebuild` hook (runs the `check` script, i.e. `vp check`), so it always runs format check, lint, and type check first — a "build" failure is often actually a format/lint/type error.
 
 All tooling config lives in a single `vite.config.ts` (imported from `vite-plus`): `test` (Vitest), `lint` (oxlint + tsgolint), `fmt` (oxfmt), and `pack` (tsdown) blocks. Coverage is scoped to `src/**/*.ts`.
 
@@ -81,8 +78,8 @@ The repo ships a bilingual README: `README.md` (English) and `README.cn.md` (Chi
 ### Running Examples
 
 ```bash
-# Runs examples/main.ts via Deno (requires Deno installed; not part of the npm test pipeline)
-pnpm run eg
+# Runs examples/main.ts via Node's built-in type stripping (requires Node >= 22.18; not part of the npm test pipeline)
+pnpm run examples
 ```
 
 ### Publish Hook
@@ -213,7 +210,7 @@ Example files are located in `examples/` directory, mirroring `src/` structure:
 - `examples/core/result/` - Result usage examples (sync `result.ts` + `result.async.ts`, including async with Try extensions)
 - `examples/std/sync/` - Sync primitives examples (Once, OnceAsync, Lazy, LazyAsync, Mutex, RwLock, Semaphore, Channel)
 - `examples/std/ops/` - ControlFlow, FnOnce, and FnOnceAsync examples
-- `examples/main.ts` - Aggregates and runs all examples (entry for `pnpm run eg`)
+- `examples/main.ts` - Aggregates and runs all examples (entry for `pnpm run examples`)
 
 See "Running Examples" above for the run command.
 
