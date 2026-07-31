@@ -13,6 +13,7 @@ This file provides guidance to AI coding agents when working with code in this r
 - **FnOnce** - One-time callable function wrappers (`FnOnce` and `FnOnceAsync`)
 
 Key characteristics:
+
 - Zero dependencies
 - Runtime immutability via `Object.freeze()`
 - Full async support with `*Async` method variants
@@ -21,6 +22,7 @@ Key characteristics:
 ## Development Commands
 
 ### Testing
+
 ```bash
 # Run all tests with coverage
 pnpm run test
@@ -30,6 +32,7 @@ pnpm run test:watch
 ```
 
 ### Building
+
 ```bash
 # Full build (gated by vp check, then vp pack: JS + d.ts in one pass)
 pnpm run build
@@ -64,6 +67,7 @@ The project uses **Vite+** (VoidZero's unified toolchain) as a single devDepende
 - Treeshake is configured via object form `{ moduleSideEffects: false, propertyReadSideEffects: false }` (Rolldown does not accept string presets like `'smallest'`); `topLevelVar: false` is set in `outputOptions` to preserve top-level `const` (Rolldown defaults to `var`).
 
 ### Documentation
+
 ```bash
 # Generate TypeDoc HTML documentation (deployed to GitHub Pages)
 # TypeDoc cleans the `docs/` output dir automatically; no separate cleanup step.
@@ -75,12 +79,14 @@ Online API documentation: https://jiangjie.github.io/happy-rusty/
 The repo ships a bilingual README: `README.md` (English) and `README.cn.md` (Chinese). When editing one, keep the other in sync.
 
 ### Running Examples
+
 ```bash
 # Runs examples/main.ts via Deno (requires Deno installed; not part of the npm test pipeline)
 pnpm run eg
 ```
 
 ### Publish Hook
+
 `prepublishOnly` runs `build && verify:package` automatically before `npm publish`, so every publish (local or CI) produces a fresh `dist/` and validates the exact tarball being shipped (attw + publint). CI handles publishing on tags — see Releasing below.
 
 ## Architecture
@@ -161,10 +167,10 @@ The codebase is organized into two main modules mirroring Rust's structure:
 
 The codebase includes some methods not present in Rust's standard library, placed in `// #region Try extensions` at the end of the `Result<T, E>` interface:
 
-- **`andTryAsync<U>(fn: (value: T) => PromiseLike<U>): Promise<Result<U, E | unknown>>`** 
+- **`andTryAsync<U>(fn: (value: T) => PromiseLike<U>): Promise<Result<U, E | unknown>>`**
   - Like `andThenAsync`, but auto-catches exceptions/Promise rejections and converts them to `Err`
   - Useful when chaining async operations that may throw without wrapping each call in `tryAsyncResult`
-  
+
 - **`orTryAsync<F>(fn: (error: E) => PromiseLike<F>): Promise<Result<T, F | unknown>>`**
   - Like `orElseAsync`, but auto-catches exceptions in recovery logic
   - Handles cases where recovery logic itself might fail
@@ -202,6 +208,7 @@ type AsyncSafeResult<T> = Promise<SafeResult<T>>;
 ### Examples
 
 Example files are located in `examples/` directory, mirroring `src/` structure:
+
 - `examples/core/option/` - Option usage examples (sync `option.ts` + `option.async.ts`)
 - `examples/core/result/` - Result usage examples (sync `result.ts` + `result.async.ts`, including async with Try extensions)
 - `examples/std/sync/` - Sync primitives examples (Once, OnceAsync, Lazy, LazyAsync, Mutex, RwLock, Semaphore, Channel)
@@ -215,12 +222,14 @@ See "Running Examples" above for the run command.
 This project uses **pnpm** for all development tasks:
 
 #### pnpm (Build, Test & Development Tools)
+
 - **Purpose**: Manages the Node.js toolchain (`vite-plus` CLI) and testing
 - **Dependencies**: `vite-plus`, `@vitest/coverage-v8`, TypeScript, TypeDoc
 - **Location**: `node_modules/` (from npm registry)
 - **Used for**: Building npm packages, testing, linting, formatting, type checking, documentation
 
 **Dependency version management with Vite+:**
+
 - `vite-plus` is the single toolchain dependency; `@vitest/coverage-v8` is the only unbundled addon and must stay pinned to the Vitest version bundled by Vite+.
 - Upgrading the toolchain means bumping `vite-plus` — NOT running a blanket devDeps upgrade. Check the Vite+ changelog for breaking changes first (pre-1.0).
 - `vite` and `vitest` are NOT declared as devDependencies — Vite+ bundles its own copies of both.
@@ -238,6 +247,7 @@ This project uses **pnpm** for all development tasks:
 ### Publishing
 
 Dual publishing to:
+
 - **npm**: Via `dist/` built with `vp pack` (CJS + ESM + dual `.d.ts`)
 - **JSR**: Directly from `src/mod.ts` source (Deno-native)
 
@@ -289,7 +299,7 @@ pnpm exec vp test tests/core/option/option.test.ts
     - `no-self-compare`, `no-template-curly-in-string`
     - `default-case-last`, `no-new-wrappers`, `radix`
     - `prefer-template`, `object-shorthand`
-  - Formatting (oxfmt): 4-space indent, single quotes, `arrowParens: 'avoid'` (keeps single-arg arrows parenthesis-free), semicolons, trailing commas, JSON files 2-space via override; md/yml/lockfiles are excluded via `ignorePatterns`
+  - Formatting (oxfmt): 4-space indent, single quotes, `arrowParens: 'avoid'` (keeps single-arg arrows parenthesis-free), semicolons, trailing commas; JSON/YAML/Markdown are also formatted (2-space via override; Markdown keeps hand-written embedded code samples untouched via `embeddedLanguageFormatting: 'off'`); only generated files are excluded via `ignorePatterns` (`coverage`/`dist`/`docs`/`pnpm-lock.yaml`)
   - Type-aware rules explicitly OFF (conflict with core design patterns — see comments in `vite.config.ts`): `typescript/no-unsafe-type-assertion` (frozen-literal construction `Object.freeze({...}) as Option<T>`), `typescript/restrict-template-expressions` (intentional generic stringification in `toString`), `typescript/no-unnecessary-type-parameters` (phantom generics like `None.map<U>` required for inference)
   - No non-null assertions: `typescript/no-non-null-assertion` is `error`. Do not use the `!` operator — use `??=`, `?? fallback`, or explicit `if (x !== null)` guards instead.
 - Strict TypeScript settings: `noUnusedLocals`, `noUnusedParameters`, `strictNullChecks`
@@ -312,6 +322,7 @@ pnpm exec vp test tests/core/option/option.test.ts
 ## Releasing
 
 Use the `/release` skill which automates:
+
 1. Update version in `package.json` and `jsr.json`
 2. Update `CHANGELOG.md` (follow [Keep a Changelog](https://keepachangelog.com/) format), including comparison link at bottom
 3. Commit: `git commit -m "release: vX.Y.Z"`

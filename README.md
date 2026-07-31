@@ -84,32 +84,32 @@ const config = parseJSON<Config>(jsonStr)
 
 ### Option&lt;T&gt;
 
-| Category | Methods |
-|----------|---------|
-| **Constructors** | `Some(value)`, `None` |
-| **Querying** | `isSome()`, `isNone()`, `isSomeAnd(fn)` |
-| **Extracting** | `expect(msg)`, `unwrap()`, `unwrapOr(default)`, `unwrapOrElse(fn)` |
+| Category         | Methods                                                                                |
+| ---------------- | -------------------------------------------------------------------------------------- |
+| **Constructors** | `Some(value)`, `None`                                                                  |
+| **Querying**     | `isSome()`, `isNone()`, `isSomeAnd(fn)`                                                |
+| **Extracting**   | `expect(msg)`, `unwrap()`, `unwrapOr(default)`, `unwrapOrElse(fn)`                     |
 | **Transforming** | `map(fn)`, `mapOr(default, fn)`, `mapOrElse(defaultFn, fn)`, `filter(fn)`, `flatten()` |
-| **Boolean ops** | `and(other)`, `andThen(fn)`, `or(other)`, `orElse(fn)`, `xor(other)` |
-| **Converting** | `okOr(err)`, `okOrElse(fn)`, `transpose()` |
-| **Combining** | `zip(other)`, `zipWith(other, fn)`, `unzip()` |
-| **Side effects** | `inspect(fn)` |
-| **Comparison** | `eq(other)` |
+| **Boolean ops**  | `and(other)`, `andThen(fn)`, `or(other)`, `orElse(fn)`, `xor(other)`                   |
+| **Converting**   | `okOr(err)`, `okOrElse(fn)`, `transpose()`                                             |
+| **Combining**    | `zip(other)`, `zipWith(other, fn)`, `unzip()`                                          |
+| **Side effects** | `inspect(fn)`                                                                          |
+| **Comparison**   | `eq(other)`                                                                            |
 
 ### Result&lt;T, E&gt;
 
-| Category | Methods |
-|----------|---------|
-| **Constructors** | `Ok(value)`, `Ok()` (void), `Err(error)` |
-| **Querying** | `isOk()`, `isErr()`, `isOkAnd(fn)`, `isErrAnd(fn)` |
-| **Extracting Ok** | `expect(msg)`, `unwrap()`, `unwrapOr(default)`, `unwrapOrElse(fn)` |
-| **Extracting Err** | `expectErr(msg)`, `unwrapErr()` |
-| **Transforming** | `map(fn)`, `mapErr(fn)`, `mapOr(default, fn)`, `mapOrElse(defaultFn, fn)`, `flatten()` |
-| **Boolean ops** | `and(other)`, `andThen(fn)`, `or(other)`, `orElse(fn)` |
-| **Converting** | `ok()`, `err()`, `transpose()` |
-| **Type casting** | `asOk<F>()`, `asErr<U>()` |
-| **Side effects** | `inspect(fn)`, `inspectErr(fn)` |
-| **Comparison** | `eq(other)` |
+| Category           | Methods                                                                                |
+| ------------------ | -------------------------------------------------------------------------------------- |
+| **Constructors**   | `Ok(value)`, `Ok()` (void), `Err(error)`                                               |
+| **Querying**       | `isOk()`, `isErr()`, `isOkAnd(fn)`, `isErrAnd(fn)`                                     |
+| **Extracting Ok**  | `expect(msg)`, `unwrap()`, `unwrapOr(default)`, `unwrapOrElse(fn)`                     |
+| **Extracting Err** | `expectErr(msg)`, `unwrapErr()`                                                        |
+| **Transforming**   | `map(fn)`, `mapErr(fn)`, `mapOr(default, fn)`, `mapOrElse(defaultFn, fn)`, `flatten()` |
+| **Boolean ops**    | `and(other)`, `andThen(fn)`, `or(other)`, `orElse(fn)`                                 |
+| **Converting**     | `ok()`, `err()`, `transpose()`                                                         |
+| **Type casting**   | `asOk<F>()`, `asErr<U>()`                                                              |
+| **Side effects**   | `inspect(fn)`, `inspectErr(fn)`                                                        |
+| **Comparison**     | `eq(other)`                                                                            |
 
 ### Async Methods
 
@@ -200,12 +200,14 @@ We intentionally omit `readonly` modifiers from method signatures in interfaces.
 ## Why happy-rusty?
 
 JavaScript's `null`/`undefined` and try-catch patterns lead to:
+
 - Uncaught null reference errors
 - Forgotten error handling
 - Verbose try-catch blocks
 - Unclear function contracts
 
 `happy-rusty` provides Rust's battle-tested patterns:
+
 - **Explicit optionality** - `Option<T>` makes absence visible in types
 - **Explicit errors** - `Result<T, E>` forces error handling consideration
 - **Method chaining** - Transform values without nested if-else or try-catch

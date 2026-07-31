@@ -84,32 +84,32 @@ const config = parseJSON<Config>(jsonStr)
 
 ### Option&lt;T&gt;
 
-| 分类 | 方法 |
-|------|------|
-| **构造器** | `Some(value)`, `None` |
-| **查询** | `isSome()`, `isNone()`, `isSomeAnd(fn)` |
-| **提取** | `expect(msg)`, `unwrap()`, `unwrapOr(default)`, `unwrapOrElse(fn)` |
-| **转换** | `map(fn)`, `mapOr(default, fn)`, `mapOrElse(defaultFn, fn)`, `filter(fn)`, `flatten()` |
-| **布尔操作** | `and(other)`, `andThen(fn)`, `or(other)`, `orElse(fn)`, `xor(other)` |
-| **类型转换** | `okOr(err)`, `okOrElse(fn)`, `transpose()` |
-| **组合** | `zip(other)`, `zipWith(other, fn)`, `unzip()` |
-| **副作用** | `inspect(fn)` |
-| **比较** | `eq(other)` |
+| 分类         | 方法                                                                                   |
+| ------------ | -------------------------------------------------------------------------------------- |
+| **构造器**   | `Some(value)`, `None`                                                                  |
+| **查询**     | `isSome()`, `isNone()`, `isSomeAnd(fn)`                                                |
+| **提取**     | `expect(msg)`, `unwrap()`, `unwrapOr(default)`, `unwrapOrElse(fn)`                     |
+| **转换**     | `map(fn)`, `mapOr(default, fn)`, `mapOrElse(defaultFn, fn)`, `filter(fn)`, `flatten()` |
+| **布尔操作** | `and(other)`, `andThen(fn)`, `or(other)`, `orElse(fn)`, `xor(other)`                   |
+| **类型转换** | `okOr(err)`, `okOrElse(fn)`, `transpose()`                                             |
+| **组合**     | `zip(other)`, `zipWith(other, fn)`, `unzip()`                                          |
+| **副作用**   | `inspect(fn)`                                                                          |
+| **比较**     | `eq(other)`                                                                            |
 
 ### Result&lt;T, E&gt;
 
-| 分类 | 方法 |
-|------|------|
-| **构造器** | `Ok(value)`, `Ok()` (void), `Err(error)` |
-| **查询** | `isOk()`, `isErr()`, `isOkAnd(fn)`, `isErrAnd(fn)` |
-| **提取 Ok** | `expect(msg)`, `unwrap()`, `unwrapOr(default)`, `unwrapOrElse(fn)` |
-| **提取 Err** | `expectErr(msg)`, `unwrapErr()` |
-| **转换** | `map(fn)`, `mapErr(fn)`, `mapOr(default, fn)`, `mapOrElse(defaultFn, fn)`, `flatten()` |
-| **布尔操作** | `and(other)`, `andThen(fn)`, `or(other)`, `orElse(fn)` |
-| **类型转换** | `ok()`, `err()`, `transpose()` |
-| **类型断言** | `asOk<F>()`, `asErr<U>()` |
-| **副作用** | `inspect(fn)`, `inspectErr(fn)` |
-| **比较** | `eq(other)` |
+| 分类         | 方法                                                                                   |
+| ------------ | -------------------------------------------------------------------------------------- |
+| **构造器**   | `Ok(value)`, `Ok()` (void), `Err(error)`                                               |
+| **查询**     | `isOk()`, `isErr()`, `isOkAnd(fn)`, `isErrAnd(fn)`                                     |
+| **提取 Ok**  | `expect(msg)`, `unwrap()`, `unwrapOr(default)`, `unwrapOrElse(fn)`                     |
+| **提取 Err** | `expectErr(msg)`, `unwrapErr()`                                                        |
+| **转换**     | `map(fn)`, `mapErr(fn)`, `mapOr(default, fn)`, `mapOrElse(defaultFn, fn)`, `flatten()` |
+| **布尔操作** | `and(other)`, `andThen(fn)`, `or(other)`, `orElse(fn)`                                 |
+| **类型转换** | `ok()`, `err()`, `transpose()`                                                         |
+| **类型断言** | `asOk<F>()`, `asErr<U>()`                                                              |
+| **副作用**   | `inspect(fn)`, `inspectErr(fn)`                                                        |
+| **比较**     | `eq(other)`                                                                            |
 
 ### 异步方法
 
@@ -195,12 +195,14 @@ some.unwrap = () => 0;  // TypeError: Cannot assign to read only property
 ## 为什么选择 happy-rusty？
 
 JavaScript 的 `null`/`undefined` 和 try-catch 模式会导致：
+
 - 未捕获的空引用错误
 - 遗忘的错误处理
 - 冗长的 try-catch 代码块
 - 不清晰的函数契约
 
 `happy-rusty` 提供了 Rust 久经考验的模式：
+
 - **显式可选性** - `Option<T>` 在类型中明确表示值的缺失
 - **显式错误** - `Result<T, E>` 强制考虑错误处理
 - **链式调用** - 无需嵌套 if-else 或 try-catch 即可转换值

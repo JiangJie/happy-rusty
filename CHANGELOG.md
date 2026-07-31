@@ -8,52 +8,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.10.0] - 2026-06-30
 
 ### Added
+
 - **New Sync Primitive**: `Semaphore` - Counting semaphore for limiting async concurrency, with `acquire`/`tryAcquire`/`withPermit`/`availablePermits`. Inspired by tokio's `Semaphore` (Rust std does not include one). Useful for fetch rate limiting, connection pools, and task queues.
 - **New Method**: `RwLockWriteGuard.downgrade()` - Atomically converts a write guard to a read guard, releasing waiting readers while keeping pending writers waiting. Equivalent to Rust 1.92's `RwLockWriteGuard::downgrade`
 
 ### Chores
+
 - Upgraded devDependencies: vite, vitest, @vitest/coverage-v8, @vitest/ui, eslint, rollup, typescript-eslint
 
 ## [1.9.2] - 2026-04-12
 
 ### Changed
+
 - **Performance**: Added `/*#__PURE__*/` annotations to all top-level function call expressions for better tree-shaking support in consumer bundlers
 
 ### Fixed
+
 - **Build**: Migrated `treeshake` config from deprecated `'smallest'` string to object form for Vite 8 (Rolldown) compatibility
 - **Build**: Added `topLevelVar: false` to output options to preserve `const` declarations in bundled output
 
 ### Chores
+
 - Upgraded devDependencies: vite, vitest, eslint, typedoc, typescript-eslint
 
 ## [1.9.1] - 2026-01-16
 
 ### Changed
+
 - **Performance**: `Channel` buffer replaced `Array` with `Queue` for O(1) shift operations
 
 ### Documentation
+
 - Added `@since` tags to all public APIs
 - Improved JSDoc consistency and formatting
 
 ### CI
+
 - Changed JSR publish to trigger on release instead of push to main
 
 ## [1.9.0] - 2026-01-04
 
 ### Added
+
 - **Try Extensions for Result**:
   - `andTryAsync<U>` - Like `andThenAsync`, but auto-catches exceptions/Promise rejections and converts them to `Err`
   - `orTryAsync<F>` - Like `orElseAsync`, but auto-catches exceptions in recovery logic
 
 ### Changed
+
 - **Performance**: `map()` and `mapErr()` now return `this` when the Result variant doesn't match, avoiding unnecessary object creation
 
 ### Removed
+
 - `promiseToAsyncResult()` - Use `tryAsyncResult()` instead (deprecated since v1.7.0)
 
 ## [1.8.0] - 2025-12-31
 
 ### Added
+
 - **New Sync Primitives**:
   - `OnceAsync<T>` - Async-first one-time initialization with concurrent call handling
   - `RwLock<T>` - Async read-write lock (multiple concurrent readers or single writer)
@@ -78,18 +90,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Rust Documentation Links** - All Rust-equivalent interfaces now link to official Rust docs via `@see` tags
 
 ### Changed
+
 - **Module Reorganization** - Source code restructured into `core/` (Option, Result) and `std/` (sync, ops) directories, mirroring Rust's stdlib organization
 - **Async Callback Types** - All async methods now accept `PromiseLike<T> | T` instead of just `Promise<T>`, allowing mixed sync/async callbacks
 - **Async Return Types** - Use `Awaited<T>` to properly flatten nested Promises in async method return types
 - **Internal Optimizations** - Cached Promise constants (`ASYNC_NONE`, etc.) for better runtime performance
 
 ### Fixed
+
 - `this` binding issue in `Once.getOrTryInitAsync`
 - Nested Promise flattening in async methods
 
 ## [1.7.1] - 2025-12-26
 
 ### Added
+
 - **Argument passing** - All `try*` functions now support passing arguments like `Promise.try`:
   - `tryOption(JSON.parse, jsonString)` instead of `tryOption(() => JSON.parse(jsonString))`
   - `tryResult(decodeURIComponent, str)` instead of `tryResult(() => decodeURIComponent(str))`
@@ -98,35 +113,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.7.0] - 2025-12-26
 
 ### Added
+
 - `tryOption()` - Capture synchronous exceptions as Option (success → Some, exception → None)
 - `tryAsyncOption()` - Capture async/Promise exceptions as Option
 - `tryResult()` - Capture synchronous exceptions as Result (success → Ok, exception → Err)
 - `tryAsyncResult()` - Capture async/Promise exceptions as Result
 
 ### Deprecated
+
 - `promiseToAsyncResult()` - Use `tryAsyncResult()` instead (same functionality, more consistent naming)
 
 ## [1.6.2] - 2025-12-25
 
 ### Changed
+
 - `promiseToAsyncResult` now accepts `PromiseLike<T>` instead of `Promise<T>` for broader compatibility with thenable objects
 - Use `AsyncResult` type alias in function signatures for consistency
 
 ### Removed
+
 - Removed unused `source` field from package.json (Parcel legacy)
 - Removed redundant `@internal` tags from private (non-exported) functions
 
 ## [1.6.1] - 2025-12-19
 
 ### Changed
+
 - License changed from GPL-3.0 to MIT for broader adoption and easier integration
 
 ### Added
+
 - Navigation links (GitHub, npm, JSR) in TypeDoc documentation header
 
 ## [1.6.0] - 2025-12-18
 
 ### Added
+
 - **Sync Primitives**: `Once<T>`, `Lazy<T>`, `LazyAsync<T>`, `Mutex<T>` for Rust-style synchronization
 - **Control Flow**: `ControlFlow<B, C>` with `Break` and `Continue` variants
 - `Symbol.toStringTag` property to all types for better type identification
@@ -140,28 +162,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CHANGELOG.md with full version history
 
 ### Changed
+
 - All instances are now frozen with `Object.freeze()` for runtime immutability
 - TypeDoc output format from Markdown to HTML for GitHub Pages compatibility
 - Migrated from Deno test to Vitest
 - Build process split into Vite (JS) and Rollup (dts)
 
 ### Fixed
+
 - Symbol property syntax and duplicate declaration issues
 - Type inference improvements for `None` interface methods
 
 ## [1.5.0] - 2024-08-11
 
 ### Added
+
 - Async versions of methods: `isSomeAndAsync`, `isOkAndAsync`, `isErrAndAsync`, `unwrapOrElseAsync`, `andThenAsync`, `orElseAsync`
 - Async examples
 
 ### Changed
+
 - Updated pnpm to v9.7.0
 - Updated ESLint configuration
 
 ## [1.4.0] - 2024-08-05
 
 ### Added
+
 - `Ok()` constructor without arguments (similar to Rust's `Ok(())`)
 - `RESULT_VOID` constant for void Result returns
 - `VoidResult<E>`, `VoidIOResult`, `AsyncVoidResult<E>`, `AsyncVoidIOResult` type aliases
@@ -169,94 +196,114 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.2] - 2024-08-04
 
 ### Changed
+
 - Renamed `helpers` to `utils`
 - Improved `@example` annotations in JSDoc
 
 ## [1.3.1] - 2024-08-03
 
 ### Fixed
+
 - `map` methods now correctly return new objects instead of mutating
 
 ### Changed
+
 - Updated Rollup to v4.20.0
 
 ## [1.3.0] - 2024-08-01
 
 ### Added
+
 - `RESULT_TRUE`, `RESULT_FALSE`, `RESULT_ZERO` constants
 
 ### Fixed
+
 - Circular dependency issues
 
 ### Changed
+
 - Reorganized code structure
 
 ## [1.2.0] - 2024-08-01
 
 ### Added
+
 - `isOption()` and `isResult()` type guard utilities
 - Custom string conversion for Option and Result
 
 ### Changed
+
 - Replaced arrow functions with normal functions for better debug experience
 - Updated ESLint to v9
 
 ## [1.1.2] - 2024-07-17
 
 ### Added
+
 - `asOk<F>()` and `asErr<U>()` methods for type casting
 
 ## [1.1.1] - 2024-07-13
 
 ### Fixed
+
 - TypeDoc configuration issues
 
 ### Changed
+
 - Updated dependencies
 
 ## [1.1.0] - 2024-06-09
 
 ### Added
+
 - `Option.filter()` method
 - Many new Option and Result APIs
 - Comprehensive code comments and documentation
 
 ### Changed
+
 - Improved type inference
 - `Option.filter()` now returns `Option<T>` instead of boolean
 
 ## [1.0.9] - 2024-05-14
 
 ### Added
+
 - Documentation for exported symbols
 - README examples
 
 ## [1.0.8] - 2024-05-13
 
 ### Changed
+
 - Switched from npm to pnpm
 - Added GitHub Actions test workflow with Codecov
 
 ## [1.0.7] - 2024-05-08
 
 ### Changed
+
 - `Some` value type changed to `NonNullable<T>`
 
 ### Fixed
+
 - Can now invoke `err()` from `Ok` variant
 
 ## [1.0.6] - 2024-05-08
 
 ### Added
+
 - Commonly used type exports
 
 ### Changed
+
 - Set `type: "module"` in package.json
 - Build target set to ESNext
 
 ## [1.0.5] - 2024-05-05
 
 ### Changed
+
 - Throw `TypeError` instead of generic `Error`
 - Switched to Rollup for building
 - Added Bun support in CI
@@ -264,39 +311,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.4] - 2024-05-04
 
 ### Added
+
 - Chinese README (`README.cn.md`)
 - JSR publishing workflow
 - npm publishing workflows
 
 ### Changed
+
 - Replaced Parcel with Rollup for building
 - Replaced Jest with Bun test
 
 ## [1.0.3] - 2024-04-27
 
 ### Added
+
 - Installation and Examples sections in README
 
 ### Changed
+
 - Force return const for better type inference
 
 ## [1.0.2] - 2024-04-26
 
 ### Added
+
 - JSR publishing support
 
 ### Changed
+
 - Improved code comments
 
 ## [1.0.1] - 2024-04-26
 
 ### Changed
+
 - Replaced enum with const for better tree-shaking
 - Marked package as side-effect free
 
 ## [1.0.0] - 2024-04-24
 
 ### Added
+
 - Initial release
 - `Option<T>` type with `Some` and `None` variants
 - `Result<T, E>` type with `Ok` and `Err` variants

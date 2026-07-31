@@ -95,22 +95,19 @@ export default defineConfig({
         semi: true,
         trailingComma: 'all',
         sortPackageJson: false,
-        ignorePatterns: [
-            '**/*.md',
-            '**/*.yaml',
-            '**/*.yml',
-            '.github/**',
-            '.vscode/**',
-            'coverage',
-            'dist',
-            'docs',
-            'pnpm-lock.yaml',
-        ],
+        ignorePatterns: ['coverage', 'dist', 'docs', 'pnpm-lock.yaml'],
         overrides: [
             {
-                files: ['**/*.json', '**/*.jsonc'],
+                files: ['**/*.json', '**/*.jsonc', '**/*.yaml', '**/*.yml'],
                 options: {
                     tabWidth: 2,
+                },
+            },
+            {
+                files: ['**/*.md'],
+                options: {
+                    tabWidth: 2,
+                    embeddedLanguageFormatting: 'off',
                 },
             },
         ],
