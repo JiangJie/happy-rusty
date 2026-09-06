@@ -946,6 +946,42 @@ describe('Channel', () => {
             const result = await sendPromise;
             expect(typeof result).toBe('boolean');
         });
+
+        it('should ignore a stale send timeout callback after the waiter was served', async () => {
+            const originalSetTimeout = globalThis.setTimeout;
+            const originalClearTimeout = globalThis.clearTimeout;
+            const callbacks: (() => void)[] = [];
+
+            globalThis.setTimeout = (handler: TimerHandler) => {
+                callbacks.push(handler as () => void);
+                return callbacks.length;
+            };
+            globalThis.clearTimeout = () => {};
+
+            try {
+                const ch = Channel<number>(1);
+                ch.trySend(1);
+
+                const first = ch.sendTimeout(2, 100);
+                const second = ch.sendTimeout(3, 100);
+
+                expect(ch.tryReceive().unwrap()).toBe(1);
+                await expect(first).resolves.toBe(true);
+
+                // Simulate the first timeout callback running after the first
+                // waiter was already removed by a successful send.
+                callbacks[0]?.();
+
+                expect(ch.tryReceive().unwrap()).toBe(2);
+                // The second waiter remains queued and is served normally.
+                await expect(second).resolves.toBe(true);
+                expect(ch.tryReceive().unwrap()).toBe(3);
+                callbacks[1]?.();
+            } finally {
+                globalThis.setTimeout = originalSetTimeout;
+                globalThis.clearTimeout = originalClearTimeout;
+            }
+        });
     });
 
     describe('receiveTimeout', () => {
@@ -1061,6 +1097,40 @@ describe('Channel', () => {
             const result = await receivePromise;
             // Just ensure no errors occur - the race is handled correctly
             expect(result.isSome() || result.isNone()).toBe(true);
+        });
+
+        it('should ignore a stale receive timeout callback after the waiter was served', async () => {
+            const originalSetTimeout = globalThis.setTimeout;
+            const originalClearTimeout = globalThis.clearTimeout;
+            const callbacks: (() => void)[] = [];
+
+            globalThis.setTimeout = (handler: TimerHandler) => {
+                callbacks.push(handler as () => void);
+                return callbacks.length;
+            };
+            globalThis.clearTimeout = () => {};
+
+            try {
+                const ch = Channel<number>(10);
+                const first = ch.receiveTimeout(100);
+                const second = ch.receiveTimeout(100);
+
+                expect(ch.trySend(1)).toBe(true);
+                await expect(first).resolves.toSatisfy(value => value.isSome());
+
+                // Simulate the first timeout callback running after the first
+                // waiter was already removed by a successful receive.
+                callbacks[0]?.();
+
+                expect(ch.trySend(2)).toBe(true);
+                const secondResult = await second;
+                expect(secondResult.isSome()).toBe(true);
+                expect(secondResult.unwrap()).toBe(2);
+                callbacks[1]?.();
+            } finally {
+                globalThis.setTimeout = originalSetTimeout;
+                globalThis.clearTimeout = originalClearTimeout;
+            }
         });
     });
 

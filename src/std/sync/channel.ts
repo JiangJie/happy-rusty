@@ -820,7 +820,9 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
 
             const timeoutId = setTimeout(() => {
                 const index = sendWaitQueue.indexOf(waiter);
-                sendWaitQueue.splice(index, 1);
+                if (index >= 0) {
+                    sendWaitQueue.splice(index, 1);
+                }
                 resolve(false);
             }, ms);
 
@@ -854,7 +856,9 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
 
             const timeoutId = setTimeout(() => {
                 const index = receiveWaitQueue.indexOf(wrappedWaiter);
-                receiveWaitQueue.splice(index, 1);
+                if (index >= 0) {
+                    receiveWaitQueue.splice(index, 1);
+                }
                 resolve(None);
             }, ms);
         });
