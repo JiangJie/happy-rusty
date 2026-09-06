@@ -147,12 +147,10 @@ interface ApiError {
     message: string;
 }
 
-const apiResult = validateEmail('bad-email').mapErr(
-    (err): ApiError => ({
-        code: 400,
-        message: `Validation error: ${err.message}`,
-    }),
-);
+const apiResult = validateEmail('bad-email').mapErr((err): ApiError => ({
+    code: 400,
+    message: `Validation error: ${err.message}`,
+}));
 
 console.log(
     apiResult
