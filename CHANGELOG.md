@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.1] - 2026-09-06
+
+### Fixed
+
+- **Channel**: `for await` leaving early (a `break`, an error thrown in the loop body, or an explicit `iterator.return()`) now cancels the pending `next()`. An abandoned iterator no longer holds its spot in the receive queue, so it cannot swallow a message intended for another consumer
+- **Channel**: a timeout callback firing after its waiter was already served no longer removes an unrelated waiter (`splice(-1, 1)` on a `-1` index)
+- **OnceAsync**: `set()` and `tryInsert()` return `Err` while a `getOrInit`/`getOrTryInit` attempt is in flight, instead of reporting `Ok` and then being overwritten by the attempt's result — matching Rust's `OnceLock::set` racing an in-progress `get_or_init`
+- **OnceAsync**: `wait()` no longer rejects when an initialization attempt fails. It keeps waiting until the cell is actually initialized, matching Rust's `OnceLock::wait`
+- **OnceAsync**: a caller joining a failed attempt retries with its own initializer, matching Rust's `get_or_try_init`. The in-flight slot is claimed synchronously, so a synchronously-executing initializer that re-enters joins the attempt instead of starting a second one
+
+### Chores
+
+- Migrated to the Vite+ unified toolchain (`vp check` for fmt + lint + type checking, `vp pack` for JS and `.d.ts` bundling), replacing ESLint and the previous build setup
+- Merged all CI gates into a single `ci.yml` job and added attw + publint verification of the tarball that is actually published
+- Upgraded devDependencies: `vite-plus` 0.3.0, `@vitest/coverage-v8` 4.1.11, `publint` 0.3.24
+
 ## [1.10.0] - 2026-06-30
 
 ### Added
@@ -358,6 +374,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full TypeScript support
 - Comprehensive API matching Rust's Option and Result
 
+[1.10.1]: https://github.com/JiangJie/happy-rusty/compare/v1.10.0...v1.10.1
 [1.10.0]: https://github.com/JiangJie/happy-rusty/compare/v1.9.2...v1.10.0
 [1.9.2]: https://github.com/JiangJie/happy-rusty/compare/v1.9.1...v1.9.2
 [1.9.1]: https://github.com/JiangJie/happy-rusty/compare/v1.9.0...v1.9.1
