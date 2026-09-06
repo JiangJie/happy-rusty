@@ -115,6 +115,8 @@ const config = parseJSON<Config>(jsonStr)
 
 所有转换方法都有带 `Async` 后缀的异步变体（如 `andThenAsync`、`mapAsync`、`unwrapOrElseAsync`）。
 
+异步变体遵循库的错误约定：回调被实际调用时，若其同步抛错，错误会在调用点同步抛出——与同步方法一致；只有回调返回 rejected Promise 时，错误才以 rejection 形式呈现。如需把抛出的异常转为 `Err`/`None` 值，请使用 `try*` 辅助函数（`tryResult`/`tryAsyncResult`/`tryOption`/`tryAsyncOption`），或在 `Result` 上使用 `andTryAsync`/`orTryAsync` 方法。
+
 ### 类型别名
 
 ```ts

@@ -18,6 +18,13 @@ pub enum Result<T, E> {
     Err(E),
 }
 ```
+ * Async method variants (the `*Async` suffix) follow the same error
+ * convention as the rest of the library: when the callback is invoked (i.e.
+ * the variant matches), a synchronous throw propagates synchronously at the
+ * call site — matching the sync methods — and only a callback that returns a
+ * rejected promise surfaces as a rejection. To capture thrown errors as `Err`
+ * instead, use `andTryAsync`/`orTryAsync` or `tryAsyncResult`/`tryResult`.
+ *
  * @typeParam T - The type of the value contained in a successful `Result`.
  * @typeParam E - The type of the error contained in an unsuccessful `Result`.
  * @since 1.0.0

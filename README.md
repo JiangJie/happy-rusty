@@ -115,6 +115,8 @@ const config = parseJSON<Config>(jsonStr)
 
 All transformation methods have async variants with `Async` suffix (e.g., `andThenAsync`, `mapAsync`, `unwrapOrElseAsync`).
 
+Async variants follow the library's error convention: when the callback is invoked, a synchronous throw propagates synchronously at the call site — just like the sync methods — and only a callback that returns a rejected promise surfaces as a promise rejection. To capture thrown exceptions as `Err`/`None` values instead, use the `try*` helpers (`tryResult`/`tryAsyncResult`/`tryOption`/`tryAsyncOption`) or, on `Result`, the `andTryAsync`/`orTryAsync` methods.
+
 ### Type Aliases
 
 ```ts
