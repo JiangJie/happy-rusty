@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
-import { Err, Ok, OnceAsync } from '../../../src/mod.ts';
+import { Err, Ok, OnceAsync, type AsyncResult } from '../../../src/mod.ts';
 
 describe('OnceAsync', () => {
     describe('initial state', () => {
@@ -428,6 +428,227 @@ describe('OnceAsync', () => {
             expect(v1).toBe(42);
             expect(v2).toBe(42);
             expect(v3).toBe(42);
+        });
+    });
+
+    describe('in-flight initialization', () => {
+        it('set() from a synchronous initializer is rejected', async () => {
+            const once = OnceAsync<number>();
+            let result: ReturnType<typeof once.set> | undefined;
+
+            const initPromise = once.getOrInit(() => {
+                result = once.set(42);
+                return 1;
+            });
+
+            expect(result?.isErr()).toBe(true);
+            expect(result?.unwrapErr()).toBe(42);
+            await expect(initPromise).resolves.toBe(1);
+            expect(once.get().unwrap()).toBe(1);
+        });
+
+        it('tryInsert() from a synchronous initializer is rejected', async () => {
+            const once = OnceAsync<number>();
+            let result: ReturnType<typeof once.tryInsert> | undefined;
+
+            const initPromise = once.getOrInit(() => {
+                result = once.tryInsert(42);
+                return 1;
+            });
+
+            expect(result?.isErr()).toBe(true);
+            expect(result?.unwrapErr()).toEqual([undefined, 42]);
+            await expect(initPromise).resolves.toBe(1);
+            expect(once.get().unwrap()).toBe(1);
+        });
+
+        it('set() from a synchronous fallible initializer is rejected', async () => {
+            const once = OnceAsync<number>();
+            let result: ReturnType<typeof once.set> | undefined;
+
+            const initPromise = once.getOrTryInit(() => {
+                result = once.set(42);
+                return Ok(1);
+            });
+
+            expect(result?.isErr()).toBe(true);
+            expect(result?.unwrapErr()).toBe(42);
+            const initResult = await initPromise;
+            expect(initResult.isOk()).toBe(true);
+            expect(once.get().unwrap()).toBe(1);
+        });
+
+        it('set() during in-flight initialization returns Err and does not overwrite', async () => {
+            const once = OnceAsync<number>();
+            let resolveInit!: (value: number) => void;
+
+            const initPromise = once.getOrInit(
+                () =>
+                    new Promise<number>(resolve => {
+                        resolveInit = resolve;
+                    }),
+            );
+
+            const result = once.set(42);
+            expect(result.isErr()).toBe(true);
+            expect(result.unwrapErr()).toBe(42);
+
+            resolveInit(1);
+            await initPromise;
+
+            expect(once.isInitialized()).toBe(true);
+            expect(once.get().unwrap()).toBe(1);
+        });
+
+        it('tryInsert() during in-flight initialization returns Err', async () => {
+            const once = OnceAsync<number>();
+            let resolveInit!: (value: number) => void;
+
+            const initPromise = once.getOrInit(
+                () =>
+                    new Promise<number>(resolve => {
+                        resolveInit = resolve;
+                    }),
+            );
+
+            const result = once.tryInsert(42);
+            expect(result.isErr()).toBe(true);
+
+            resolveInit(1);
+            await initPromise;
+
+            expect(once.get().unwrap()).toBe(1);
+        });
+
+        it('wait() is not rejected by a failed init attempt and resolves on later set()', async () => {
+            const once = OnceAsync<number>();
+
+            const failing = once.getOrTryInit(async () => Err('boom'));
+            const waitPromise = once.wait();
+
+            const failingResult = await failing;
+            expect(failingResult.isErr()).toBe(true);
+
+            const result = once.set(42);
+            expect(result.isOk()).toBe(true);
+
+            await expect(waitPromise).resolves.toBe(42);
+        });
+
+        it('getOrInit() waiting on a failing getOrTryInit retries with its own fn', async () => {
+            const once = OnceAsync<number>();
+
+            const tryResult = once.getOrTryInit(async () => {
+                await new Promise(r => setTimeout(r, 5));
+                return Err('boom');
+            });
+
+            const initValue = await once.getOrInit(() => 7);
+
+            expect(initValue).toBe(7);
+            expect(once.get().unwrap()).toBe(7);
+            expect((await tryResult).isErr()).toBe(true);
+        });
+
+        it('a synchronous initializer re-entering getOrInit joins instead of double-running', async () => {
+            const once = OnceAsync<number>();
+            let outerCalls = 0;
+            let innerCalls = 0;
+            let inner: Promise<number> | undefined;
+
+            const outer = once.getOrInit(() => {
+                outerCalls++;
+                inner = once.getOrInit(() => {
+                    innerCalls++;
+                    return 7;
+                });
+                return 1;
+            });
+
+            expect(await outer).toBe(1);
+            expect(outerCalls).toBe(1);
+            expect(innerCalls).toBe(0); // inner's own fn never runs
+            expect(inner).toBeDefined();
+            await expect(inner as Promise<number>).resolves.toBe(1); // joins outer's value
+            expect(once.get().unwrap()).toBe(1);
+        });
+
+        it('a synchronous initializer re-entering getOrTryInit joins the outer attempt', async () => {
+            const once = OnceAsync<number>();
+            let outerCalls = 0;
+            let innerCalls = 0;
+            let inner: AsyncResult<number, string> | undefined;
+
+            const outer = once.getOrInit(() => {
+                outerCalls++;
+                inner = once.getOrTryInit(() => {
+                    innerCalls++;
+                    return Ok(7);
+                });
+                return 1;
+            });
+
+            expect(await outer).toBe(1);
+            expect(outerCalls).toBe(1);
+            expect(innerCalls).toBe(0);
+            expect(inner).toBeDefined();
+
+            const innerResult = await (inner as AsyncResult<number, string>);
+            expect(innerResult.isOk()).toBe(true);
+            expect(innerResult.unwrap()).toBe(1); // got the outer's value, not its own 7
+            expect(once.get().unwrap()).toBe(1);
+        });
+
+        it('getOrInit() rejects when the initializer rejects asynchronously, then retries', async () => {
+            const once = OnceAsync<number>();
+            const fn = vi.fn(async () => {
+                await new Promise(r => setTimeout(r, 1));
+                throw new Error('async boom');
+            });
+
+            await expect(once.getOrInit(fn)).rejects.toThrow('async boom');
+            expect(once.isInitialized()).toBe(false);
+
+            const value = await once.getOrInit(async () => 5);
+            expect(value).toBe(5);
+            expect(fn).toHaveBeenCalledTimes(1);
+        });
+
+        it('getOrTryInit() rejects when the initializer rejects asynchronously', async () => {
+            const once = OnceAsync<number>();
+            const fn = vi.fn(async () => {
+                await new Promise(r => setTimeout(r, 1));
+                throw new Error('async boom');
+            });
+
+            await expect(once.getOrTryInit(fn)).rejects.toThrow('async boom');
+            expect(once.isInitialized()).toBe(false);
+
+            const result = await once.getOrTryInit(async () => Ok(5));
+            expect(result.unwrap()).toBe(5);
+        });
+
+        it('stale cleanup from a failed attempt does not clear a newer attempt', async () => {
+            const once = OnceAsync<number>();
+
+            expect(() => {
+                once.getOrInit(() => {
+                    throw new Error('first');
+                });
+            }).toThrow('first');
+
+            const second = once.getOrInit(async () => {
+                await new Promise(r => setTimeout(r, 10));
+                return 2;
+            });
+
+            // Let the first attempt's rejection cleanup run while the second
+            // attempt is still pending.
+            await Promise.resolve();
+
+            expect(once.set(3).isErr()).toBe(true);
+            await expect(second).resolves.toBe(2);
+            expect(once.get().unwrap()).toBe(2);
         });
     });
 

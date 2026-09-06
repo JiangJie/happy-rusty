@@ -101,8 +101,13 @@ export interface OnceAsync<T> {
     /**
      * Sets the contents to `value`.
      *
+     * If an initialization attempt (`getOrInit`/`getOrTryInit`) is currently
+     * in progress, the attempt wins: `set()` returns `Err(value)` without
+     * writing, matching Rust's `OnceLock::set` racing an in-flight
+     * `get_or_init`.
+     *
      * @param value - The value to store.
-     * @returns `Ok(undefined)` if empty, `Err(value)` if already initialized.
+     * @returns `Ok(undefined)` if empty, `Err(value)` if already initialized or being initialized.
      * @example
      * ```ts
      * const once = OnceAsync<number>();
@@ -120,8 +125,12 @@ export interface OnceAsync<T> {
      * Unlike `set()`, this method returns the stored value on success,
      * and returns both the current and passed values on failure.
      *
+     * If an initialization attempt (`getOrInit`/`getOrTryInit`) is currently
+     * in progress, the attempt wins and `Err` is returned; because the current
+     * value has not been committed yet, it is reported as `undefined`.
+     *
      * @param value - The value to store.
-     * @returns `Ok(value)` if empty, `Err([currentValue, passedValue])` if already initialized.
+     * @returns `Ok(value)` if empty, `Err([currentValue, passedValue])` if already initialized or being initialized.
      * @example
      * ```ts
      * const once = OnceAsync<number>();
@@ -142,6 +151,17 @@ export interface OnceAsync<T> {
      *
      * If multiple calls occur concurrently, only the first one will run the
      * initialization function. Other calls will wait for it to complete.
+     * If that in-flight attempt fails (e.g. a `getOrTryInit` returning
+     * `Err`), a waiting `getOrInit` caller whose own fn has not run yet
+     * retries with its own `fn` — matching Rust's `get_or_try_init`.
+     *
+     * **Not reentrant:** `fn` must not call `getOrInit`/`getOrTryInit` on this
+     * same `OnceAsync` and `await` the result — the outer initializer waits on
+     * the inner, which in turn waits on the outer, so neither promise ever
+     * settles (a circular wait). This mirrors Rust, where a `OnceLock`
+     * initializer is likewise not reentrant. A re-entrant call that does *not*
+     * `await` the result instead joins the in-flight attempt and resolves with
+     * its value.
      *
      * @param fn - A function that returns `PromiseLike<Awaited<T>>` or `Awaited<T>` to initialize.
      * @returns A promise that resolves to the stored value (`Awaited<T>`).
@@ -165,7 +185,13 @@ export interface OnceAsync<T> {
      * If `fn` returns `Err`, remains uninitialized.
      *
      * If multiple calls occur concurrently, only the first one will run the
-     * initialization function. Other calls will wait for it to complete.
+     * initialization function. Other calls will wait for it to complete;
+     * if that attempt fails, a waiting caller whose own fn has not run yet
+     * retries with its own `fn`.
+     *
+     * **Not reentrant:** as with `getOrInit`, `fn` must not call
+     * `getOrInit`/`getOrTryInit` on this same `OnceAsync` and `await` the
+     * result, which would wait on itself and never settle.
      *
      * @typeParam E - The error type.
      * @param fn - A function that returns `PromiseLike<Result<Awaited<T>, E>>` or `Result<Awaited<T>, E>`.
@@ -225,6 +251,11 @@ export interface OnceAsync<T> {
      * If initialization is in progress, waits for it to complete.
      * If the cell is uninitialized and no initialization is in progress,
      * the returned promise will resolve when another caller initializes the cell.
+     *
+     * Unlike an in-flight init attempt, `wait()` never rejects: a failed
+     * `getOrTryInit` leaves the cell empty and the waiter keeps waiting until
+     * a later `set()`/init attempt succeeds. This matches Rust's
+     * `OnceLock::wait`, which only returns once the cell is initialized.
      *
      * @returns A promise that resolves to the stored value once initialized.
      * @example
@@ -322,6 +353,42 @@ export function OnceAsync<T>(): OnceAsync<T> {
         waiters = [];
     }
 
+    /**
+     * Claims the in-flight slot for a fresh initialization attempt.
+     *
+     * The joinable `pendingPromise` is created *before* the caller invokes its
+     * initializer, so a synchronously-executing initializer that re-enters
+     * through `getOrInit`/`getOrTryInit` (or calls `set`/`tryInsert`) sees the
+     * slot as taken and joins/waits instead of starting a second attempt.
+     *
+     * The marker is cleared as soon as the attempt settles, and this handler is
+     * registered first so it runs before any waiter's retry handler — a retry
+     * must observe the cell as free to start a fresh attempt.
+     */
+    function claimAttempt(): {
+        attempt: Promise<Value>;
+        commit: (val: Value) => void;
+        fail: (reason: unknown) => void;
+        clear: () => void;
+    } {
+        let commit!: (val: Value) => void;
+        let fail!: (reason: unknown) => void;
+        const attempt = new Promise<Value>((resolve, reject) => {
+            commit = (val: Value) => resolve(val);
+            fail = (reason: unknown) => reject(reason);
+        });
+        pendingPromise = attempt;
+        const clear = (): void => {
+            // A stale attempt must not clear a newer attempt that claimed the
+            // slot after this one failed synchronously.
+            if (pendingPromise === attempt) {
+                pendingPromise = undefined;
+            }
+        };
+        void attempt.then(clear, clear);
+        return { attempt, commit, fail, clear };
+    }
+
     // Use `Promise.resolve(fn())` instead of `async` to preserve sync error behavior:
     // sync throws propagate directly, async errors become rejected Promises.
     function getOrTryInit<E>(
@@ -335,41 +402,84 @@ export function OnceAsync<T>(): OnceAsync<T> {
             >;
         }
 
-        // If already initializing, wait for it
+        // If already initializing, wait for it. If that attempt fails, this
+        // caller's own fn has not run yet, so retry with it — matching Rust's
+        // `get_or_try_init`, where waiters get their chance only after the
+        // current attempt has failed.
         if (pendingPromise) {
             return pendingPromise.then(
                 () => Ok(value as Value),
-                // Previous initialization failed via Err result, let this call try again.
-                // Note: fn's sync errors won't throw here since we're inside a .then() callback,
-                // they will be caught and converted to rejected Promise by Promise.resolve(fn()).
                 () => getOrTryInit(fn),
             );
         }
 
-        // Create a new pending promise for this initialization attempt
-        // fn() is called synchronously here - sync throws propagate directly
-        // Store the Result separately to preserve the original Result
-        const resultPromise = Promise.resolve(fn());
+        const { attempt, commit, fail, clear } = claimAttempt();
+        let resultPromise: Promise<Result<Value, E>>;
+        try {
+            resultPromise = Promise.resolve(fn());
+            void resultPromise
+                .then(result => {
+                    if (result.isOk()) {
+                        const val = result.unwrap();
+                        setValue(val);
+                        commit(val);
+                    } else {
+                        // Err: the attempt fails so any joiners retry, but this
+                        // initiating caller still receives the original Err below.
+                        fail(result);
+                    }
+                }, fail)
+                .catch(fail);
+        } catch (error) {
+            // fn threw synchronously: mark the attempt failed (joiners retry)
+            // and release the slot, while the initiating caller still sees the
+            // sync error directly.
+            fail(error);
+            clear();
+            throw error;
+        }
 
-        pendingPromise = resultPromise
-            .then(result => {
-                if (result.isOk()) {
-                    const val = result.unwrap();
-                    setValue(val);
-                    return val;
-                }
-                // If Err, throw to signal failure (waiters will retry)
-                throw result;
-            })
-            .finally(() => {
-                pendingPromise = undefined;
-            });
-
-        // Wait for pendingPromise to complete (success or failure), then return original Result
-        return pendingPromise.then(
+        // Resolve to the original Result whether the attempt succeeded or not.
+        return attempt.then(
             () => resultPromise,
             () => resultPromise,
         );
+    }
+
+    // Use `Promise.resolve(fn())` instead of `async` to preserve sync error behavior:
+    // sync throws propagate directly, async errors become rejected Promises.
+    function getOrInit(fn: () => PromiseLike<Value> | Value): Promise<Value> {
+        if (initialized) {
+            // Reuse cached promise to avoid creating new Promise on each call
+            return (resolvedPromise ??= Promise.resolve(value as Value));
+        }
+
+        // If already initializing, wait for it. If that attempt fails, this
+        // caller's own fn has not run yet, so retry with it — matching Rust's
+        // `get_or_try_init`, where waiters get their chance only after the
+        // current attempt has failed.
+        if (pendingPromise) {
+            return pendingPromise.then(
+                () => (resolvedPromise ??= Promise.resolve(value as Value)),
+                () => getOrInit(fn),
+            );
+        }
+
+        const { attempt, commit, fail, clear } = claimAttempt();
+        try {
+            void Promise.resolve(fn())
+                .then(result => {
+                    setValue(result);
+                    commit(result);
+                }, fail)
+                .catch(fail);
+        } catch (error) {
+            fail(error);
+            clear();
+            throw error;
+        }
+
+        return attempt;
     }
 
     return Object.freeze<OnceAsync<T>>({
@@ -384,7 +494,7 @@ export function OnceAsync<T>(): OnceAsync<T> {
         },
 
         set(newValue: Value): VoidResult<Value> {
-            if (initialized) {
+            if (initialized || pendingPromise !== undefined) {
                 return Err(newValue);
             }
             setValue(newValue);
@@ -392,37 +502,17 @@ export function OnceAsync<T>(): OnceAsync<T> {
         },
 
         tryInsert(newValue: Value): Result<Value, [Value, Value]> {
-            if (initialized) {
-                return Err([value as Value, newValue]);
+            if (initialized || pendingPromise !== undefined) {
+                const currentValue = initialized
+                    ? (value as Value)
+                    : (undefined as unknown as Value);
+                return Err([currentValue, newValue]);
             }
             setValue(newValue);
             return Ok(newValue);
         },
 
-        // Use `Promise.resolve(fn())` instead of `async` to preserve sync error behavior:
-        // sync throws propagate directly, async errors become rejected Promises.
-        getOrInit(fn: () => PromiseLike<Value> | Value): Promise<Value> {
-            if (initialized) {
-                // Reuse cached promise to avoid creating new Promise on each call
-                return (resolvedPromise ??= Promise.resolve(value as Value));
-            }
-
-            // If already initializing, wait for the pending promise
-            if (pendingPromise) {
-                return pendingPromise;
-            }
-
-            pendingPromise = Promise.resolve(fn())
-                .then(result => {
-                    setValue(result);
-                    return result;
-                })
-                .finally(() => {
-                    pendingPromise = undefined;
-                });
-
-            return pendingPromise;
-        },
+        getOrInit,
 
         getOrTryInit,
 
@@ -449,12 +539,10 @@ export function OnceAsync<T>(): OnceAsync<T> {
                 return (resolvedPromise ??= Promise.resolve(value as Value));
             }
 
-            // If initialization is in progress, wait for it
-            if (pendingPromise) {
-                return pendingPromise;
-            }
-
-            // Otherwise, add to waiters and wait for someone to initialize
+            // Register a waiter that resolves as soon as the cell becomes
+            // initialized. Unlike reusing the in-flight `pendingPromise`,
+            // this never rejects: a failed init attempt leaves the cell empty,
+            // and a later successful `set()`/init attempt still wakes the waiter.
             return new Promise<Value>(resolve => {
                 waiters.push(resolve);
             });
