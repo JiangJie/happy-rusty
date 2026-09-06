@@ -157,6 +157,17 @@ export interface Receiver<T> {
     /**
      * Returns an async iterator that yields values until the channel is closed.
      *
+     * The returned iterator is itself async-iterable and implements the full
+     * iterator protocol, including `return()`: leaving early — a `break`, an
+     * error raised in the loop body, or an explicit `iterator.return()` —
+     * cancels any in-flight `next()` so it no longer holds a spot in the
+     * receive queue and cannot swallow a message intended for another consumer.
+     *
+     * Note that a bare `receive()`/`send()` returns an ordinary promise that
+     * cannot be cancelled. If such a promise is abandoned while pending, it
+     * still occupies the queue and will consume the next message — prefer
+     * `for await` (or an explicit `iterator.return()`) when you may stop early.
+     *
      * @example
      * ```ts
      * for await (const msg of receiver) {
@@ -165,7 +176,7 @@ export interface Receiver<T> {
      * console.log('Channel closed');
      * ```
      */
-    [Symbol.asyncIterator](): AsyncIterator<T>;
+    [Symbol.asyncIterator](): AsyncIterableIterator<T>;
 
     /**
      * Custom `toString` implementation.
@@ -324,6 +335,14 @@ export interface Channel<T> {
     /**
      * Returns an async iterator that yields values until the channel is closed.
      *
+     * The returned iterator is itself async-iterable and implements the full
+     * iterator protocol, including `return()`: leaving early — a `break`, an
+     * error raised in the loop body, or an explicit `iterator.return()` —
+     * cancels any in-flight `next()` so it no longer holds a spot in the
+     * receive queue and cannot swallow a message intended for another
+     * consumer. Note that a bare `receive()`/`send()` promise cannot be
+     * cancelled once pending; see the caveat on the Receiver view.
+     *
      * @example
      * ```ts
      * for await (const msg of channel) {
@@ -331,7 +350,7 @@ export interface Channel<T> {
      * }
      * ```
      */
-    [Symbol.asyncIterator](): AsyncIterator<T>;
+    [Symbol.asyncIterator](): AsyncIterableIterator<T>;
 
     /**
      * Custom `toString` implementation.
@@ -841,16 +860,64 @@ export function Channel<T>(capacity = Infinity): Channel<T> {
         });
     }
 
-    function asyncIterator(): AsyncIterator<T> {
-        return {
-            async next(): Promise<IteratorResult<T>> {
-                const result = await receive();
-                if (result.isNone()) {
-                    return { done: true, value: undefined };
+    function asyncIterator(): AsyncIterableIterator<T> {
+        let finished = false;
+        // Waiters this iterator has parked in `receiveWaitQueue` and that have
+        // not been served yet. `return()` cancels them so an abandoned iterator
+        // does not keep its queue spot and swallow a future message.
+        const parked = new Set<(value: Option<T>) => void>();
+
+        const iterator: AsyncIterableIterator<T> = {
+            [Symbol.asyncIterator](): AsyncIterableIterator<T> {
+                return this;
+            },
+
+            next(): Promise<IteratorResult<T>> {
+                if (finished) {
+                    return Promise.resolve({ done: true, value: undefined });
                 }
-                return { done: false, value: result.unwrap() };
+
+                const result = tryReceive();
+                if (result.isSome()) {
+                    return Promise.resolve({ done: false, value: result.unwrap() });
+                }
+                if (closed) {
+                    return Promise.resolve({ done: true, value: undefined });
+                }
+
+                // Park a cancellable waiter until a value arrives or the
+                // channel closes.
+                return new Promise<IteratorResult<T>>(resolve => {
+                    const waiter = (value: Option<T>): void => {
+                        parked.delete(waiter);
+                        if (value.isNone()) {
+                            resolve({ done: true, value: undefined });
+                        } else {
+                            resolve({ done: false, value: value.unwrap() });
+                        }
+                    };
+                    parked.add(waiter);
+                    receiveWaitQueue.push(waiter);
+                });
+            },
+
+            return(): Promise<IteratorResult<T>> {
+                finished = true;
+                // Remove every still-parked waiter from the queue and settle it
+                // as done, so a later value is delivered to a live consumer.
+                // A waiter that has been served deletes itself from `parked`,
+                // so anything still in the set is guaranteed to be queued and
+                // `indexOf` always finds it.
+                for (const waiter of parked) {
+                    receiveWaitQueue.splice(receiveWaitQueue.indexOf(waiter), 1);
+                    waiter(None);
+                }
+                parked.clear();
+                return Promise.resolve({ done: true, value: undefined });
             },
         };
+
+        return iterator;
     }
 
     function createSender(): Sender<T> {

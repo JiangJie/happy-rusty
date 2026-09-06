@@ -423,6 +423,82 @@ describe('Channel', () => {
             expect(results).toEqual([1, 2]);
             expect(ch.length).toBe(1); // Still has 3
         });
+
+        it('should return an iterator that is itself async-iterable', () => {
+            const ch = Channel<number>(10);
+            const iterator = ch[Symbol.asyncIterator]();
+
+            expect(typeof iterator[Symbol.asyncIterator]).toBe('function');
+            expect(iterator[Symbol.asyncIterator]()).toBe(iterator);
+        });
+
+        it('should support for-await over the iterator object itself', async () => {
+            const ch = Channel<number>(10);
+            ch.trySend(7);
+            ch.close();
+
+            const iterator = ch[Symbol.asyncIterator]();
+            const values: number[] = [];
+            for await (const value of iterator) {
+                values.push(value);
+            }
+
+            expect(values).toEqual([7]);
+        });
+
+        it('return() should cancel a pending next() without losing a later message', async () => {
+            const ch = Channel<number>(10);
+            const iterator = ch[Symbol.asyncIterator]();
+
+            const pendingNext = iterator.next();
+            await new Promise(r => setTimeout(r, 0));
+
+            expect(typeof iterator.return).toBe('function');
+            const result = await (iterator.return as () => Promise<IteratorResult<number>>)();
+            expect(result.done).toBe(true);
+
+            await expect(pendingNext).resolves.toMatchObject({ done: true });
+
+            expect(ch.trySend(1)).toBe(true);
+            expect(ch.length).toBe(1);
+
+            const received = ch.tryReceive();
+            expect(received.isSome()).toBe(true);
+            expect(received.unwrap()).toBe(1);
+        });
+
+        it('an early-returned iterator should not steal messages from other consumers', async () => {
+            const ch = Channel<number>(10);
+
+            // Park a next() on one iterator, then abandon it via return()
+            const abandoned = ch[Symbol.asyncIterator]();
+            const parked = abandoned.next();
+            await new Promise(r => setTimeout(r, 0));
+            await (abandoned.return as () => Promise<IteratorResult<number>>)();
+            await expect(parked).resolves.toMatchObject({ done: true });
+
+            const values: number[] = [];
+            const consumer = (async () => {
+                for await (const value of ch) {
+                    values.push(value);
+                }
+            })();
+
+            await ch.send(1);
+            await ch.send(2);
+            ch.close();
+            await consumer;
+
+            expect(values).toEqual([1, 2]);
+        });
+
+        it('next() after return() is immediately done', async () => {
+            const ch = Channel<number>(10);
+            const iterator = ch[Symbol.asyncIterator]();
+
+            await (iterator.return as () => Promise<IteratorResult<number>>)();
+            await expect(iterator.next()).resolves.toMatchObject({ done: true });
+        });
     });
 
     describe('sender view', () => {
