@@ -13,7 +13,7 @@ import { ASYNC_NONE, None, Some, type AsyncOption, type Option } from '../../cor
 /**
  * A sender view of a channel that can only send values.
  *
- * Created by calling `channel.sender()`. Shares state with the parent channel.
+ * Obtained from the `sender` property of a `Channel`. Shares state with the parent channel.
  *
  * @typeParam T - The type of values that can be sent.
  * @see https://doc.rust-lang.org/std/sync/mpmc/struct.Sender.html
@@ -140,7 +140,7 @@ export interface Sender<T> {
 /**
  * A receiver view of a channel that can only receive values.
  *
- * Created by calling `channel.receiver()`. Shares state with the parent channel.
+ * Obtained from the `receiver` property of a `Channel`. Shares state with the parent channel.
  * Implements `AsyncIterable` for use with `for await...of`.
  *
  * @typeParam T - The type of values that can be received.
