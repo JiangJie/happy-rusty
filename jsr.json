@@ -5,6 +5,6 @@
   "version": "1.10.1",
   "exports": "./src/mod.ts",
   "publish": {
-    "include": ["LICENSE", "README.md", "CHANGELOG.md", "src"]
+    "include": ["LICENSE", "README.md", "src"]
   }
 }
